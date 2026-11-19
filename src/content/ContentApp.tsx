@@ -43,7 +43,7 @@ function Bank() {
   const sel_ = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => setF({ ...f, [k]: e.target.value })
   return (
     <div className="flex flex-col gap-4">
-      <Panel title="Bank at a glance" sub="61 questions per level. The test draws from these pools. Grade numbers show which grade each pool checks.">
+      <Panel title="Bank at a glance" sub="100 questions per level. The test draws from these pools. Grade numbers show which grade each pool checks.">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-soft"><th className="px-2 py-1 text-start">Level</th><th className="px-2 text-start">Grades</th>{POOLS.map(p => <th key={p} className="px-2 text-end">{p}</th>)}<th className="px-2 text-end">Match</th></tr></thead>
