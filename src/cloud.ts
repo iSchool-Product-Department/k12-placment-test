@@ -6,11 +6,10 @@ const URL_ = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 export const cloudOn = !!(URL_ && KEY)
 
-const TOKEN = 'ischool.placement.token'
-const get = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
-const set = (k: string, v: string | null) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k) } catch { /* private mode */ } }
-export const token = () => get(TOKEN)
-export const signOut = () => set(TOKEN, null)
+declare const __ADMIN_KEY__: string | null
+/** Admin and content open only where the service key exists: the local dev server. A build is the student test alone. */
+export const adminKey = __ADMIN_KEY__
+export const studentOnly = import.meta.env.PROD
 
 const headers = (auth = KEY!) => ({ apikey: KEY!, Authorization: `Bearer ${auth}`, 'Content-Type': 'application/json' })
 
@@ -19,18 +18,10 @@ export async function saveTest(rec: TestRecord) {
   if (!r.ok) throw new Error(`save ${r.status}`)
 }
 
-export async function signIn(email: string, password: string) {
-  const r = await fetch(`${URL_}/auth/v1/token?grant_type=password`, { method: 'POST', headers: headers(), body: JSON.stringify({ email, password }) })
-  if (!r.ok) throw new Error('Wrong email or password.')
-  set(TOKEN, (await r.json()).access_token)
-}
-
-/** All finished tests. Throws 'auth' when the sign-in has expired. */
+/** All finished tests, read with the service key (local dev only). */
 export async function fetchTests(): Promise<TestRecord[]> {
-  const t = token()
-  if (!t) throw new Error('auth')
-  const r = await fetch(`${URL_}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: headers(t) })
-  if (r.status === 401 || r.status === 403) { signOut(); throw new Error('auth') }
+  if (!adminKey) throw new Error('Add SUPABASE_SERVICE_KEY to .env.local, then restart npm run dev.')
+  const r = await fetch(`${URL_}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: adminKey, Authorization: `Bearer ${adminKey}` } })
   if (!r.ok) throw new Error(`load ${r.status}`)
   return (await r.json()).map((x: { data: TestRecord }) => x.data)
 }

@@ -7,9 +7,8 @@ create table if not exists tests (
 );
 alter table tests enable row level security;
 
--- Only signed-in team members can read results. Students cannot read anything.
+-- No read policies: students cannot read anything. The admin reads with the service key, on your laptop only.
 drop policy if exists "team reads tests" on tests;
-create policy "team reads tests" on tests for select to authenticated using (true);
 
 -- Students save through this function only. A finished test is never overwritten (no retakes).
 create or replace function save_test(rec jsonb) returns void

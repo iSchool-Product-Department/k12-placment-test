@@ -5,6 +5,7 @@ import StudentApp from './student/StudentApp'
 import AdminApp from './admin/AdminApp'
 import ContentApp from './content/ContentApp'
 import type { Lang } from './i18n'
+import { studentOnly } from './cloud'
 
 // Plain #name hashes (student, admin, admin-<id>, content-rules) so links work everywhere, including inside artifacts.
 const read = () => (location.hash.replace(/^#\/?/, '') || 'student').split(/[-/]/)
@@ -31,7 +32,8 @@ export default function App() {
   const [lang, setLang] = useState<Lang>('en')
   useEffect(() => { const f = () => { setRoute(read()); window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
   const go = (h: string) => { location.hash = h.replace(/\//g, '-') }
-  const view = route[0]
+  // A deployed build is the test alone: any other hash shows the student view, with no tabs.
+  const view = studentOnly ? 'student' : route[0]
   const studentRtl = view === 'student' && lang === 'ar'
   useEffect(() => { document.documentElement.lang = studentRtl ? 'ar' : 'en'; document.documentElement.dir = studentRtl ? 'rtl' : 'ltr' }, [studentRtl])
   const tabs: [string, string, React.ReactNode][] = [['student', 'Student', <GraduationCap size={16} />], ['admin', 'Admin', <LayoutDashboard size={16} />], ['content', 'Content', <Library size={16} />]]
@@ -41,13 +43,13 @@ export default function App() {
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4" dir="ltr">
           <img src="./ischool-logo-white.png" alt="iSchool" className="h-8 w-auto" />
           <span className="hidden font-[var(--font-head)] text-lg font-bold sm:inline">Placement Test</span>
-          <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
+          {!studentOnly && <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
             {tabs.map(([k, l, i]) => (
               <button key={k} onClick={() => go(k)} aria-pressed={view === k} className={clsx('flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-extrabold', view === k ? 'bg-white text-deep' : 'text-white/90 hover:text-white')}>{i}<span className="hidden sm:inline">{l}</span></button>
             ))}
-          </nav>
+          </nav>}
           {view === 'student' && (
-            <div className="flex rounded-full bg-deep/50 p-1">
+            <div className={clsx("flex rounded-full bg-deep/50 p-1", studentOnly && "ms-auto")}>
               {(['en', 'ar'] as Lang[]).map(l => <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l} className={clsx('rounded-full px-2.5 py-1.5 text-sm font-extrabold', lang === l ? 'bg-white text-deep' : 'text-white/90')}>{l === 'en' ? 'EN' : 'عربي'}</button>)}
             </div>
           )}
