@@ -10,6 +10,7 @@ import { T, bandOf, type Band, type Lang } from '../i18n'
 import { store, useConfig } from '../store'
 import { QuestionView, roomy, stableShuffle } from '../question/QuestionView'
 import { hasSim } from '../question/Visual'
+import { scenePlays } from '../question/Scene'
 import { useDragSensors } from '../question/DragAnswers'
 import { GradeIcon } from '../grades'
 
@@ -215,7 +216,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const pct = (n / total) * 100
   const ready = value != null && (q.t !== 'Order' || (value as string[]).filter(Boolean).length === q.o.filter(Boolean).length)
     && (q.t !== 'Sort' && q.t !== 'Match' || Object.keys(value as object).length === q.o.filter(Boolean).length)
-  const stage = hasSim(q)
+  const stage = hasSim(q) || scenePlays(q)
   const submit = () => {
     if (!ready || locked) return
     sec.current = (Date.now() - t0.current) / 1000

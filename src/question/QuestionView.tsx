@@ -111,7 +111,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
       <div className={clsx('flex flex-col gap-3', side && 'md:grid md:items-center md:gap-5', side && (wide ? 'md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : 'md:grid-cols-2'))}>
       {q.img && !hasSim(q)
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[28vh] w-auto max-w-full rounded-2xl object-contain" />
-        : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
+        : <QuestionVisual q={q} lang={lang} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
       <div className="contents" {...(locked ? { inert: '' } : {})}>
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
       {q.t === 'Order' && (isBlockOrder(q)

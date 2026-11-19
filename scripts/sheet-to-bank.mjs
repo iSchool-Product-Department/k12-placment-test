@@ -74,10 +74,51 @@ async function picture(url) {
   return `q/${name}`
 }
 
+// Ages 6 to 9 (levels 1 and 2): a card with no emoji gets a drawn icon from its words. Things come before
+// actions ("Play sound" is sound). A question gets icons only if every card gets a different one, so a Sort
+// never gives its answer away with two matching icons. A new word needs a line here (and in icons.tsx if the icon is new).
+const THING = {
+  keyboard: 'keyboard', mouse: 'mouse', screen: 'monitor', monitor: 'monitor', headphones: 'headphones', microphone: 'mic', mic: 'mic',
+  camera: 'camera', printer: 'printer', speaker: 'speaker', photo: 'image', picture: 'image', image: 'image', background: 'image',
+  voice: 'voice', speech: 'voice', sound: 'sound', volume: 'sound', video: 'video', calculator: 'calculator', phone: 'phone',
+  light: 'lamp', doorbell: 'bell', png: 'image', mp3: 'music', txt: 'file', mp4: 'video', folder: 'folder', files: 'folder',
+  bin: 'trash', downloads: 'download', menu: 'menu', browser: 'globe', coin: 'coin', star: 'star', point: 'star', spike: 'spike',
+  lava: 'flame', obstacle: 'obstacle', door: 'door', pause: 'pause', score: 'trophy', cat: 'cat', apple: 'apple', fish: 'fish',
+  dark: 'moon', hungry: 'food', raining: 'rain', cold: 'snow', clap: 'clap', jump: 'jump', step: 'steps',
+  button: 'button', label: 'label', title: 'title', sprite: 'sprite', character: 'sprite', drawing: 'palette', password: 'lock',
+  idea: 'lamp', story: 'book', model: 'brain', classifier: 'brain', prompt: 'talk', reply: 'talk', home: 'house',
+  school: 'school', space: 'keyboard', reset: 'reset', list: 'list', shark: 'fish', flower: 'flower', robot: 'robot',
+}
+const ACTION = {
+  save: 'save', delete: 'trash', mute: 'mute', click: 'click', tap: 'hand', touch: 'hand', start: 'play', play: 'play', stop: 'stop',
+  send: 'send', post: 'share', tell: 'talk', say: 'talk', find: 'search', view: 'eye', show: 'eye', hide: 'hide', walk: 'steps',
+  forward: 'up', backward: 'down', back: 'undo', reset: 'reset', test: 'check', check: 'check', train: 'brain', build: 'build',
+  plan: 'pencil', release: 'rocket', run: 'rocket', read: 'book', type: 'keyboard', typed: 'keyboard', record: 'pencil',
+  collect: 'box', wet: 'water', rinse: 'water', rub: 'hand', choose: 'click', correct: 'pencil', if: 'if', repeat: 'repeat', when: 'click', game: 'game', turn: 'turn',
+}
+function wordIcon(text) {
+  const words = text.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(Boolean)
+  const find = map => { for (const w of words) { const hit = map[w] ?? map[w.replace(/(es|s)$/, '')] ?? map[w.replace(/s$/, '')]; if (hit) return hit } }
+  if (/turn left/i.test(text)) return 'left'
+  if (/turn right/i.test(text)) return 'right'
+  if (/press(es)? (a )?key/i.test(text)) return 'keyboard'
+  if (/\bturns\b/i.test(text)) return 'turn'
+  return find(THING) || find(ACTION) || ''
+}
+function autoIcons(r, t) {
+  if (+r[C.lv] > 2 || r[C.oimg].trim() || ['Type answer', 'Code MCQ'].includes(t)) return null
+  const cards = [1, 2, 3, 4].map(k => r[optCol(k, 'EN')] || '').map(s => (t === 'Match' || t === 'Sort' ? s.split('=')[0] : s).trim())
+  const got = cards.map(s => (s ? wordIcon(s) : ''))
+  const n = cards.filter(Boolean).length
+  if (t === 'Text MCQ' && cards.some(s => s.split(/\s+/).length > 3)) return null // long answers are ideas, not things
+  return got.filter(Boolean).length === n && new Set(got.filter(Boolean)).size === n ? got : null
+}
+
 const bank = []
 for (const r of rows.filter(r => r[C.id])) {
   const oimg = await Promise.all(r[C.oimg].split('\n').filter(s => s.trim()).map(picture))
-  const oicon = icons(r)
+  let oicon = icons(r)
+  if (!oicon.some(Boolean)) oicon = autoIcons(r, r[C.t]) || oicon
   bank.push({
     id: r[C.id], old: r[C.old], lv: +r[C.lv], grade: r[C.grade], pool: r[C.pool], strand: r[C.strand], d: r[C.d], t: r[C.t],
     q: r[C.q], qa: r[C.qa], scr: r[C.scr], why: r[C.why], src: r[C.src],
