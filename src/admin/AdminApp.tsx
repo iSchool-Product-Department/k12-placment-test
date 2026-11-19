@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { AlertTriangle, ArrowLeft, Check, Download, Info, LayoutGrid, List, RotateCcw, Search, X } from 'lucide-react'
 import clsx from 'clsx'
@@ -7,6 +7,7 @@ import { groupName } from '../engine/engine'
 import { GRADES, GradeIcon } from '../grades'
 import { BY_ID } from '../data/ladder'
 import { store, useTests } from '../store'
+import { cloudOn, signIn, signOut, token } from '../cloud'
 import { QuestionView, KeyLine, answerText } from '../question/QuestionView'
 import { Journey } from './Journey'
 import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when, TIER_NO } from './labels'
@@ -16,7 +17,40 @@ const TIERS: Tier[] = ['Explorers', 'Creators', 'Innovators']
 const levelLabel = (lv: number) => `Grade ${2 * lv - 1} - ${2 * lv}`
 const took = (t: TestRecord) => (t.finishedAt ? `${mins(t.finishedAt - t.createdAt)} min` : '')
 
-export default function AdminApp({ route, go }: { route: string[]; go: (h: string) => void }) {
+export default function AdminApp(props: { route: string[]; go: (h: string) => void }) {
+  const [state, setState] = useState<'login' | 'loading' | 'ready' | string>(cloudOn ? (token() ? 'loading' : 'login') : 'ready')
+  useEffect(() => {
+    if (state !== 'loading') return
+    store.loadRemote().then(() => setState('ready'), e => setState(e.message === 'auth' ? 'login' : 'Could not load tests. Refresh to try again.'))
+  }, [state])
+  if (state === 'login') return <SignIn done={() => setState('loading')} />
+  if (state === 'loading') return <p className="py-16 text-center font-bold text-soft">Loading tests...</p>
+  if (state !== 'ready') return <p className="py-16 text-center font-bold text-bad">{state}</p>
+  return <Admin {...props} />
+}
+
+function SignIn({ done }: { done: () => void }) {
+  const [email, setEmail] = useState('')
+  const [pw, setPw] = useState('')
+  const [err, setErr] = useState('')
+  const [busy, setBusy] = useState(false)
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault(); setBusy(true); setErr('')
+    signIn(email.trim(), pw).then(done, (x: Error) => { setErr(x.message); setBusy(false) })
+  }
+  const field = 'w-full rounded-xl border-2 border-line bg-white px-3 py-2.5 font-semibold text-deep outline-none focus:border-blue'
+  return (
+    <form onSubmit={submit} className="mx-auto mt-16 flex max-w-sm flex-col gap-3 rounded-3xl border border-line bg-white p-6 shadow-[var(--shadow-card)]">
+      <div><p className="m-0 text-sm font-extrabold text-orange-deep">Admin</p><h1 className="m-0 text-2xl text-deep">Sign in</h1><p className="m-0 text-sm text-soft">Team accounts only.</p></div>
+      <label className="text-sm font-bold text-deep">Email<input type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} className={field} /></label>
+      <label className="text-sm font-bold text-deep">Password<input type="password" autoComplete="current-password" required value={pw} onChange={e => setPw(e.target.value)} className={field} /></label>
+      {err && <p role="alert" className="m-0 text-sm font-bold text-bad">{err}</p>}
+      <button disabled={busy} className="rounded-full bg-blue px-4 py-2.5 font-extrabold text-white disabled:opacity-60">{busy ? 'Signing in...' : 'Sign in'}</button>
+    </form>
+  )
+}
+
+function Admin({ route, go }: { route: string[]; go: (h: string) => void }) {
   const tests = useTests()
   // PRD 7.1: finished tests only.
   const done = useMemo(() => tests.filter(t => t.status === 'done'), [tests])
@@ -52,7 +86,9 @@ function TestsHome({ tests, open }: { tests: TestRecord[]; open: (id: string) =>
         <div><p className="m-0 text-sm font-extrabold text-orange-deep">Admin</p><h1 className="m-0 text-3xl text-deep">Placement tests</h1><p className="m-0 text-sm text-soft">{tests.length} finished tests. Unfinished tests are not shown.</p></div>
         <div className="flex flex-wrap gap-2">
           <Seg value={view} set={setView} items={[['list', <><List size={15} /> Tests</>], ['groups', <><LayoutGrid size={15} /> Groups</>]]} />
-          <Confirm onYes={() => store.reset()} className="flex items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-sm font-bold text-soft hover:border-blue" ask="Sure? Click again"><RotateCcw size={14} /> Reset demo</Confirm>
+          {cloudOn
+            ? <button onClick={() => { signOut(); location.reload() }} className="rounded-full border-2 border-line bg-white px-3 text-sm font-bold text-soft hover:border-blue">Sign out</button>
+            : <Confirm onYes={() => store.reset()} className="flex items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-sm font-bold text-soft hover:border-blue" ask="Sure? Click again"><RotateCcw size={14} /> Reset demo</Confirm>}
         </div>
       </div>
       {view === 'list' ? (

@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { DEFAULT_CONFIG, isExpired, seeded, simulate, startLevel } from './engine/engine'
 import type { Config, TestRecord } from './engine/types'
 import { BANK } from './data/ladder'
+import { cloudOn, fetchTests, saveTest } from './cloud'
 
 /**
  * Storage adapter. The demo keeps everything in this browser (localStorage).
@@ -10,30 +11,55 @@ import { BANK } from './data/ladder'
  */
 const KEY = 'ischool.placement.v2.tests.4'
 const CFG_KEY = 'ischool.placement.v2.config'
+const PENDING = 'ischool.placement.pending'
 
 const safeGet = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
 const safeSet = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* private mode */ } }
 
-let tests: TestRecord[] = load()
+let tests: TestRecord[] = cloudOn ? loadLocal() ?? [] : loadLocal() ?? seed()
 let config: Config = { ...DEFAULT_CONFIG, ...JSON.parse(safeGet(CFG_KEY) || '{}') }
 const subs = new Set<() => void>()
 const emit = () => subs.forEach(f => f())
 
-function load(): TestRecord[] {
+function loadLocal(): TestRecord[] | null {
   const raw = safeGet(KEY)
   if (raw) try { return (JSON.parse(raw) as TestRecord[]).map(t => (isExpired(t) ? { ...t, status: 'expired' as const } : t)) } catch { /* fall through */ }
-  return seed()
+  return null
 }
 function persist() { safeSet(KEY, JSON.stringify(tests)); emit() }
 
+/** Cloud: every real save goes to Supabase. Ids that failed stay queued and are sent again on the next save or page load. */
+let pending: string[] = JSON.parse(safeGet(PENDING) || '[]')
+async function push(ids: string[]) {
+  pending = [...new Set([...pending, ...ids])]; safeSet(PENDING, JSON.stringify(pending))
+  for (const id of pending) {
+    const rec = tests.find(t => t.id === id)
+    try { if (rec) await saveTest(rec); pending = pending.filter(x => x !== id) } catch { /* offline: retry later */ }
+  }
+  safeSet(PENDING, JSON.stringify(pending))
+}
+if (cloudOn && pending.length) push([])
+
+/** Admin, cloud mode: finished tests from every device. null until loaded. */
+let remote: TestRecord[] | null = null
+let merged: TestRecord[] = []
+/** Remote tests plus this browser's simulated ones (Content > Simulator). Cached so React sees a stable list. */
+const view = () => {
+  const next = [...(remote ?? []), ...tests.filter(t => t.simulated)]
+  if (next.length !== merged.length || next.some((t, i) => t !== merged[i])) merged = next
+  return merged
+}
+
 export const store = {
   subscribe(f: () => void) { subs.add(f); return () => subs.delete(f) },
-  tests: () => tests,
+  tests: () => (cloudOn ? view() : tests),
+  async loadRemote() { remote = await fetchTests(); emit() },
   config: () => config,
   save(rec: TestRecord) {
     const i = tests.findIndex(t => t.id === rec.id)
     tests = i >= 0 ? tests.map(t => (t.id === rec.id ? rec : t)) : [rec, ...tests]
     persist()
+    if (cloudOn && !rec.simulated) push([rec.id])
   },
   /** PRD 6.8: the open test in this browser, if it is less than 24 hours old. */
   resumable: () => tests.find(t => t.status === 'in_progress' && !t.simulated && !isExpired(t)),
