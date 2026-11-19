@@ -142,7 +142,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   }, [q?.id])
   if (!q) return null
   const n = rec.answers.length
-  const ready = value != null && (q.t !== 'Order' || (value as string[]).length === q.o.filter(Boolean).length)
+  const ready = value != null && (q.t !== 'Order' || (value as string[]).filter(Boolean).length === q.o.filter(Boolean).length)
     && (q.t !== 'Sort' && q.t !== 'Match' || Object.keys(value as object).length === q.o.filter(Boolean).length)
   const submit = () => {
     if (!ready) return
