@@ -12,3 +12,6 @@ yarn-debug.log*
 yarn-error.log*
 /.changelog
 .npm/
+dist/*.tsbuildinfo
+_K12*.pptx
+.env.local
