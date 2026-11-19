@@ -480,7 +480,7 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
     <DndContext sensors={sensors} collisionDetection={collide} onDragStart={onStart} onDragMove={onMove} onDragEnd={onEnd} onDragCancel={() => setDrag(null)}>
       <div className="flex flex-col gap-2">
         <p className="m-0 text-sm text-soft">{hint}</p>
-        <div ref={box} className="relative grid grid-cols-2 gap-x-12 gap-y-2 sm:gap-x-20">
+        <div ref={box} className="relative grid grid-cols-2 gap-x-8 gap-y-2 sm:gap-x-20">
           <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
             {lines.map(({ l, a, b }) => (
               <g key={l} stroke={colorOf(l)} fill={colorOf(l)}>
@@ -499,7 +499,7 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
               const id = 'L' + l, linked = value[l] != null
               return (
                 <MatchCard key={id} id={id} disabled={review} onTap={() => tap(id)} cardRef={n => { cards.current[id] = n }}
-                  className={cls(id, linked, 'L')} style={linked ? { borderColor: colorOf(l) } : undefined}>
+                  className={clsx(cls(id, linked, 'L'), 'max-sm:flex-wrap max-sm:justify-center max-sm:text-center')} style={linked ? { borderColor: colorOf(l) } : undefined}>
                   {linked && badge(l)}
                   {art(l)}
                   {p.left && <span>{p.left}</span>}

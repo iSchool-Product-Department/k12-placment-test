@@ -104,7 +104,7 @@ function Preview({ q }: { q: Question }) {
   const [v, setV] = useState<AnswerValue | null>(null)
   const band = q.lv <= 2 ? 'kids' : q.lv <= 4 ? 'teen' : 'pro'
   return (
-    <section className="sticky top-20 self-start rounded-3xl border border-line bg-white p-5 shadow-[var(--shadow-card)]">
+    <section className="self-start lg:sticky lg:top-20 rounded-3xl border border-line bg-white p-5 shadow-[var(--shadow-card)]">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <span className="text-sm font-extrabold text-deep">{q.id}</span>
         <span className="text-xs text-soft">{q.old ? `v1: ${q.old}` : 'new in v2'} · Level {q.lv} · {q.grade} · {q.strand}</span>
@@ -259,7 +259,7 @@ function Tiers() {
         {(['Explorers', 'Creators', 'Innovators'] as Tier[]).map(t => <div key={t} className="mb-2 flex items-center gap-3"><TierBadge tier={t} /><span className="text-sm">{TIER_STYLE[t].blurb}</span></div>)}
       </Panel>
       <Panel title="How strength is worked out" sub="Only answers at the final level count. Harder questions count more.">
-        <div className="mb-3 grid grid-cols-5 gap-2 text-center">
+        <div className="mb-3 grid grid-cols-3 gap-2 text-center sm:grid-cols-5">
           {(Object.keys(POINTS) as (keyof typeof POINTS)[]).map(d => <div key={d} className="rounded-2xl bg-sky p-2.5"><div className="text-2xl font-extrabold text-deep">{POINTS[d]}</div><div className="text-xs font-bold text-soft">{d}</div></div>)}
         </div>
         <p className="m-0 text-sm">Strength = points earned ÷ points possible × 100.</p>

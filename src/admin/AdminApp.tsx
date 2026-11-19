@@ -208,7 +208,7 @@ function SummaryCard({ rec }: { rec: TestRecord }) {
         </dl>
       </div>
       {/* The group: grade (with its roadmap track), level and tier with its number. */}
-      <div className={clsx('flex min-w-[280px] flex-col gap-3 rounded-2xl p-4', s.bg)}>
+      <div className={clsx('flex flex-col gap-3 rounded-2xl p-4 md:min-w-[280px]', s.bg)}>
         <div>
           <span className="text-xs font-bold text-soft">Group</span>
           <div className={clsx('font-[var(--font-head)] text-3xl font-extrabold leading-tight', s.fg)}><Copy text={groupName(rec)} /></div>

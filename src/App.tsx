@@ -41,7 +41,7 @@ export default function App() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 bg-blue text-white shadow-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4" dir="ltr">
-          <img src="./ischool-logo-white.png" alt="iSchool" className="h-8 w-auto" />
+          <img src="./ischool-logo-white.png" alt="iSchool" className="h-7 w-auto sm:h-8" />
           <span className="hidden font-[var(--font-head)] text-lg font-bold sm:inline">Placement Test</span>
           {!studentOnly && <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
             {tabs.map(([k, l, i]) => (

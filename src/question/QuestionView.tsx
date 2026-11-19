@@ -39,7 +39,7 @@ function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; 
   // Pictures must be big enough to read (PRD 6.6). Icons are simpler and can be smaller.
   // Pictures fill the tile (up to 220 px wide), so drawings with margins stay readable.
   if (tile) return <span className="flex w-full flex-col items-center gap-2 text-center">{pic ? <img src={picSrc(pic)} alt="" className="h-auto max-h-[150px] w-full max-w-[220px] object-contain" /> : <Art icon={icon} size={64} />}{label}</span>
-  return <span className="flex items-center gap-3"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
+  return <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [overflow-wrap:anywhere]"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
 }
 
 export function speak(q: Question, lang: Lang) {
@@ -128,7 +128,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
                 className={clsx('flex items-center gap-3 rounded-2xl border-2 bg-white px-4 text-start font-bold transition-colors', plain ? 'min-h-[64px] py-3.5 text-lg' : 'min-h-[52px] py-2.5',
-                  tiles ? 'flex-col justify-center px-2 py-3 text-lg' : band === 'kids' && !side && 'sm:flex-col sm:justify-center sm:text-center',
+                  tiles ? 'min-w-0 flex-col justify-center px-2 py-3 text-[15px] hyphens-auto [overflow-wrap:anywhere] sm:text-lg' : band === 'kids' && !side && 'sm:flex-col sm:justify-center sm:text-center',
                   on && !review && 'border-blue bg-sky shadow-[0_0_0_4px_rgba(5,172,255,.18)]',
                   !on && !right && 'border-line hover:border-bright',
                   review && on && !right && 'border-bad bg-red-50', right && 'border-ok bg-green-50')}>
