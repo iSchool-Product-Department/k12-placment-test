@@ -205,19 +205,21 @@ export function Blocks({ scr }: { scr: string }) {
 
 /* ------------------------------------------------------------------ code with light syntax colours */
 const KW = /\b(def|return|if|elif|else|for|while|in|range|print|var|let|const|function|int|float|void|public|class|true|false|True|False|None|new|try|catch|import|from|and|or|not|async|await|List|String|Debug\.Log|console\.log)\b/
-export function Code({ src }: { src: string }) {
+/** Code with light syntax colours. Shared by code questions and the code order editor. */
+export function CodeText({ src }: { src: string }) {
   const tokens = src.split(/("[^"]*"|'[^']*'|\/\/.*|#.*|\b\d+(?:\.\d+)?\b|\b\w+\b|[^\w\s]|\s+)/).filter(Boolean)
+  return <>{tokens.map((t, i) => {
+    const cls = /^["']/.test(t) ? 'text-[#C76316]' : /^(\/\/|#)/.test(t) ? 'text-soft italic' : /^\d/.test(t) ? 'text-[#0F8F6B]' : KW.test(t) && t.match(KW)![0] === t ? 'text-deep font-semibold' : ''
+    return <span key={i} className={cls}>{t}</span>
+  })}</>
+}
+export function Code({ src }: { src: string }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm" dir="ltr">
       <div className="flex items-center gap-1.5 border-b border-line bg-sky px-3 py-1.5">
         <i className="h-2.5 w-2.5 rounded-full bg-orange" /><i className="h-2.5 w-2.5 rounded-full bg-gold" /><i className="h-2.5 w-2.5 rounded-full bg-bright" />
       </div>
-      <pre className="mono m-0 overflow-x-auto p-4 text-[14px] leading-relaxed text-ink">
-        {tokens.map((t, i) => {
-          const cls = /^["']/.test(t) ? 'text-[#C76316]' : /^(\/\/|#)/.test(t) ? 'text-soft italic' : /^\d/.test(t) ? 'text-[#0F8F6B]' : KW.test(t) && t.match(KW)![0] === t ? 'text-deep font-semibold' : ''
-          return <span key={i} className={cls}>{t}</span>
-        })}
-      </pre>
+      <pre className="mono m-0 overflow-x-auto p-4 text-[14px] leading-relaxed text-ink"><CodeText src={src} /></pre>
     </div>
   )
 }

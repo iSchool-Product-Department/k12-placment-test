@@ -14,6 +14,8 @@ import clsx from 'clsx'
 import { GripVertical } from 'lucide-react'
 import type { Question } from '../engine/types'
 import { correctAnswer, keysOf, matchPairs, sortBoxes } from '../engine/engine'
+import { codeFile, codeIndents } from './codeLines'
+import { CodeText } from './Visual'
 import type { Lang } from '../i18n'
 
 const L = 'ABCD'
@@ -52,30 +54,37 @@ function Zone({ id, disabled, onTap, className, children }: { id: string; disabl
 }
 
 // ---------------------------------------------------------------- Order
-export function OrderAnswer({ q, value, set, salt, review, hint, big, shuffle, label, clear }: Common & { value: string[]; set: (v: string[] | null) => void; clear: string }) {
+type OrderProps = Common & { value: string[]; set: (v: string[] | null) => void; clear: string }
+
+/** Shared by the card and code editor versions: slots, tray, swap on drop, tap to place. */
+function useOrder({ q, value, set, salt, shuffle }: OrderProps) {
   const keys = keysOf(q).map(i => L[i])
   const slots = keys.map((_, i) => value[i] || '')
   const pool = useMemo(() => shuffle(keys, q.id + salt), [q.id])
-  const tray = pool.filter(k => !slots.includes(k))
   const [active, setActive] = useState<string | null>(null)
-  const sensors = useDragSensors()
-
   const put = (k: string, to: number | 'tray') => {
     const s = [...slots], from = s.indexOf(k)
     if (to === 'tray') { if (from >= 0) s[from] = '' }
     else { const prev = s[to]; s[to] = k; if (from >= 0 && from !== to) s[from] = prev }
     set(s.some(Boolean) ? s : null)
   }
-  const end = ({ active: a, over }: DragEndEvent) => {
-    setActive(null)
-    const k = String(a.id)
-    if (!over || over.id === 'tray') return put(k, 'tray')
-    put(k, +String(over.id).slice(1))
+  const ctx = {
+    sensors: useDragSensors(), collisionDetection: collide,
+    onDragStart: (e: DragStartEvent) => setActive(String(e.active.id)),
+    onDragCancel: () => setActive(null),
+    onDragEnd: ({ active: a, over }: DragEndEvent) => {
+      setActive(null)
+      put(String(a.id), !over || over.id === 'tray' ? 'tray' : +String(over.id).slice(1))
+    },
   }
-  const right = (i: number) => q.o[L.indexOf(slots[i])] === q.o[i]
+  return { slots, tray: pool.filter(k => !slots.includes(k)), active, put, ctx, right: (i: number) => q.o[L.indexOf(slots[i])] === q.o[i] }
+}
 
+export function OrderAnswer(p: OrderProps) {
+  const { review, hint, big, label, clear, set } = p
+  const { slots, tray, active, put, ctx, right } = useOrder(p)
   return (
-    <DndContext sensors={sensors} collisionDetection={collide} onDragStart={(e: DragStartEvent) => setActive(String(e.active.id))} onDragEnd={end} onDragCancel={() => setActive(null)}>
+    <DndContext {...ctx}>
       <div className="flex flex-col gap-3">
         <p className="m-0 text-sm text-soft">{hint}</p>
         <ol className="m-0 flex list-none flex-col gap-2 p-0">
@@ -103,6 +112,73 @@ export function OrderAnswer({ q, value, set, salt, review, hint, big, shuffle, l
         )}
       </div>
       <DragOverlay dropAnimation={null}>{active && <div className={clsx(cardCls(big), 'border-blue shadow-[var(--shadow-pop)]')}>{label(active)}</div>}</DragOverlay>
+    </DndContext>
+  )
+}
+
+/**
+ * "Put the lines in order" for levels 3 to 6 (PRD 6.5): a light editor with a file tab, line numbers
+ * and a caret on the next empty line. Each line carries its real indent, so the program reads right
+ * only when the order is right.
+ */
+export function CodeOrderAnswer(p: OrderProps) {
+  const { q, review, hint, clear, set } = p
+  const { slots, tray, active, put, ctx, right } = useOrder(p)
+  const lines = keysOf(q).map(i => q.o[i])
+  const { lang, file, unit } = codeFile(lines)
+  const indents = codeIndents(lines)
+  const text = (k: string) => q.o[L.indexOf(k)]
+  const indentOf = (k: string) => indents[L.indexOf(k)] * unit
+  const next = slots.indexOf('')
+  const chip = 'mono flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-[13px] leading-snug text-ink sm:text-[14px]'
+
+  return (
+    <DndContext {...ctx}>
+      <div className="flex flex-col gap-3">
+        <p className="m-0 text-sm text-soft">{hint}</p>
+        <div dir="ltr" className="overflow-hidden rounded-2xl border border-line bg-white">
+          <div className="flex items-end justify-between border-b border-line bg-mist px-2 pt-2">
+            <span className="mono rounded-t-lg border border-b-0 border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-ink">{file}</span>
+            <span className="pb-1.5 pe-2 text-xs font-bold text-soft">{lang}</span>
+          </div>
+          <ol className="m-0 list-none py-2 ps-0">
+            {slots.map((k, i) => (
+              <li key={i}>
+                <Zone id={'s' + i} disabled={review} className="flex min-h-[44px] items-stretch border-2 border-transparent">
+                  <span className={clsx('mono w-10 shrink-0 select-none pe-3 pt-[11px] text-end text-[13px]', !review && i === next ? 'font-semibold text-blue' : 'text-soft/70')}>{i + 1}</span>
+                  <div className="flex min-w-0 flex-1 items-center pe-2">
+                    {k ? (
+                      <Card id={k} disabled={review} onTap={() => put(k, 'tray')}
+                        className={clsx('group flex w-full items-center rounded-md px-2 py-1.5 text-start', review ? (right(i) ? 'bg-green-50' : 'bg-red-50') : 'hover:bg-sky')}>
+                        <code className="mono min-w-0 flex-1 whitespace-pre-wrap break-words text-[13px] leading-relaxed text-ink sm:text-[14px]"
+                          style={{ paddingInlineStart: `${indentOf(k)}ch`, backgroundImage: indentOf(k) ? `repeating-linear-gradient(to right, var(--color-line) 0 1px, transparent 1px ${unit}ch)` : undefined, backgroundSize: `${indentOf(k)}ch 100%`, backgroundRepeat: 'no-repeat' }}>
+                          <CodeText src={text(k)} />
+                        </code>
+                        {!review && <GripVertical size={16} className="shrink-0 text-soft opacity-40 group-hover:opacity-100" aria-hidden="true" />}
+                      </Card>
+                    ) : (
+                      <span className={clsx('flex h-8 w-full items-center rounded-md border border-dashed px-2', i === next && !review ? 'border-bright bg-sky/50' : 'border-line')}>
+                        {i === next && !review && <span className="h-5 w-0.5 bg-blue motion-safe:animate-pulse" aria-hidden="true" />}
+                      </span>
+                    )}
+                  </div>
+                </Zone>
+              </li>
+            ))}
+          </ol>
+        </div>
+        {!review && (
+          <Zone id="tray" className="flex min-h-[52px] flex-wrap gap-2 rounded-2xl border-2 border-transparent p-1" >
+            {tray.map(k => (
+              <Card key={k} id={k} onTap={() => next >= 0 && put(k, next)} className={clsx(chip, 'border-line hover:border-bright')}>
+                <code className="mono whitespace-pre-wrap text-start"><CodeText src={text(k)} /></code><Grip />
+              </Card>
+            ))}
+            {slots.some(Boolean) && <button type="button" onClick={() => set(null)} className="rounded-xl px-3 py-2 text-sm font-bold text-soft hover:bg-sky">{clear}</button>}
+          </Zone>
+        )}
+      </div>
+      <DragOverlay dropAnimation={null}>{active && <div dir="ltr" className={clsx(chip, 'border-blue shadow-[var(--shadow-pop)]')}><code className="mono"><CodeText src={text(active)} /></code></div>}</DragOverlay>
     </DndContext>
   )
 }

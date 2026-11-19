@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import bankJson from '../data/bank.json'
 import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
 import type { Question, TestRecord } from './types'
+import { codeIndents, isCodeOrder } from '../question/codeLines'
 
 const bank = bankJson as Question[]
 const byId = new Map(bank.map(q => [q.id, q]))
@@ -66,6 +67,16 @@ describe('answer keys', () => {
       for (const p of [q.img, ...(q.oimg || [])].filter(Boolean)) expect(existsSync(`public/${p}`), p).toBe(true)
       expect([...q.o, ...q.oa].join(' '), q.id).not.toMatch(/\p{Extended_Pictographic}/u)
     }
+  })
+  it('code order questions get real indentation (PRD 6.5)', () => {
+    const ind = (id: string) => codeIndents(byId.get(id)!.o.filter(Boolean))
+    expect(ind('L3-T-01')).toEqual([0, 0, 1, 2]) // for / if / print
+    expect(ind('L3-T-04')).toEqual([0, 1, 0, 0]) // def body, then back out
+    expect(ind('L5-T-01')).toEqual([0, 0, 1, 0]) // addEventListener(() => { ... });
+    expect(ind('L5-T-05')).toEqual([0, 1, 1, 0])
+    expect(ind('L6-T-01')).toEqual([0, 1, 1, 0])
+    expect(ind('L6-T-05')).toEqual([0, 1, 2, 0]) // "} }" closes two
+    expect(bank.filter(isCodeOrder).map(q => q.id)).toEqual(['L3-T-01', 'L3-T-04', 'L3-T-06', 'L5-T-01', 'L5-T-05', 'L6-T-01', 'L6-T-05'])
   })
   it('bank has 61 questions per level with the v2 pool sizes', () => {
     for (let lv = 1; lv <= 6; lv++) {

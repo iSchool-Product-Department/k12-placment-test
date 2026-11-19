@@ -3,7 +3,8 @@ import { Check, Volume2, X } from 'lucide-react'
 import clsx from 'clsx'
 import type { AnswerValue, Question } from '../engine/types'
 import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes, splitPair } from '../engine/engine'
-import { MatchAnswer, OrderAnswer, SortAnswer } from './DragAnswers'
+import { CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer } from './DragAnswers'
+import { isCodeOrder } from './codeLines'
 import { T, type Band, type Lang } from '../i18n'
 import { QuestionVisual } from './Visual'
 
@@ -81,7 +82,9 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[30vh] w-auto max-w-full rounded-2xl object-contain" />
         : <QuestionVisual q={q} choice={stageChoice} />}
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
-      {q.t === 'Order' && <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.tapOrder} clear={t.clear} />}
+      {q.t === 'Order' && (isCodeOrder(q)
+        ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.codeOrder} clear={t.clear} />
+        : <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.tapOrder} clear={t.clear} />)}
       {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.sortHint} />}
       {q.t === 'Match' && <MatchAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.matchHint} />}
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
