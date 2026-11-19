@@ -18,6 +18,7 @@ const en = {
   sortHint: 'Drag each card into a box, or tap a card and then a box.', matchHint: 'Drag from a dot to its partner, or tap a card and then its partner.',
   tapHint: 'Tap a card, then tap where it goes.',
   questionOf: (n: number, total: number) => `Question ${n} of about ${total}`,
+  cheers: ['Nice work', 'Keep going', 'Good thinking', 'You’ve got this', 'Great focus', 'Well done'],
   // The tier as a name only, never as a rank (no other tier names, no order, no score).
   youAre: { Explorers: 'You’re an Explorer', Creators: 'You’re a Creator', Innovators: 'You’re an Innovator' } as Record<Tier, string>,
   inGrade: (g: number) => `in Grade ${g}!`, contact: 'Our team will contact you soon.', newStudent: 'New student',
@@ -42,6 +43,7 @@ const ar: typeof en = {
   sortHint: 'اسحب كل بطاقة إلى صندوق، أو اضغط على البطاقة ثم على الصندوق.', matchHint: 'اسحب من النقطة إلى ما يناسبها، أو اضغط على بطاقة ثم على ما يناسبها.',
   tapHint: 'اضغط على بطاقة، ثم اضغط على مكانها.',
   questionOf: (n: number, total: number) => `السؤال ${n} من حوالي ${total}`,
+  cheers: ['عمل رائع', 'واصل', 'تفكير جميل', 'أنت قادر', 'تركيز رائع', 'أحسنت'],
   youAre: { Explorers: 'أنت من المستكشفين', Creators: 'أنت من المبدعين', Innovators: 'أنت من المبتكرين' },
   inGrade: (g: number) => `في الصف ${g}!`, contact: 'سيتواصل معك فريقنا قريبًا.', newStudent: 'طالب جديد',
   welcomeBack: (name: string) => `أهلًا بعودتك يا ${name}`, resumeNote: 'أكمل من حيث توقفت.', resume: 'أكمل',

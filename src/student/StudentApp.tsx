@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core'
 import { Apple, ArrowRight, Minus, Plus, ShoppingBasket, Star, Volleyball } from 'lucide-react'
 import clsx from 'clsx'
@@ -8,7 +8,7 @@ import type { AnswerValue, Practice, TestRecord } from '../engine/types'
 import { BANK, BY_ID } from '../data/ladder'
 import { T, bandOf, type Band, type Lang } from '../i18n'
 import { store, useConfig } from '../store'
-import { QuestionView, stableShuffle } from '../question/QuestionView'
+import { QuestionView, roomy, stableShuffle } from '../question/QuestionView'
 import { hasSim } from '../question/Visual'
 import { useDragSensors } from '../question/DragAnswers'
 import { BODY, Buddy, PARTS, encode, parse, randomBuddy, type Part } from './Buddy'
@@ -38,7 +38,7 @@ export default function StudentApp({ lang }: { lang: Lang }) {
 
   return (
     <div className="relative min-h-[calc(100dvh-64px)] overflow-hidden">
-      <Backdrop band={band} />
+      <Backdrop />
       <div className={clsx('relative mx-auto px-4 pb-10 pt-4 sm:pt-6', phase === 'test' ? 'max-w-5xl' : 'max-w-3xl')}>
         <AnimatePresence mode="wait">
           {phase === 'welcome' && <motion.div key="w" {...fade}><Welcome {...{ t, band, name, setName, age, setAge, buddy, setBuddy }} onStart={() => setPhase('practice')} /></motion.div>}
@@ -224,9 +224,15 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const t0 = useRef(Date.now())
   useEffect(() => { t0.current = Date.now() }, [q?.id])
   useEffect(() => { if (played) { const id = setTimeout(finish, 700); return () => clearTimeout(id) } }, [played])
+  // After each answer the buddy steps along the bar and says something kind. Never tied to right or wrong.
+  const done = rec.answers.length
+  const [cheer, setCheer] = useState(0)
+  useEffect(() => { if (!done) return; setCheer(done); const id = setTimeout(() => setCheer(0), 1800); return () => clearTimeout(id) }, [done])
+  const still = useReducedMotion()
   if (!q) return null
   const n = rec.answers.length
   const total = Math.max(aboutTotal(rec), n + 1)
+  const pct = (n / total) * 100
   const ready = value != null && (q.t !== 'Order' || (value as string[]).filter(Boolean).length === q.o.filter(Boolean).length)
     && (q.t !== 'Sort' && q.t !== 'Match' || Object.keys(value as object).length === q.o.filter(Boolean).length)
   const stage = hasSim(q)
@@ -242,15 +248,31 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   }
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 px-1">
+      <div className="flex items-end gap-3 px-1">
         <span className="shrink-0 text-sm font-extrabold text-deep">{t.questionOf(n + 1, total)}</span>
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={n} aria-valuemax={total}>
-          <motion.div className="h-full rounded-full bg-blue" animate={{ width: `${(n / total) * 100}%` }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} />
+        <div className="relative flex-1 pt-11">
+          <div className="h-2 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuenow={n} aria-valuemax={total}>
+            <motion.div className="h-full rounded-full bg-blue" animate={{ width: `${pct}%` }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} />
+          </div>
+          <motion.div className="absolute top-0 -translate-x-1/2 rtl:translate-x-1/2" style={{ insetInlineStart: 0 }} initial={false}
+            animate={{ insetInlineStart: `${pct}%` }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+            <motion.div animate={still ? undefined : { y: [0, -3, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
+              <Buddy code={rec.avatar} size={34} mood={cheer ? 'cheer' : 'idle'} />
+            </motion.div>
+            <AnimatePresence>
+              {cheer > 0 && (
+                <motion.span key={cheer} initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
+                  className={clsx('absolute top-1 whitespace-nowrap rounded-full border border-line bg-white px-3 py-1 text-sm font-extrabold text-deep shadow-[var(--shadow-card)]', pct > 60 ? 'end-full me-1' : 'start-full ms-1')}>
+                  {t.cheers[(cheer + rec.id.length) % t.cheers.length]}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
-        <Buddy code={rec.avatar} size={30} />
       </div>
       <AnimatePresence mode="wait">
-        <motion.div key={q.id} initial={{ opacity: 0, x: lang === 'ar' ? -24 : 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}>
+        {/* Text-only questions get a narrower card with bigger answers; pictures, code and drag questions use the full width. */}
+        <motion.div key={q.id} className={clsx('mx-auto w-full', !roomy(q) && 'max-w-3xl')} initial={{ opacity: 0, x: lang === 'ar' ? -24 : 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}>
           <Card>
             <QuestionView q={q} lang={lang} band={band} value={value} onChange={setValue} salt={rec.id} locked={locked} onPlayed={() => setPlayedId(q.id)}
               listenHot={rec.practice?.readHelp} tapMode={rec.practice?.tapMode} />
@@ -279,17 +301,7 @@ export function Btn({ children, variant = 'primary', ...p }: React.ButtonHTMLAtt
 }
 
 /** Quiet backgrounds: clouds for the youngest, a dot grid for teens, a line grid for the oldest. */
-function Backdrop({ band }: { band: Band }) {
-  return (
-    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-      {band === 'kids' && <div className="absolute inset-0 bg-sky">
-        <Cloud className="left-[4%] top-[6%] w-28" /><Cloud className="right-[6%] top-[30%] w-36" /><Cloud className="bottom-[8%] left-[10%] w-24" />
-      </div>}
-      {band === 'teen' && <div className="absolute inset-0 [background-image:radial-gradient(#DCEAF3_1.5px,transparent_1.5px)] [background-size:22px_22px]" />}
-      {band === 'pro' && <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(#DCEAF3_1px,transparent_1px),linear-gradient(90deg,#DCEAF3_1px,transparent_1px)] [background-size:44px_44px]" />}
-    </div>
-  )
+/** One calm background for every age (brand Neutral-100 with a faint dot grid), so nothing jumps between ages. */
+function Backdrop() {
+  return <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(#DCEAF3_1.5px,transparent_1.5px)] [background-size:22px_22px]" aria-hidden="true" />
 }
-const Cloud = ({ className }: { className: string }) => (
-  <svg viewBox="0 0 120 60" className={clsx('absolute', className)}><g fill="#fff"><circle cx="35" cy="35" r="20" /><circle cx="60" cy="25" r="25" /><circle cx="85" cy="37" r="18" /><rect x="18" y="35" width="85" height="20" rx="10" /></g></svg>
-)

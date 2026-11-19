@@ -522,8 +522,8 @@
 "scr": ""
 },
 "L6-DL-02": {
-"what": "Fourth option added",
-"why": "Three options let a guesser pass too often",
+"what": "Fourth option added. Then v5: New starter: phone storage is full.",
+"why": "The spreadsheet ##### question needs spreadsheet use that many students do not have.",
 "q": "A spreadsheet cell shows #####. What usually fixes it?",
 "o": [
 "Make the column wider",
@@ -1159,5 +1159,76 @@
 "get nectar"
 ],
 "scr": "Three blocks to drag into order. The move block snaps inside the loop."
+},
+"L3-LG-05": {
+"what": "Both steps now sit in the code box with the starting values.",
+"why": "Steps written in the sentence and values in the box were hard to follow.",
+"q": "Step 1: a = a × b. Step 2: b = a + b. What is b?",
+"o": [
+"9",
+"12",
+"5",
+"6"
+],
+"scr": "a = 2\nb = 3"
+},
+"L3-LG-02": {
+"what": "New question: who is the shortest.",
+"why": "The number guessing game was unclear without playing it first.",
+"q": "Guess my number from 1 to 100. I say higher or lower. Best first guess?",
+"o": [
+"50",
+"1",
+"10",
+"99"
+],
+"scr": ""
+},
+"L6-LG-02": {
+"what": "Two balls without putting back, instead of one.",
+"why": "One ball out of four was too easy to be a medium question for ages 16 to 18.",
+"q": "A bag has 3 red balls and 1 blue ball. You pick one at random. What is the chance it is red?",
+"o": [
+"75%",
+"25%",
+"33%",
+"50%"
+],
+"scr": ""
+},
+"L6-LG-03": {
+"what": "Right turns and then left turns, instead of right turns only.",
+"why": "Five right turns alone was too easy to be a medium question for ages 16 to 18.",
+"q": "A robot faces north and turns right by 90 degrees five times. Which way is it facing now?",
+"o": [
+"East",
+"North",
+"South",
+"West"
+],
+"scr": ""
+},
+"L1-LG-03": {
+"what": "New shape pictures: sharp corners marked with orange dots.",
+"why": "The old square had rounded corners, so with corners or without was not clear.",
+"q": "Does it have corners? Sort the shapes.",
+"o": [
+"Square = With corners",
+"Circle = Without corners",
+"Triangle = With corners",
+"Oval = Without corners"
+],
+"scr": "Four shapes to drag into two boxes"
+},
+"L1-G2-12": {
+"what": "New picture with a row of tiles to count, and 'will it move'.",
+"why": "The robot stood still in the picture, so there was nothing to count.",
+"q": "How many steps does the character move?",
+"o": [
+"4",
+"1",
+"5"
+],
+"scr": "repeat 4 times [ move forward ]"
 }
 }

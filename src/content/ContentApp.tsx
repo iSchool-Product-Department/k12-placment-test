@@ -31,7 +31,7 @@ export default function ContentApp({ route, go }: { route: string[]; go: (h: str
 }
 
 /* ---------------------------------------------------------------- bank */
-// v4 content edits, built from the sheet's Change log rows (ChangeLog-v4.csv) with each question's wording before.
+// v4 content edits, built from the sheet's Change log rows (ChangeLog.csv) with each question's wording before.
 type Change = { what: string; why: string; q: string; o: string[]; scr: string }
 const CHANGES = changesJson as Record<string, Change>
 const POOLS = ['Starter', 'Logic', 'Lower grade', 'Upper grade', 'Grade task'] as const
@@ -64,7 +64,7 @@ function Bank() {
             <select value={f.d} onChange={sel_('d')} className="rounded-xl border-2 border-line bg-white px-2 py-2"><option value="">All difficulty</option>{['Starter', 'Easy', 'Medium', 'Hard'].map(p => <option key={p}>{p}</option>)}</select>
             <select value={f.t} onChange={sel_('t')} className="rounded-xl border-2 border-line bg-white px-2 py-2"><option value="">All types</option>{types.map(p => <option key={p}>{p}</option>)}</select>
           </div>
-          <label className="mb-2 flex w-fit cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" checked={!!f.ch} onChange={e => setF({ ...f, ch: e.target.checked ? '1' : '' })} className="accent-orange" /> Changed in v4 only ({Object.keys(CHANGES).length})</label>
+          <label className="mb-2 flex w-fit cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" checked={!!f.ch} onChange={e => setF({ ...f, ch: e.target.checked ? '1' : '' })} className="accent-orange" /> Changed in v4 and v5 only ({Object.keys(CHANGES).length})</label>
           <label className="mb-2 flex items-center gap-2 rounded-xl border-2 border-line px-3"><Search size={16} className="text-soft" /><input value={f.q} onChange={sel_('q')} placeholder="Search text, ID or old ID" className="min-w-0 flex-1 py-2 outline-none" /></label>
           <p className="m-0 mb-2 text-xs font-bold text-soft">{list.length} questions</p>
           <div className="max-h-[640px] overflow-y-auto pe-1">
@@ -87,7 +87,7 @@ const DiffDot = ({ d }: { d: string }) => <i className="mt-1.5 h-2.5 w-2.5 shrin
 function Changed({ c }: { c: Change }) {
   return (
     <details className="mb-3 rounded-2xl bg-warm p-3 text-sm">
-      <summary className="cursor-pointer font-bold text-deep">Changed in v4: {c.what}</summary>
+      <summary className="cursor-pointer font-bold text-deep">Changed: {c.what}</summary>
       <p className="m-0 mt-2 text-soft">{c.why}</p>
       <div className="mt-2 rounded-xl border border-line bg-white p-3">
         <p className="m-0 text-xs font-extrabold text-soft">Before</p>

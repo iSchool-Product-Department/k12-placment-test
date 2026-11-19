@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import type { AnswerRec, TestRecord } from '../engine/types'
 import { BY_ID } from '../data/ladder'
 import { OUTCOME, STEP_LABEL } from './labels'
+import { Buddy } from '../student/Buddy'
 
 /**
  * The test as a road through the levels: x is time, y is the level.
@@ -57,7 +58,8 @@ export function Journey({ rec, onQuestion }: { rec: TestRecord; onQuestion: (a: 
                 style={{ transformOrigin: `${x}px ${y}px`, cursor: 'pointer' }} onClick={() => setSel(i)}>
                 {on && <circle cx={x} cy={y} r={end ? 27 : 24} fill="none" stroke="#FF7F1C" strokeWidth={3} />}
                 <circle cx={x} cy={y} r={end ? 21 : 18} fill={end ? '#FFD700' : n.kind === 'start' ? '#fff' : n.kind === 'now' ? '#FF7F1C' : '#056FEC'} stroke={n.kind === 'start' ? '#056FEC' : '#fff'} strokeWidth={3} />
-                <text x={x} y={y + 5} textAnchor="middle" fontSize={14} fontWeight={800} fill={end ? '#0E2A4D' : n.kind === 'start' ? '#056FEC' : '#fff'}>{n.kind === 'start' ? rec.avatar : end ? '★' : i}</text>
+                <text x={x} y={y + 5} textAnchor="middle" fontSize={14} fontWeight={800} fill={end ? '#0E2A4D' : n.kind === 'start' ? '#056FEC' : '#fff'}>{n.kind === 'start' ? '' : end ? '★' : i}</text>
+                {n.kind === 'start' && <foreignObject x={x - 14} y={y - 17} width={28} height={34}><Buddy code={rec.avatar} size={28} /></foreignObject>}
                 {w >= 560 && <text x={x} y={y + (y > H - 80 ? -30 : 38)} textAnchor="middle" fontSize={12} fontWeight={800} fill="#0E2A4D">{n.label}</text>}
                 {w >= 560 && <text x={x} y={y + (y > H - 80 ? -44 : 52)} textAnchor="middle" fontSize={11} fill="#5B7599">{n.sub}</text>}
               </motion.g>

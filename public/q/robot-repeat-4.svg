@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="Nunito Sans, Arial, sans-serif" font-weight="800">
+<rect x="2" y="2" width="636" height="356" rx="18" fill="#fff" stroke="#DCEAF3" stroke-width="3"/>
+<path d="M150 70q30-22 60 0h90v32H150z" fill="#F5A623"/><text x="164" y="94" fill="#fff" font-size="19">when run</text>
+<path d="M150 102h250v36H190v42h210v32H150z" fill="#E07B39"/><text x="164" y="128" fill="#fff" font-size="19">repeat</text>
+<rect x="232" y="108" width="34" height="24" rx="12" fill="#fff"/><text x="249" y="127" fill="#0E2A4D" font-size="17" text-anchor="middle">4</text><text x="276" y="128" fill="#fff" font-size="19">times</text>
+<rect x="190" y="140" width="170" height="38" rx="5" fill="#5B67B0"/><text x="204" y="166" fill="#fff" font-size="19">move forward</text>
+<g transform="translate(70 262)">
+<rect x="0" y="0" width="500" height="64" rx="12" fill="#F7FAFF" stroke="#DCEAF3" stroke-width="2"/>
+<g stroke="#DCEAF3" stroke-width="2"><path d="M100 0v64M200 0v64M300 0v64M400 0v64"/></g>
+<g transform="translate(28 6)"><path d="M22 2v10" stroke="#5B7599" stroke-width="3"/><circle cx="22" cy="3" r="4" fill="#FF7F1C"/><rect x="2" y="12" width="40" height="38" rx="9" fill="#056FEC"/><rect x="10" y="22" width="24" height="12" rx="5" fill="#fff"/><circle cx="16" cy="28" r="3" fill="#0E2A4D"/><circle cx="28" cy="28" r="3" fill="#0E2A4D"/></g>
+<path d="M78 32h14m0 0-6-6m6 6-6 6" stroke="#FF7F1C" stroke-width="4" fill="none" stroke-linecap="round"/>
+</g>
+</svg>

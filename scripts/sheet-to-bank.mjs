@@ -60,6 +60,8 @@ const EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'im
 async function picture(url) {
   url = url.trim()
   if (!url) return ''
+  // A picture drawn in this repo: "q/name.svg" in the sheet means public/q/name.svg.
+  if (/^q\/[\w.-]+$/.test(url)) { if (!existsSync(new URL(url.slice(2), DIR))) throw new Error(`Missing public/${url}`); return url }
   const id = url.match(/\/d\/([\w-]+)/)?.[1] || url.match(/[?&]id=([\w-]+)/)?.[1]
   if (!id) throw new Error(`Not a Drive picture link: ${url}`)
   for (const ext of Object.values(EXT)) if (existsSync(new URL(`${id}.${ext}`, DIR))) return `q/${id}.${ext}`

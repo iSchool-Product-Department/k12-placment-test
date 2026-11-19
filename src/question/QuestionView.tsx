@@ -23,6 +23,8 @@ export function optText(q: Question, i: number, lang: Lang) {
   const t = (lang === 'ar' && q.oa[i]) || q.o[i] || ''
   return q.t === 'Order' && isBlockOrder(q) ? blockText(t) : t
 }
+/** Questions with a picture, stage, code or drag answers use the wide layout; text-only ones a narrower card. */
+export const roomy = (q: Question) => !!q.img || hasVisual(q) || ['Order', 'Sort', 'Match'].includes(q.t)
 export const picSrc = (p: string) => import.meta.env.BASE_URL + p
 const isCodey = (s: string) => !/[؀-ۿ]/.test(s) && (/[;{}=<>$#]|^\w[\w.]*\(.*\)$|\(\)/.test(s))
 /** An option's picture: a sheet picture, or a drawn icon for the emoji the sheet used. */
@@ -92,6 +94,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   // Any picture, stage, code or blocks with a plain answer list: side by side on wider screens, so nothing scrolls.
   const side = (!!q.img || hasVisual(q)) && (q.t.endsWith('MCQ') || q.t === 'Type answer') && !tiles
   const wide = side && !hasSim(q) && !q.img && looksLikeCode(q)
+  const plain = !roomy(q) && !keys.some(k => q.oimg?.[k] || q.oicon?.[k])
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
     <div className="flex flex-col gap-3">
@@ -123,7 +126,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
             const on = value === L[k], right = review && L[k] === 'A'
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
-                className={clsx('flex min-h-[52px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-2.5 text-start font-bold transition-colors',
+                className={clsx('flex items-center gap-3 rounded-2xl border-2 bg-white px-4 text-start font-bold transition-colors', plain ? 'min-h-[64px] py-3.5 text-lg' : 'min-h-[52px] py-2.5',
                   tiles ? 'flex-col justify-center px-2 py-3 text-lg' : band === 'kids' && !side && 'sm:flex-col sm:justify-center sm:text-center',
                   on && !review && 'border-blue bg-sky shadow-[0_0_0_4px_rgba(5,172,255,.18)]',
                   !on && !right && 'border-line hover:border-bright',

@@ -29,6 +29,8 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - Replace "Read-aloud plays on its own for ages 6 to 7" with: "Read-aloud plays only when the student taps Listen."
 - A question should fit on one screen. On wider screens: a picture, stage, code or block program sits beside the answers; order cards sit beside their numbered slots; the block palette sits beside the script; four short options go in two columns.
 - Next stays pinned to the bottom of the screen, so it is never scrolled away.
+- Text-only questions use a narrower card with bigger answers (64 px tall, larger text). Questions with a picture, code, stage or drag answers use the full width.
+- The student's buddy rides the progress bar. After each answer it steps forward and shows one short line ("Nice work", "Keep going", "Good thinking"...). The line never depends on whether the answer was right.
 
 ## 6.4 Question types
 - Stage questions (robot, bee, number line). The stage stays still while the student answers. Next locks the answer, the stage plays it, then the test moves to the next question by itself. There is no separate Run button, and no trying again.
@@ -48,6 +50,9 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - Replace the ending with: "You're a Creator in Grade 4! Our team will contact you soon." (Explorer, Creator or Innovator). The student sees only their own tier name, never the other names, an order or a score. Arabic: "أنت من المبدعين في الصف 4!"
 - In the demo only, a small "New student" link lets the next person on the same device start.
 
+## 7.2 One test (roadmap)
+- The first milestone shows the student's buddy, not its saved code.
+
 ## 7.1 Test list
 - The student code is click to copy for now. Linking it to the iSchool admin needs the URL format of the student page (open question).
 
@@ -60,10 +65,16 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 
 ## 9 Questions and settings sheet
 - v4 content (100 questions): definitions became doing questions, tool names removed (Sprite Lab, Godot, Figma, Unity, pandas and others), every starter at Levels 3 to 6 has 4 options, icons on young students' options.
+- v5 content (7 questions): L3-LG-05 shows both steps in the code box; L3-LG-02 is now "who is the shortest" (the number guessing game was unclear); L6-DL-02 is now phone storage (spreadsheet ##### needs spreadsheet use); L6-LG-02 and L6-LG-03 are harder, they were too easy for a medium at ages 16 to 18; L1-LG-03 has new shape pictures with sharp corners marked; L1-G2-12 has a row of tiles to count and says "will it move". All in ChangeLog.csv.
+- A picture can be a file drawn in the repo: write "q/name.svg" in the picture column instead of a Drive link.
 - The bank has a test that every question stays within the word limit for its age (Start here tab), and that every stage belongs to a real question.
 
 ## 11 Technical notes
 - Test status values: in progress, finished, expired.
+
+## 10 Brand
+- One background for every age: Neutral-100 with a faint dot grid. It used to change by age (sky with clouds, dots, grid).
+- The logo stays still. The brand rules forbid moving or changing its parts, so the buddy is what feels alive.
 
 ## 12 Open questions
 - What is the URL of a student's page in the iSchool admin, so the student code can link to it?
