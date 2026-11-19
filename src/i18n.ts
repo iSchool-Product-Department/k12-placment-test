@@ -19,7 +19,7 @@ const en = {
   youreIn: (g: number) => `You’re in Grade ${g}!`, contact: 'Our team will contact you soon.', newStudent: 'New student',
   welcomeBack: (name: string) => `Welcome back, ${name}`, resumeNote: 'Pick up where you stopped.', resume: 'Continue',
   pq: {
-    kids: ['Drag the apple into the basket.', ['Apple', 'Ball', 'Star']],
+    kids: ['Put the apple in the basket.', ['Apple', 'Ball', 'Star']],
     teen: ['What comes next? 3, 6, 9, 12, ?', ['15', '14', '18']],
     pro: ['All bloops are razzies, and all razzies are lazzies. Are all bloops lazzies?', ['Yes', 'No', 'Not enough information']],
   } as Record<Band, [string, string[]]>,
@@ -41,7 +41,7 @@ const ar: typeof en = {
   youreIn: (g: number) => `أنت في الصف ${g}!`, contact: 'سيتواصل معك فريقنا قريبًا.', newStudent: 'طالب جديد',
   welcomeBack: (name: string) => `أهلًا بعودتك يا ${name}`, resumeNote: 'أكمل من حيث توقفت.', resume: 'أكمل',
   pq: {
-    kids: ['اسحب التفاحة إلى السلة.', ['تفاحة', 'كرة', 'نجمة']],
+    kids: ['ضع التفاحة في السلة.', ['تفاحة', 'كرة', 'نجمة']],
     teen: ['ما الرقم التالي؟ 3، 6، 9، 12، ؟', ['15', '14', '18']],
     pro: ['كل البلوبز رازيز، وكل الرازيز لازيز. هل كل البلوبز لازيز؟', ['نعم', 'لا', 'المعلومات غير كافية']],
   },

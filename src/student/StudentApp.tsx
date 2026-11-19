@@ -165,45 +165,45 @@ function PracticeStep({ t, band, onDone }: { t: Tx; band: Band; onDone: (p: Prac
 }
 
 const THINGS = [Apple, Volleyball, Star]
-/** Drag one of three things into the basket, or tap it and then the basket. Thing 0 is the apple. */
+/** Put one of three things in the basket: one tap drops it in, dragging works too, so nobody gets stuck. Thing 0 is the apple. */
 function AppleDrag({ names, onAnswer }: { names: string[]; onAnswer: (i: number, tapped: boolean) => void }) {
   const [inBasket, setIn] = useState<number | null>(null)
-  const [sel, setSel] = useState<number | null>(null)
-  const put = (i: number, tapped: boolean) => { setIn(i); setSel(null); onAnswer(i, tapped) }
+  const dragged = useRef(false)
+  const put = (i: number, tapped: boolean) => { setIn(i); onAnswer(i, tapped) }
   const sensors = useDragSensors()
-  const end = (e: DragEndEvent) => { if (e.over) put(+e.active.id, false) }
+  const end = (e: DragEndEvent) => { if (e.over) put(+e.active.id, false); setTimeout(() => (dragged.current = false)) }
   const I = inBasket != null ? THINGS[inBasket] : null
   return (
-    <DndContext sensors={sensors} onDragEnd={end}>
+    <DndContext sensors={sensors} onDragStart={() => (dragged.current = true)} onDragEnd={end} onDragCancel={() => (dragged.current = false)}>
       <div className="flex flex-wrap items-center justify-center gap-6">
         <div className="flex gap-3">
-          {[1, 0, 2].map(i => inBasket !== i && <Thing key={i} i={i} label={names[i]} sel={sel === i} onTap={() => setSel(sel === i ? null : i)} />)}
+          {[1, 0, 2].map(i => inBasket !== i && <Thing key={i} i={i} label={names[i]} onTap={() => !dragged.current && put(i, true)} />)}
         </div>
-        <Basket onTap={() => sel != null && put(sel, true)} hot={sel != null}>{I && <I size={40} className="text-orange" />}</Basket>
+        <Basket>{I && <I size={40} className="text-orange" />}</Basket>
       </div>
     </DndContext>
   )
 }
-function Thing({ i, label, sel, onTap }: { i: number; label: string; sel: boolean; onTap: () => void }) {
+function Thing({ i, label, onTap }: { i: number; label: string; onTap: () => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: String(i) })
   const I = THINGS[i]
   return (
-    <button ref={setNodeRef} {...attributes} {...listeners} onClick={onTap} aria-label={label} aria-pressed={sel}
+    <button ref={setNodeRef} {...attributes} {...listeners} onClick={onTap} aria-label={label}
       style={transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined}
-      className={clsx('flex h-24 w-24 touch-none flex-col items-center justify-center gap-1 rounded-2xl border-2 bg-white font-bold', sel ? 'border-blue bg-sky' : 'border-line', isDragging && 'z-10 shadow-lg')}>
+      className={clsx('flex h-24 w-24 touch-none flex-col items-center justify-center gap-1 rounded-2xl border-2 border-line bg-white font-bold hover:border-bright', isDragging && 'z-10 shadow-lg')}>
       <I size={40} className={i === 0 ? 'text-bad' : i === 1 ? 'text-blue' : 'text-gold'} />
       <span className="text-sm">{label}</span>
     </button>
   )
 }
-function Basket({ children, onTap, hot }: { children: React.ReactNode; onTap: () => void; hot: boolean }) {
+function Basket({ children }: { children: React.ReactNode }) {
   const { setNodeRef, isOver } = useDroppable({ id: 'basket' })
   return (
-    <button ref={setNodeRef} onClick={onTap} aria-label="basket"
-      className={clsx('relative grid h-32 w-36 place-items-center rounded-3xl border-2 border-dashed', isOver || hot ? 'border-blue bg-sky' : 'border-line bg-white')}>
+    <div ref={setNodeRef} aria-label="basket"
+      className={clsx('relative grid h-32 w-36 place-items-center rounded-3xl border-2 border-dashed', isOver ? 'border-blue bg-sky' : 'border-line bg-white')}>
       <ShoppingBasket size={72} strokeWidth={1.5} className="text-deep" />
       <span className="absolute top-3">{children}</span>
-    </button>
+    </div>
   )
 }
 

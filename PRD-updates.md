@@ -11,7 +11,7 @@ Newest decisions go at the bottom of each section.
 
 ## 6.2 Practice question
 - Read-aloud never plays by itself. If the practice answer is wrong or takes over 20 seconds, the Listen button stands out (orange, with its label) on every question after it.
-- Ages 6 to 9: "Drag the apple into the basket", with a ball and a star as the other choices. If the student taps instead of dragging, or takes over 20 seconds, later drag questions show tap instructions. Tap works on every drag question anyway.
+- Ages 6 to 9: "Put the apple in the basket", with a ball and a star as the other choices. One tap on the apple drops it in; dragging works too, so no child gets stuck on the first screen. If the student taps instead of dragging, or takes over 20 seconds, later drag questions show tap instructions. Tap works on every drag question anyway.
 
 ## 6.3 The question screen
 - Replace "Read-aloud plays on its own for ages 6 to 7" with: "Read-aloud plays only when the student taps Listen."
