@@ -2,7 +2,7 @@
 import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import bankJson from '../data/bank.json'
-import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
+import { answer, check, groupName, isExpired, pointsOf, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
 import type { Question, TestRecord } from './types'
 import { blockIndents, codeIndents, isBlockOrder, isCodeOrder } from '../question/codeLines'
 import { ICONS } from '../question/icons'
@@ -109,13 +109,28 @@ describe('answer keys', () => {
   })
 })
 
+describe('tiers and resume (PRD 5.5, 6.8)', () => {
+  it('a grade task is worth 3 points, and the group name is tier plus grade', () => {
+    for (const q of bank.filter(q => q.pool === 'Grade task')) expect(pointsOf(q), q.id).toBe(3)
+    expect(pointsOf(bank.find(q => q.pool === 'Lower grade' && q.d === 'Easy')!)).toBe(1)
+    const r = play(12, [[1, 1, 1], [1, 1, 0, 0], [1, 1, 1, 1]])
+    expect(groupName(r)).toBe(`${r.tier!.tier} G8`)
+  })
+  it('an unfinished test expires after 24 hours; a finished one never does', () => {
+    const r = newTest({ name: 't', age: 9, avatar: '', lang: 'en' }, bank, seeded(1))
+    expect(isExpired(r, r.createdAt + 23 * 3600e3)).toBe(false)
+    expect(isExpired(r, r.createdAt + 25 * 3600e3)).toBe(true)
+    expect(isExpired({ ...r, status: 'done' }, r.createdAt + 99 * 3600e3)).toBe(false)
+  })
+})
+
 describe('every possible score (Adaptive Rules tab)', () => {
   it('first scored question is always a Starter', () => {
     for (let age = 6; age <= 18; age++) expect(byId.get(play(age, []).answers[0].qid)!.pool).toBe('Starter')
   })
-  it('warm-up 0 or 1 of 3 at Level 1 places Grade 1, Foundation, flagged', () => {
+  it('warm-up 0 or 1 of 3 at Level 1 places Grade 1, Explorers, flagged', () => {
     for (const w of [[0, 0, 0], [1, 0, 0]]) {
-      const r = play(6, [w]); expect(grade(r)).toBe(1); expect(r.tier!.tier).toBe('Foundation'); expect(r.flags).toContain('failL1')
+      const r = play(6, [w]); expect(grade(r)).toBe(1); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failL1')
     }
   })
   it('warm-up fail above Level 1 goes one level down', () => {
@@ -123,8 +138,8 @@ describe('every possible score (Adaptive Rules tab)', () => {
     expect(r.steps.map(s => s.name)).toEqual(['warmup', 'warmupDown', 'grade'])
     expect(grade(r)).toBe(4)
   })
-  it('fails both warm-ups: lower grade of S-1, Foundation', () => {
-    const r = play(10, [[1, 0, 0], [0, 1, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Foundation'); expect(r.flags).toContain('failBoth')
+  it('fails both warm-ups: lower grade of S-1, Explorers', () => {
+    const r = play(10, [[1, 0, 0], [0, 1, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth')
   })
   it('knowledge 0 or 1 of 4 places the lower grade of S', () => {
     expect(grade(play(12, [[1, 1, 1], [0, 0, 0, 0]]))).toBe(7)
@@ -143,19 +158,19 @@ describe('every possible score (Adaptive Rules tab)', () => {
     expect(grade(play(8, [[1, 1, 1], [1, 1, 1, 0], [1, 1, 0, 0]]))).toBe(5)
     expect(grade(play(8, [[1, 1, 1], [1, 1, 1, 0], [1, 1, 1, 0], [1, 1, 1, 0]]))).toBe(6)
   })
-  it('perfect up-check flags and makes Advanced', () => {
+  it('perfect up-check flags and makes Innovators', () => {
     const r = play(8, [[1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]])
-    expect(r.flags).toContain('perfectUp'); expect(r.tier!.tier).toBe('Advanced'); expect(grade(r)).toBe(5)
+    expect(r.flags).toContain('perfectUp'); expect(r.tier!.tier).toBe('Innovators'); expect(grade(r)).toBe(5)
   })
   it('Level 6 with a high knowledge score goes straight to the grade check', () => {
     const r = play(17, [[1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]); expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(12)
   })
-  it('sheet example: capped by digital basics', () => {
+  it('sheet example: capped by digital basics (grade task counts 3)', () => {
     const r = play(12, [[0, 1, 1], [1, 1, 0, 0], [1, 1, 1, 1]])
-    expect(grade(r)).toBe(8); expect(r.tier!.strength).toBe(75); expect(r.tier!.baseTier).toBe('Advanced'); expect(r.tier!.tier).toBe('Core')
+    expect(grade(r)).toBe(8); expect(r.tier!.strength).toBe(76); expect(r.tier!.baseTier).toBe('Innovators'); expect(r.tier!.tier).toBe('Creators')
   })
-  it('sheet example: smart beginner is Core, not Foundation', () => {
-    const r = play(10, [[1, 1, 1], [1, 0, 0, 0]]); expect(grade(r)).toBe(5); expect(r.tier!.strength).toBe(50); expect(r.tier!.tier).toBe('Core')
+  it('sheet example: smart beginner is Creators, not Explorers', () => {
+    const r = play(10, [[1, 1, 1], [1, 0, 0, 0]]); expect(grade(r)).toBe(5); expect(r.tier!.strength).toBe(50); expect(r.tier!.tier).toBe('Creators')
   })
   it('test length is 7 to 15 questions', () => {
     const rng = seeded(3)

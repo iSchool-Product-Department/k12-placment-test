@@ -59,7 +59,7 @@ export type OutcomeKey =
 export interface StepResult { name: StepName; lv: number; right: number; total: number; outcome: OutcomeKey }
 
 export type FlagKey = 'failL1' | 'failBoth' | 'perfectUp' | 'fast' | 'odd' | 'starterMiss' | 'fallback'
-export type Tier = 'Foundation' | 'Core' | 'Advanced'
+export type Tier = 'Explorers' | 'Creators' | 'Innovators'
 
 export interface Placement { lv: number; which: 'lower' | 'upper'; grade: number }
 
@@ -71,18 +71,23 @@ export interface TierResult {
   possible: number
   counted: number
   confidence: 'High' | 'Medium' | 'Low'
-  reasons: ('forcedFoundation' | 'perfectUp' | 'capStarter' | 'capFast')[]
-  byDiff: Record<Diff, { right: number; total: number }>
+  reasons: ('forcedExplorers' | 'perfectUp' | 'capStarter' | 'capFast')[]
+  byDiff: Record<Diff | 'Grade task', { right: number; total: number }>
 }
 
-export interface Student { name: string; age: number; avatar: string; lang: 'en' | 'ar' }
+/** avatar: the buddy, encoded by src/student/Buddy.tsx. code, phone, email come from the iSchool admin record (fake in the demo). */
+export interface Student { name: string; age: number; avatar: string; lang: 'en' | 'ar'; code?: string; phone?: string; email?: string }
+
+/** The practice question (PRD 6.2). Wrong or slow: the Listen button stands out. Young student who could not drag: tap mode. */
+export interface Practice { ok: boolean; sec: number; readHelp: boolean; tapMode: boolean }
 
 export interface TestRecord extends Student {
   id: string
   createdAt: number
   finishedAt?: number
   start: number
-  status: 'in_progress' | 'done' | 'abandoned'
+  status: 'in_progress' | 'done' | 'expired'
+  practice?: Practice
   step?: StepState
   answers: AnswerRec[]
   steps: StepResult[]

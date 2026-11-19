@@ -8,7 +8,14 @@ export const DEFAULT_CONFIG: Config = {
   warmPass: 2, knowUp: 3, knowLow: 1, gradeUpper: 3, coreAt: 45, advAt: 75, fastSec: 3, fastCount: 4,
 }
 
-export const POINTS: Record<Diff, number> = { Starter: 1, Easy: 1, Medium: 2, Hard: 3 }
+export const POINTS: Record<Diff | 'Grade task', number> = { Starter: 1, Easy: 1, Medium: 2, Hard: 3, 'Grade task': 3 }
+/** PRD 5.5: a grade task is worth 3 whatever its difficulty. */
+export const pointsOf = (q: Question) => POINTS[q.pool === 'Grade task' ? 'Grade task' : q.d]
+export const groupName = (rec: TestRecord) => (rec.tier && rec.placement ? `${rec.tier.tier} G${rec.placement.grade}` : '')
+
+/** PRD 6.8: an unfinished test can be continued for 24 hours, then it expires. */
+export const RESUME_MS = 24 * 3600e3
+export const isExpired = (rec: TestRecord, now = Date.now()) => rec.status === 'in_progress' && now - rec.createdAt > RESUME_MS
 
 /** Which questions each step draws, in order. */
 export const STEP_SLOTS: Record<'warmup' | 'know' | 'grade', Slot[]> = {
@@ -61,6 +68,7 @@ function buildStep(rec: TestRecord, name: StepName, lv: number, bank: Question[]
 }
 
 export function newTest(student: Student, bank: Question[], rng: Rng = Math.random, id?: string): TestRecord {
+  student = { code: `STA-ISCHOOL-S-${100 + Math.floor(rng() * 900)}`, ...student }
   const start = startLevel(student.age)
   const rec: TestRecord = {
     ...student, id: id ?? Math.random().toString(36).slice(2, 10), createdAt: Date.now(), start,
@@ -190,22 +198,22 @@ export function computeTier(rec: TestRecord, cfg: Config, bank: Question[]): Tie
   const byId = new Map(bank.map(q => [q.id, q]))
   const F = rec.placement!.lv
   const counted = rec.answers.filter(a => a.lv === F)
-  const byDiff = { Starter: { right: 0, total: 0 }, Easy: { right: 0, total: 0 }, Medium: { right: 0, total: 0 }, Hard: { right: 0, total: 0 } }
+  const byDiff = { Starter: { right: 0, total: 0 }, Easy: { right: 0, total: 0 }, Medium: { right: 0, total: 0 }, Hard: { right: 0, total: 0 }, 'Grade task': { right: 0, total: 0 } }
   let earned = 0, possible = 0
   for (const a of counted) {
-    const d = byId.get(a.qid)!.d
-    possible += POINTS[d]; byDiff[d].total++
-    if (a.ok) { earned += POINTS[d]; byDiff[d].right++ }
+    const q = byId.get(a.qid)!, d = q.pool === 'Grade task' ? 'Grade task' : q.d, pts = pointsOf(q)
+    possible += pts; byDiff[d].total++
+    if (a.ok) { earned += pts; byDiff[d].right++ }
   }
   const strength = possible ? Math.round((earned / possible) * 100) : 0
-  const baseTier: Tier = strength >= cfg.advAt ? 'Advanced' : strength >= cfg.coreAt ? 'Core' : 'Foundation'
+  const baseTier: Tier = strength >= cfg.advAt ? 'Innovators' : strength >= cfg.coreAt ? 'Creators' : 'Explorers'
   let tier = baseTier
   const reasons: TierResult['reasons'] = []
   const has = (f: FlagKey) => rec.flags.includes(f)
-  if (has('failL1') || has('failBoth')) { tier = 'Foundation'; reasons.push('forcedFoundation') }
-  else if (has('perfectUp')) { tier = 'Advanced'; reasons.push('perfectUp') }
-  if (tier === 'Advanced' && has('starterMiss')) { tier = 'Core'; reasons.push('capStarter') }
-  if (tier === 'Advanced' && has('fast')) { tier = 'Core'; reasons.push('capFast') }
+  if (has('failL1') || has('failBoth')) { tier = 'Explorers'; reasons.push('forcedExplorers') }
+  else if (has('perfectUp')) { tier = 'Innovators'; reasons.push('perfectUp') }
+  if (tier === 'Innovators' && has('starterMiss')) { tier = 'Creators'; reasons.push('capStarter') }
+  if (tier === 'Innovators' && has('fast')) { tier = 'Creators'; reasons.push('capFast') }
   const n = counted.length
   return { tier, baseTier, strength, earned, possible, counted: n, confidence: n >= 7 ? 'High' : n >= 4 ? 'Medium' : 'Low', reasons, byDiff }
 }
@@ -223,13 +231,11 @@ export function answer(rec0: TestRecord, value: AnswerValue, sec: number, bank: 
   return rec
 }
 
-/** Rough progress for the student's progress bar (the test is 7 to 15 questions). */
-export function progress(rec: TestRecord) {
+/** "Question 3 of about 10" (PRD 6.3): answered, plus what is left in this step, plus one more step unless this is the last. */
+export function aboutTotal(rec: TestRecord) {
   const done = rec.answers.length
-  if (!rec.step) return 1
-  const left = rec.step.draws.length - rec.step.i
-  const after = rec.step.name === 'grade' ? 0 : 4
-  return done / (done + left + after)
+  if (!rec.step) return done
+  return done + rec.step.draws.length - rec.step.i + (rec.step.name === 'grade' ? 0 : 4)
 }
 
 // ---------------------------------------------------------------- simulator

@@ -34,8 +34,9 @@ export function Art({ pic, icon, size }: { pic?: string; icon?: string; size: nu
 function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; icon?: string; big?: boolean; tile?: boolean }) {
   const label = isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]" dir="ltr">{text}</code> : text ? <span>{text}</span> : null
   if (!pic && !icon) return label
-  if (tile) return <span className="flex flex-col items-center gap-2 text-center"><Art pic={pic} icon={icon} size={80} />{label}</span>
-  return <span className="flex items-center gap-3"><Art pic={pic} icon={icon} size={big ? 56 : 40} />{label}</span>
+  // Pictures must be big enough to read (PRD 6.6). Icons are simpler and can be smaller.
+  if (tile) return <span className="flex flex-col items-center gap-2 text-center"><Art pic={pic} icon={icon} size={pic ? 120 : 64} />{label}</span>
+  return <span className="flex items-center gap-3"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
 }
 
 export function speak(q: Question, lang: Lang) {
@@ -72,48 +73,54 @@ interface Props {
   /** The answer is in: inputs stop, and a stage (if any) plays the answer, then calls onPlayed. */
   locked?: boolean
   onPlayed?: () => void
+  /** The practice showed reading is hard: the Listen button stands out (it never plays by itself). */
+  listenHot?: boolean
+  /** The practice showed dragging is hard: hints talk about tapping only (tap works everywhere). */
+  tapMode?: boolean
 }
 
-export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '', review, showListen = true, locked, onPlayed }: Props) {
+export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '', review, showListen = true, locked, onPlayed, listenHot, tapMode }: Props) {
   const t = T[lang]
   const set = (v: AnswerValue | null) => !review && !locked && onChange?.(v)
   const keys = keysOf(q)
   const label = (k: string) => <OptLabel text={optText(q, L.indexOf(k), lang)} pic={q.oimg?.[L.indexOf(k)]} icon={q.oicon?.[L.indexOf(k)]} big={band === 'kids'} />
-  const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={band === 'kids' ? 48 : 36} />
+  const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={q.oimg?.[i] ? 72 : band === 'kids' ? 48 : 36} />
+  const hint = (h: string) => (tapMode ? t.tapHint : h)
   const drag = { q, lang, salt, review, big: band === 'kids', shuffle: stableShuffle, label }
-  // Ages 6 to 9: when options have pictures, show them as big picture tiles, word underneath.
-  const tiles = band === 'kids' && keys.some(k => q.oimg?.[k] || q.oicon?.[k])
+  // Picture tiles, word underneath: ages 6 to 9 for any picture or icon, every age for real pictures.
+  const tiles = keys.some(k => q.oimg?.[k]) || (band === 'kids' && keys.some(k => q.oicon?.[k]))
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <h2 className={clsx('m-0 flex-1 text-ink', band === 'kids' ? 'text-[26px] font-bold' : band === 'teen' ? 'text-2xl font-bold' : 'text-[22px] font-semibold')}>{qText(q, lang)}</h2>
         {showListen && (
-          <button onClick={() => speak(q, lang)} className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 py-1.5 text-sm font-extrabold text-deep hover:border-blue" aria-label={t.listen}>
-            <Volume2 size={18} /> <span className="hidden sm:inline">{t.listen}</span>
+          <button onClick={() => speak(q, lang)} aria-label={t.listen}
+            className={clsx('flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-sm font-extrabold', listenHot ? 'border-orange bg-orange text-white' : 'border-line bg-white text-deep hover:border-blue')}>
+            <Volume2 size={18} /> <span className={listenHot ? '' : 'hidden sm:inline'}>{t.listen}</span>
           </button>
         )}
       </div>
       {q.img && !hasSim(q)
-        ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[30vh] w-auto max-w-full rounded-2xl object-contain" />
+        ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[28vh] w-auto max-w-full rounded-2xl object-contain" />
         : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
       <div className="contents" {...(locked ? { inert: '' } : {})}>
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
       {q.t === 'Order' && (isBlockOrder(q)
-        ? <BlockOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.blockOrder} clear={t.clear} />
+        ? <BlockOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={hint(t.blockOrder)} clear={t.clear} />
         : isCodeOrder(q)
-        ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.codeOrder} clear={t.clear} />
-        : <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.tapOrder} clear={t.clear} />)}
-      {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.sortHint} />}
-      {q.t === 'Match' && <MatchAnswer {...drag} art={art} value={(value as Record<string, number>) || {}} set={set} hint={t.matchHint} />}
+        ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={hint(t.codeOrder)} clear={t.clear} />
+        : <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={hint(t.tapOrder)} clear={t.clear} />)}
+      {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.sortHint)} />}
+      {q.t === 'Match' && <MatchAnswer {...drag} art={art} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.matchHint)} />}
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
-        <div className={clsx('grid gap-3', tiles ? (keys.length === 4 ? 'grid-cols-2' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
+        <div className={clsx('grid gap-2.5', tiles ? (keys.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
           {stableShuffle(keys, q.id + salt).map((k, n) => {
             const on = value === L[k], right = review && L[k] === 'A'
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
-                className={clsx('flex min-h-[60px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-3 text-start font-bold transition-colors',
-                  tiles ? 'min-h-[150px] flex-col justify-center px-2 py-4 text-lg' : band === 'kids' && 'sm:flex-col sm:justify-center sm:text-center',
+                className={clsx('flex min-h-[52px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-2.5 text-start font-bold transition-colors',
+                  tiles ? 'flex-col justify-center px-2 py-3 text-lg' : band === 'kids' && 'sm:flex-col sm:justify-center sm:text-center',
                   on && !review && 'border-blue bg-sky shadow-[0_0_0_4px_rgba(5,172,255,.18)]',
                   !on && !right && 'border-line hover:border-bright',
                   review && on && !right && 'border-bad bg-red-50', right && 'border-ok bg-green-50')}>

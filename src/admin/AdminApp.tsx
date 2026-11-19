@@ -9,7 +9,7 @@ import { QuestionView, KeyLine } from '../question/QuestionView'
 import { Journey } from './Journey'
 import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when } from './labels'
 
-const TIERS: Tier[] = ['Foundation', 'Core', 'Advanced']
+const TIERS: Tier[] = ['Explorers', 'Creators', 'Innovators']
 
 export default function AdminApp({ route, go }: { route: string[]; go: (h: string) => void }) {
   const tests = useTests()
@@ -69,7 +69,7 @@ function TestsHome({ tests, open }: { tests: TestRecord[]; open: (id: string) =>
                     <td className="border-b border-line px-2 py-2.5"><span className="flex items-center gap-2 font-bold"><span className="text-xl">{t.avatar}</span>{t.name}{t.simulated && <span className="rounded bg-sky px-1.5 text-[10px] font-bold text-soft">demo</span>}</span></td>
                     <td className="border-b border-line px-2">{t.age}</td>
                     <td className="whitespace-nowrap border-b border-line px-2 text-soft">{when(t.createdAt)}</td>
-                    <td className="border-b border-line px-2 font-bold">{t.placement ? `Grade ${t.placement.grade}` : <span className="font-semibold text-soft">{t.status === 'abandoned' ? 'Not finished' : 'In progress'}</span>}</td>
+                    <td className="border-b border-line px-2 font-bold">{t.placement ? `Grade ${t.placement.grade}` : <span className="font-semibold text-soft">{t.status === 'expired' ? 'Not finished' : 'In progress'}</span>}</td>
                     <td className="border-b border-line px-2">{t.tier && <TierBadge tier={t.tier.tier} />}</td>
                     <td className="border-b border-line px-2">{t.tier && <span className="font-bold">{t.tier.strength}</span>}</td>
                     <td className="border-b border-line px-2">{t.answers.length}</td>
@@ -91,7 +91,7 @@ function Groups({ tests, open }: { tests: TestRecord[]; open: (id: string) => vo
   const grades = [...new Set(tests.map(t => t.placement!.grade))].sort((a, b) => a - b)
   return (
     <div className="flex flex-col gap-3">
-      <p className="m-0 text-sm text-soft">One session group is one grade and one tier. If a group is too small, merge it with the next tier. Never put Foundation and Advanced together.</p>
+      <p className="m-0 text-sm text-soft">One session group is one grade and one tier. If a group is too small, merge it with the next tier. Never put Explorers and Innovators together.</p>
       {grades.map(g => (
         <motion.div layout key={g} className="rounded-3xl border border-line bg-white p-4 shadow-[var(--shadow-card)]">
           <div className="mb-3 flex items-center gap-2"><Users size={18} className="text-blue" /><h3 className="m-0 text-xl text-deep">Grade {g}</h3><span className="text-sm text-soft">{tests.filter(t => t.placement!.grade === g).length} {tests.filter(t => t.placement!.grade === g).length === 1 ? 'student' : 'students'}</span></div>
@@ -106,7 +106,7 @@ function Groups({ tests, open }: { tests: TestRecord[]; open: (id: string) => vo
                     {kids.map(k => <motion.button whileHover={{ y: -2 }} key={k.id} onClick={() => open(k.id)} className="flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-sm font-bold shadow-sm"><span>{k.avatar}</span>{k.name}</motion.button>)}
                     {!kids.length && <span className="text-xs text-soft">Nobody yet</span>}
                   </div>
-                  {kids.length > 0 && kids.length < 3 && <p className="m-0 mt-2 text-xs text-soft">Small group: consider merging with {tr === 'Core' ? 'Foundation or Advanced' : 'Core'}.</p>}
+                  {kids.length > 0 && kids.length < 3 && <p className="m-0 mt-2 text-xs text-soft">Small group: consider merging with {tr === 'Creators' ? 'Explorers or Innovators' : 'Creators'}.</p>}
                 </div>
               )
             })}
@@ -137,7 +137,7 @@ function TestPage({ rec, back }: { rec: TestRecord; back: () => void }) {
             <div className="font-[var(--font-head)] text-3xl font-extrabold text-blue">Grade {p.grade}</div>
             <div className="text-xs text-soft">Level {p.lv}, {p.which} grade</div>
           </div>
-        ) : <span className="rounded-full bg-white/20 px-3 py-1 font-bold">{rec.status === 'abandoned' ? 'Not finished' : 'In progress'}</span>}
+        ) : <span className="rounded-full bg-white/20 px-3 py-1 font-bold">{rec.status === 'expired' ? 'Not finished' : 'In progress'}</span>}
         <Confirm onYes={() => { store.remove(rec.id); back() }} className="flex items-center gap-1 rounded-full p-2 text-sm font-bold hover:bg-white/15" ask="Delete?"><Trash2 size={18} /></Confirm>
       </div>
 

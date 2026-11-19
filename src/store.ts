@@ -1,14 +1,15 @@
 import { useSyncExternalStore } from 'react'
-import { DEFAULT_CONFIG, seeded, simulate, startLevel } from './engine/engine'
+import { DEFAULT_CONFIG, isExpired, seeded, simulate, startLevel } from './engine/engine'
 import type { Config, TestRecord } from './engine/types'
-import { AVATARS, BANK } from './data/ladder'
+import { BANK } from './data/ladder'
+import { randomBuddy } from './student/Buddy'
 
 /**
  * Storage adapter. The demo keeps everything in this browser (localStorage).
  * To go live, swap these functions for API calls (for example Supabase tables
  * `tests` and `config`) and keep the same shapes.
  */
-const KEY = 'ischool.placement.v2.tests.3'
+const KEY = 'ischool.placement.v2.tests.4'
 const CFG_KEY = 'ischool.placement.v2.config'
 
 const safeGet = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
@@ -21,7 +22,7 @@ const emit = () => subs.forEach(f => f())
 
 function load(): TestRecord[] {
   const raw = safeGet(KEY)
-  if (raw) try { return JSON.parse(raw) } catch { /* fall through */ }
+  if (raw) try { return (JSON.parse(raw) as TestRecord[]).map(t => (isExpired(t) ? { ...t, status: 'expired' as const } : t)) } catch { /* fall through */ }
   return seed()
 }
 function persist() { safeSet(KEY, JSON.stringify(tests)); emit() }
@@ -35,6 +36,8 @@ export const store = {
     tests = i >= 0 ? tests.map(t => (t.id === rec.id ? rec : t)) : [rec, ...tests]
     persist()
   },
+  /** PRD 6.8: the open test in this browser, if it is less than 24 hours old. */
+  resumable: () => tests.find(t => t.status === 'in_progress' && !t.simulated && !isExpired(t)),
   remove(id: string) { tests = tests.filter(t => t.id !== id); persist() },
   reset() { tests = seed(); persist() },
   setConfig(c: Config) { config = c; safeSet(CFG_KEY, JSON.stringify(c)); emit() },
@@ -55,6 +58,10 @@ function seed(): TestRecord[] {
     const created = now - Math.floor(rng() * 9 * 864e5) - i * 3600e3
     let t = created
     r.answers.forEach(a => { a.sec = Math.round(9 + rng() * 55); t += a.sec * 1000 })
-    return { ...r, id: 'demo' + i, createdAt: created, finishedAt: t, avatar: AVATARS[i % AVATARS.length], lang: (rng() > 0.6 ? 'ar' : 'en') as 'ar' | 'en' }
+    const n = 1000 + Math.floor(rng() * 9000)
+    return {
+      ...r, id: 'demo' + i, createdAt: created, finishedAt: t, avatar: randomBuddy(rng), lang: (rng() > 0.6 ? 'ar' : 'en') as 'ar' | 'en',
+      code: `STA-ISCHOOL-S-${400 + i}`, phone: `+20 10 ${String(n).slice(0, 2)}${i % 10} ${n}`, email: `${name.toLowerCase()}.parent@example.com`,
+    }
   }).sort((a, b) => b.createdAt - a.createdAt)
 }

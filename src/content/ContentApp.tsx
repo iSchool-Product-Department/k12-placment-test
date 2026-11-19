@@ -132,15 +132,15 @@ function Rules() {
   const set = (k: keyof Config, v: number) => store.setConfig({ ...cfg, [k]: v })
   const fields: [keyof Config, string, number][] = [
     ['warmPass', 'Warm-up pass mark (of 3)', 3], ['knowUp', 'Knowledge: go up at (of 4)', 4], ['knowLow', 'Knowledge: lower grade at or below (of 4)', 4],
-    ['gradeUpper', 'Grade check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Core starts at strength', 100], ['advAt', 'Tier: Advanced starts at strength', 100],
+    ['gradeUpper', 'Grade check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Creators starts at strength', 100], ['advAt', 'Tier: Innovators starts at strength', 100],
     ['fastSec', 'Fast answer: seconds', 10], ['fastCount', 'Fast answers before a flag', 15],
   ]
   const r = (a: number, b: number) => (a === b ? `${a}` : `${a} to ${b}`)
   const table: [string, string, string][] = [
     ['Warm-up (3)', r(cfg.warmPass, 3), 'Pass: knowledge check at this level'],
-    ['Warm-up (3)', r(0, cfg.warmPass - 1), 'Fail: warm-up one level down. At Level 1: Grade 1, Foundation'],
+    ['Warm-up (3)', r(0, cfg.warmPass - 1), 'Fail: warm-up one level down. At Level 1: Grade 1, Explorers'],
     ['Warm-up down (3)', r(cfg.warmPass, 3), 'Final level is this level: grade check'],
-    ['Warm-up down (3)', r(0, cfg.warmPass - 1), 'Lower grade of this level, Foundation'],
+    ['Warm-up down (3)', r(0, cfg.warmPass - 1), 'Lower grade of this level, Explorers'],
     ['Knowledge at S (4)', r(0, cfg.knowLow), 'Lower grade of S'],
     ['Knowledge at S (4)', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Grade check at S'],
     ['Knowledge at S (4)', r(cfg.knowUp, 4), 'Knowledge check one level up (Level 6: grade check)'],
@@ -195,8 +195,8 @@ function Rules() {
           <ul className="m-0 space-y-1.5 ps-5 text-sm">
             <li><b>2 of 4, easy right and hard wrong</b>: middle score, grade check at the level. The usual case.</li>
             <li><b>2 of 4, hard right and easy wrong</b>: same path, plus an "odd pattern" flag for the teacher.</li>
-            <li><b>Missed the starter</b> but got both puzzles: the warm-up still passes. Flag "check digital basics", tier at most Core.</li>
-            <li><b>Level 1 warm-up fails</b>: no level below, so Grade 1, Foundation, flagged. This is the shortest test (3 questions).</li>
+            <li><b>Missed the starter</b> but got both puzzles: the warm-up still passes. Flag "check digital basics", tier at most Creators.</li>
+            <li><b>Level 1 warm-up fails</b>: no level below, so Grade 1, Explorers, flagged. This is the shortest test (3 questions).</li>
             <li><b>Level 6 and strong</b>: no level above, so straight to the grade check.</li>
             <li><b>No unseen question at the asked difficulty</b>: any unseen question from the same pool and level. Shown in the team view.</li>
             <li><b>Closed early</b>: saved as "Not finished", no placement.</li>
@@ -215,12 +215,12 @@ function Tiers() {
     <div className="grid gap-4 md:grid-cols-2">
       <Panel title="Three tiers inside each grade" sub="Same questions as before. The tier uses the answers the test already has.">
         <div className="relative mb-6 mt-4 flex h-10 overflow-hidden rounded-full text-sm font-extrabold">
-          <div className="grid place-items-center bg-[#FFE2CC] text-orange-deep" style={{ width: `${cfg.coreAt}%` }}>Foundation</div>
-          <div className="grid place-items-center bg-[#CFE7FF] text-deep" style={{ width: `${cfg.advAt - cfg.coreAt}%` }}>Core</div>
-          <div className="grid flex-1 place-items-center bg-[#FFF1A6] text-[#8A6A00]">Advanced</div>
+          <div className="grid place-items-center bg-[#FFE2CC] text-orange-deep" style={{ width: `${cfg.coreAt}%` }}>Explorers</div>
+          <div className="grid place-items-center bg-[#CFE7FF] text-deep" style={{ width: `${cfg.advAt - cfg.coreAt}%` }}>Creators</div>
+          <div className="grid flex-1 place-items-center bg-[#FFF1A6] text-[#8A6A00]">Innovators</div>
         </div>
         <div className="-mt-4 mb-4 flex justify-between text-xs font-bold text-soft"><span>0</span><span style={{ marginInlineStart: `${cfg.coreAt - 4}%` }}>{cfg.coreAt}</span><span>{cfg.advAt}</span><span>100</span></div>
-        {(['Foundation', 'Core', 'Advanced'] as Tier[]).map(t => <div key={t} className="mb-2 flex items-center gap-3"><TierBadge tier={t} /><span className="text-sm">{TIER_STYLE[t].blurb}</span></div>)}
+        {(['Explorers', 'Creators', 'Innovators'] as Tier[]).map(t => <div key={t} className="mb-2 flex items-center gap-3"><TierBadge tier={t} /><span className="text-sm">{TIER_STYLE[t].blurb}</span></div>)}
       </Panel>
       <Panel title="How strength is worked out" sub="Only answers at the final level count. Harder questions count more.">
         <div className="mb-3 grid grid-cols-4 gap-2 text-center">
@@ -229,10 +229,10 @@ function Tiers() {
         <p className="m-0 text-sm">Strength = points earned ÷ points possible × 100.</p>
         <h4 className="mb-1 mt-4 text-deep">Caps</h4>
         <ul className="m-0 space-y-1 ps-5 text-sm">
-          <li>Failed the warm-up at Level 1, or both warm-ups: <b>Foundation</b>.</li>
-          <li>4 of 4 one level up: <b>Advanced</b>.</li>
-          <li>Missed a digital literacy starter: <b>at most Core</b>.</li>
-          <li>Many very fast answers: <b>at most Core</b>.</li>
+          <li>Failed the warm-up at Level 1, or both warm-ups: <b>Explorers</b>.</li>
+          <li>4 of 4 one level up: <b>Innovators</b>.</li>
+          <li>Missed a digital literacy starter: <b>at most Creators</b>.</li>
+          <li>Many very fast answers: <b>at most Creators</b>.</li>
         </ul>
         <h4 className="mb-1 mt-4 text-deep">Confidence</h4>
         <p className="m-0 text-sm">7+ questions at the final level: high. 4 to 6: medium. 3 or fewer: the teacher confirms in session 1.</p>
@@ -251,13 +251,13 @@ function Sim({ go }: { go: (h: string) => void }) {
     const N = 300, grades: Record<number, Record<Tier, number>> = {}; let q = 0, m = 0
     for (let i = 0; i < N; i++) {
       const r = simulate(ab, age, BANK, cfg)
-      const g = r.placement!.grade; grades[g] ||= { Foundation: 0, Core: 0, Advanced: 0 }; grades[g][r.tier!.tier]++
+      const g = r.placement!.grade; grades[g] ||= { Explorers: 0, Creators: 0, Innovators: 0 }; grades[g][r.tier!.tier]++
       q += r.answers.length; m += r.answers.reduce((s, a) => s + (BANK.find(x => x.id === a.qid)!.pool === 'Grade task' ? 75 : 40), 0) / 60
     }
     setRes({ grades, q: q / N, m: m / N })
   }
   const one = () => { const r = simulate(ab, age, BANK, cfg, Math.random, 'Simulated student'); r.avatar = '🧪'; store.save(r); go(`admin/${r.id}`) }
-  const max = res ? Math.max(...Object.values(res.grades).map(g => g.Foundation + g.Core + g.Advanced)) : 1
+  const max = res ? Math.max(...Object.values(res.grades).map(g => g.Explorers + g.Creators + g.Innovators)) : 1
   return (
     <div className="grid gap-4 md:grid-cols-[340px_minmax(0,1fr)]">
       <Panel title="Simulated students" sub="Simulated students answer at random, more often right on questions at or below their skill.">
@@ -277,14 +277,14 @@ function Sim({ go }: { go: (h: string) => void }) {
               {Object.entries(res.grades).sort((a, b) => +a[0] - +b[0]).map(([g, t]) => (
                 <div key={g} className="grid grid-cols-[72px_1fr_44px] items-center gap-2 text-sm font-bold">
                   <span>Grade {g}</span>
-                  <div className="flex h-6 overflow-hidden rounded-lg bg-sky" style={{ width: `${((t.Foundation + t.Core + t.Advanced) / max) * 100}%` }}>
-                    {(['Foundation', 'Core', 'Advanced'] as Tier[]).map(k => <motion.i key={k} initial={{ width: 0 }} animate={{ width: `${(t[k] / (t.Foundation + t.Core + t.Advanced)) * 100}%` }} style={{ background: TIER_STYLE[k].dot }} title={`${k}: ${t[k]}`} />)}
+                  <div className="flex h-6 overflow-hidden rounded-lg bg-sky" style={{ width: `${((t.Explorers + t.Creators + t.Innovators) / max) * 100}%` }}>
+                    {(['Explorers', 'Creators', 'Innovators'] as Tier[]).map(k => <motion.i key={k} initial={{ width: 0 }} animate={{ width: `${(t[k] / (t.Explorers + t.Creators + t.Innovators)) * 100}%` }} style={{ background: TIER_STYLE[k].dot }} title={`${k}: ${t[k]}`} />)}
                   </div>
-                  <span className="text-end">{Math.round(((t.Foundation + t.Core + t.Advanced) / 300) * 100)}%</span>
+                  <span className="text-end">{Math.round(((t.Explorers + t.Creators + t.Innovators) / 300) * 100)}%</span>
                 </div>
               ))}
             </div>
-            <div className="mt-3 flex gap-3 text-xs font-bold">{(['Foundation', 'Core', 'Advanced'] as Tier[]).map(k => <span key={k} className="flex items-center gap-1"><i className="h-2.5 w-2.5 rounded-full" style={{ background: TIER_STYLE[k].dot }} />{k}</span>)}</div>
+            <div className="mt-3 flex gap-3 text-xs font-bold">{(['Explorers', 'Creators', 'Innovators'] as Tier[]).map(k => <span key={k} className="flex items-center gap-1"><i className="h-2.5 w-2.5 rounded-full" style={{ background: TIER_STYLE[k].dot }} />{k}</span>)}</div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-sky p-3"><div className="text-xs font-bold text-soft">Average questions</div><div className="text-2xl font-extrabold text-deep">{res.q.toFixed(1)}</div></div>
               <div className="rounded-2xl bg-sky p-3"><div className="text-xs font-bold text-soft">Average minutes (estimate)</div><div className="text-2xl font-extrabold text-deep">{res.m.toFixed(1)}</div></div>

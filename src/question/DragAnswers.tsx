@@ -27,7 +27,7 @@ interface Common { q: Question; lang: Lang; salt: string; review?: boolean; hint
 
 // Pointer: drop where the finger is. Keyboard: drop on the closest place.
 const collide: CollisionDetection = a => (a.pointerCoordinates ? pointerWithin(a) : closestCenter(a))
-const useDragSensors = () => useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor))
+export const useDragSensors = () => useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor))
 
 const Grip = () => <GripVertical size={18} className="ms-auto shrink-0 text-soft" aria-hidden="true" />
 
