@@ -38,7 +38,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 bg-blue text-white shadow-md">
-        <div className="relative mx-auto flex h-16 max-w-6xl items-center gap-3 overflow-hidden ps-4 pe-16" dir="ltr">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4" dir="ltr">
           <img src="./ischool-logo-white.png" alt="iSchool" className="h-8 w-auto" />
           <span className="hidden font-[var(--font-head)] text-lg font-bold sm:inline">Placement Test</span>
           <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
@@ -51,7 +51,6 @@ export default function App() {
               {(['en', 'ar'] as Lang[]).map(l => <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l} className={clsx('rounded-full px-2.5 py-1.5 text-sm font-extrabold', lang === l ? 'bg-white text-deep' : 'text-white/90')}>{l === 'en' ? 'EN' : 'عربي'}</button>)}
             </div>
           )}
-          <svg className="pointer-events-none absolute -right-8 -top-12 hidden h-24 w-24 opacity-90 sm:block" viewBox="0 0 100 100" aria-hidden="true"><path d="M10 90 Q 20 20 90 10" fill="none" stroke="#FF7F1C" strokeWidth="9" strokeLinecap="round" /><circle cx="18" cy="72" r="5" fill="#FFD700" /></svg>
         </div>
       </header>
       <main><Safe key={route.join('-')}>
