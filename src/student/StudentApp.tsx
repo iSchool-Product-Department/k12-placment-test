@@ -24,7 +24,7 @@ export default function StudentApp({ lang }: { lang: Lang }) {
   const band = bandOf(age)
 
   const begin = () => {
-    const r = newTest({ name: name.trim() || (lang === 'ar' ? 'طالب' : 'Student'), age: age!, avatar, lang }, BANK)
+    const r = newTest({ name: name.trim(), age: age!, avatar, lang }, BANK)
     store.save(r); setRec(r); setPhase('test')
   }
   const restart = () => {
@@ -100,7 +100,7 @@ function Welcome({ t, band, name, setName, age, setAge, avatar, setAvatar, onSta
           ))}
         </div>
         <div className="mt-7 flex justify-center">
-          <motion.button whileTap={{ scale: 0.96 }} disabled={!age} onClick={onStart}
+          <motion.button whileTap={{ scale: 0.96 }} disabled={!age || !name.trim()} onClick={onStart}
             className="flex items-center gap-2 rounded-full bg-orange px-8 py-3.5 text-lg font-extrabold text-white shadow-lg shadow-orange/30 disabled:opacity-40">
             {t.start} <ArrowRight size={20} className="rtl:rotate-180" />
           </motion.button>
@@ -134,7 +134,10 @@ function Practice({ t, band, lang, onDone }: { t: typeof T.en; band: Band; lang:
 function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; band: Band; onAnswer: (v: AnswerValue, sec: number) => void }) {
   const t = T[lang]
   const q = currentQuestion(rec, BY_ID)!
-  const [value, setValue] = useState<AnswerValue | null>(null)
+  // The answer belongs to one question. Moving on must never hand it to the next one (a letter where a list is expected crashed the page).
+  const [ans, setAns] = useState<{ id: string; v: AnswerValue | null }>({ id: '', v: null })
+  const value = q && ans.id === q.id ? ans.v : null
+  const setValue = (v: AnswerValue | null) => setAns({ id: q.id, v })
   const [toast, setToast] = useState<string | null>(null)
   // Questions with a stage: "Run it" locks the answer and plays it, then Next moves on. No changes after Run.
   const [locked, setLocked] = useState(false)
@@ -142,7 +145,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const sec = useRef(0)
   const t0 = useRef(Date.now())
   useEffect(() => {
-    setValue(null); setLocked(false); setPlayed(false); t0.current = Date.now()
+    setLocked(false); setPlayed(false); t0.current = Date.now()
   }, [q?.id])
   if (!q) return null
   const n = rec.answers.length

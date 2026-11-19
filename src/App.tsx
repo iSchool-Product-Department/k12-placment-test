@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Component, useEffect, useState, type ReactNode } from 'react'
 import clsx from 'clsx'
 import { GraduationCap, LayoutDashboard, Library } from 'lucide-react'
 import StudentApp from './student/StudentApp'
@@ -8,6 +8,23 @@ import type { Lang } from './i18n'
 
 // Plain #name hashes (student, admin, admin-<id>, content-rules) so links work everywhere, including inside artifacts.
 const read = () => (location.hash.replace(/^#\/?/, '') || 'student').split(/[-/]/)
+
+// Last line of defence: a render error shows this instead of a blank white page. Changing view resets it.
+class Safe extends Component<{ children: ReactNode }, { err: Error | null }> {
+  state = { err: null as Error | null }
+  static getDerivedStateFromError(err: Error) { return { err } }
+  componentDidCatch(err: Error) { console.error(err) }
+  render() {
+    if (!this.state.err) return this.props.children
+    return (
+      <div className="mx-auto mt-16 max-w-md rounded-3xl border border-line bg-white p-6 text-center shadow-[var(--shadow-card)]">
+        <h2 className="m-0 text-2xl text-deep">Something went wrong on this screen</h2>
+        <p className="mb-4 mt-2 text-soft">Your answers so far are saved.</p>
+        <button onClick={() => location.reload()} className="rounded-full bg-orange px-6 py-2.5 font-extrabold text-white">Reload</button>
+      </div>
+    )
+  }
+}
 
 export default function App() {
   const [route, setRoute] = useState(read)
@@ -37,11 +54,11 @@ export default function App() {
           <svg className="pointer-events-none absolute -right-8 -top-12 hidden h-24 w-24 opacity-90 sm:block" viewBox="0 0 100 100" aria-hidden="true"><path d="M10 90 Q 20 20 90 10" fill="none" stroke="#FF7F1C" strokeWidth="9" strokeLinecap="round" /><circle cx="18" cy="72" r="5" fill="#FFD700" /></svg>
         </div>
       </header>
-      <main>
+      <main><Safe key={route.join('-')}>
         {view === 'student' && <StudentApp key={lang} lang={lang} />}
         {view === 'admin' && <AdminApp route={route} go={go} />}
         {view === 'content' && <ContentApp route={route} go={go} />}
-      </main>
+      </Safe></main>
     </div>
   )
 }

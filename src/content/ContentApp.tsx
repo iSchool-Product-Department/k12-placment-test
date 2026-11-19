@@ -75,7 +75,7 @@ function Bank() {
             ))}
           </div>
         </section>
-        <Preview q={sel} />
+        <Preview key={sel.id} q={sel} />
       </div>
     </div>
   )
