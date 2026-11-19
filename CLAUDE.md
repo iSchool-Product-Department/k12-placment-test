@@ -2,6 +2,8 @@
 
 The PRD is the source of truth: [iSchool Placement Test PRD](https://docs.google.com/document/d/1Tx9PsSYmmA0DU_IToRnGX8upIXgo-ntrOK6l6h2j--c/edit). Read it before changing behavior. This file only lists what is easy to get wrong.
 
+Every decision made while building goes into `PRD-updates.md` (by PRD section) until someone pastes it into the PRD.
+
 ## This is a demo
 - Front end only. Storage is localStorage through `src/store.ts`, nothing else touches it.
 - Fake students (seeded in `store.ts`). No backend, no login. Ignore PRD section 11 (Supabase, team login) for now.
@@ -12,6 +14,8 @@ The PRD is the source of truth: [iSchool Placement Test PRD](https://docs.google
 - 3 to 15 scored questions. The first scored question is always a Starter.
 - Tiers: Explorers, Creators, Innovators. Group name is tier plus grade, like "Creators G4".
 - Students see only their grade. Never show them the tier, score, strength or right and wrong.
+- Read-aloud plays only when the student taps Listen. Never on its own.
+- Option pictures stay big enough to read. Students should not scroll to reach the answers.
 - Stages (robot, bee, number line) stay still while the student answers. Next locks the answer, plays it, then moves on by itself. Never let a student change an answer after Next.
 - No XP, no points, no streaks for students.
 - No retakes. A finished test is final. An unfinished test resumes within 24 hours, then expires.
