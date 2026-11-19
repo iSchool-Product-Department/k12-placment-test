@@ -11,11 +11,12 @@ declare const __ADMIN_KEY__: string | null
 export const adminKey = __ADMIN_KEY__
 export const studentOnly = import.meta.env.PROD
 
-const headers = (auth = KEY!) => ({ apikey: KEY!, Authorization: `Bearer ${auth}`, 'Content-Type': 'application/json' })
+// apikey alone: the new sb_publishable_/sb_secret_ keys are not JWTs and fail as a Bearer token (401).
+const headers = () => ({ apikey: KEY!, 'Content-Type': 'application/json' })
 
 export async function saveTest(rec: TestRecord) {
   const r = await fetch(`${URL_}/rest/v1/rpc/save_test`, { method: 'POST', headers: headers(), body: JSON.stringify({ rec }) })
-  if (!r.ok) throw new Error(`save ${r.status}`)
+  if (!r.ok) throw new Error(`save ${r.status} ${await r.text()}`)
 }
 
 const PASS = 'ischool.placement.adminpass'
@@ -33,7 +34,7 @@ export async function fetchTests(password = savedPassword()): Promise<TestRecord
     return body
   }
   if (!adminKey) throw new Error('Add SUPABASE_SERVICE_KEY to .env.local, then restart npm run dev.')
-  const r = await fetch(`${URL_}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: adminKey, Authorization: `Bearer ${adminKey}` } })
+  const r = await fetch(`${URL_}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: adminKey } })
   if (!r.ok) throw new Error(`load ${r.status}`)
   return (await r.json()).map((x: { data: TestRecord }) => x.data)
 }
