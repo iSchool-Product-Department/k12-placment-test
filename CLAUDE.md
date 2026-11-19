@@ -4,9 +4,9 @@ The PRD is the source of truth: [iSchool Placement Test PRD](https://docs.google
 
 Every decision made while building goes into `PRD-updates.md` (by PRD section) until someone pastes it into the PRD.
 
-## This is a demo
-- Front end only. Storage is localStorage through `src/store.ts`, nothing else touches it.
-- Fake students (seeded in `store.ts`). No backend, no login. Ignore PRD section 11 (Supabase, team login) for now.
+## Storage
+- Everything goes through `src/store.ts`. With `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set (`.env.local`), tests save to Supabase (`src/cloud.ts`, plain fetch, schema in `supabase/schema.sql`) and the admin needs a team sign-in. Without them it is a local demo with fake students seeded in `store.ts`.
+- Students can only call `save_test`; they can never read results. Keep it that way.
 
 ## Rules that must match the PRD
 - Placement logic is PRD section 5. `src/engine/engine.ts` implements it, and every row of the "Every possible score" table (5.3) has a test in `src/engine/engine.test.ts`. Change the PRD, the engine and the test together, then run `npm test`.
