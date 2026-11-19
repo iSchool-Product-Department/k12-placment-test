@@ -92,7 +92,7 @@ function TileView({ tile, lang, on }: { tile: Tile; lang: Lang; on?: boolean }) 
   const I = tile.i ? ICONS[tile.i] : null
   const tone = TONE[tile.tone || 'blue']
   return (
-    <div className={clsx('flex min-w-[64px] flex-col items-center gap-1 rounded-2xl border-2 border-line bg-white px-3 py-2.5 transition-all duration-300', on && lit)}>
+    <div className={clsx('flex min-w-[56px] max-w-full flex-col items-center gap-1 rounded-2xl border-2 border-line bg-white px-3 py-2.5 transition-all duration-300', on && lit)}>
       {I && <div className={clsx('flex max-w-[180px] flex-wrap justify-center gap-0.5', tone, tile.faint && 'opacity-40')}>{Array.from({ length: tile.n || 1 }, (_, k) => <I key={k} size={tile.n && tile.n > 1 ? 30 : 40} strokeWidth={1.75} fill={tile.tone === 'gold' ? 'currentColor' : 'none'} />)}</div>}
       {tile.t && <span className={clsx('text-center font-extrabold', I ? 'text-sm text-ink' : clsx('text-xl', tile.tone ? tone : 'text-ink'))}>{say(tile.t, lang)}</span>}
     </div>
@@ -120,9 +120,9 @@ function Week({ hops, lang, choice, play, onDone }: { hops: number; lang: Lang; 
   const step = useSteps(play, hops, 650, onDone)
   const picked = DAYS.findIndex(([en]) => typeof choice === 'string' && choice.startsWith(en))
   return (
-    <div className={box} aria-hidden="true">
+    <div className="mx-auto grid w-full max-w-[460px] grid-cols-7 gap-1 rounded-2xl bg-mist p-2 sm:gap-2 sm:p-3" aria-hidden="true">
       {DAYS.map(([en, ar], i) => (
-        <div key={en} className={clsx('relative flex min-w-[52px] flex-col items-center rounded-xl border-2 border-line bg-white px-2 pb-4 pt-2 font-extrabold', i === 0 ? 'text-orange' : 'text-ink', i === picked && mark)}>
+        <div key={en} className={clsx('relative flex min-w-0 flex-col items-center rounded-xl border-2 border-line bg-white px-0.5 pb-4 pt-2 text-xs font-extrabold sm:text-base', i === 0 ? 'text-orange' : 'text-ink', i === picked && mark)}>
           {lang === 'ar' ? ar : en.slice(0, 3)}
           {i === (play ? step : 0) && <span className="absolute bottom-1 h-2.5 w-2.5 rounded-full bg-orange" />}
         </div>
@@ -156,7 +156,7 @@ function Screens({ s, lang, choice, play, onDone }: { s: Extract<SceneDef, { scr
   const screen = (parts: Part[], si: number) => {
     const goLit = s.play === 'go' && step === 2 && /setScreen/.test(pick)
     return (
-      <div key={si} className={clsx('relative flex h-[200px] w-[130px] flex-col items-center gap-2 rounded-[22px] border-4 bg-white p-2.5 pt-4 transition-all duration-300',
+      <div key={si} className={clsx('relative flex h-[200px] w-[min(130px,34vw)] flex-col items-center gap-2 rounded-[22px] border-4 bg-white p-2.5 pt-4 transition-all duration-300',
         frameOn ? 'border-deep' : 'border-dashed border-line', si === 1 && goLit && 'scale-105 border-blue!', si === 0 && goLit && 'opacity-50',
         /background/i.test(pick) && mark)}>
         {parts.map((p, i) => {
@@ -169,7 +169,7 @@ function Screens({ s, lang, choice, play, onDone }: { s: Extract<SceneDef, { scr
             return built(/start button/i) && <span key={i} className={clsx('relative rounded-full bg-orange px-4 py-1 text-sm font-extrabold text-white transition-transform', marked, tapped && 'scale-90')}>
               {t}{tapped && <Tap size={26} className="absolute -bottom-5 -end-4 text-deep" strokeWidth={2} />}</span>
           }
-          if (p.k === 'input') return <span key={i} className="w-full rounded-lg border-2 border-line px-2 py-1 text-xs text-soft">{t}</span>
+          if (p.k === 'input') return <span key={i} className="w-full truncate rounded-lg border-2 border-line px-2 py-1 text-xs text-soft">{t}</span>
           if (p.k === 'sprite') return <Sprite key={i} size={40} className="text-blue" strokeWidth={1.75} />
           // A hidden sprite peeks out behind the picture. "front" brings it forward, if that was the pick.
           const front = p.hidden && step > 0 && /front/i.test(pick)

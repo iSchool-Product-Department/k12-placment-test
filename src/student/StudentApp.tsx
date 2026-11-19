@@ -259,7 +259,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
             <QuestionView q={q} lang={lang} band={band} value={value} onChange={setValue} salt={rec.id} locked={locked} onPlayed={() => setPlayedId(q.id)}
               listenHot={rec.practice?.readHelp} tapMode={rec.practice?.tapMode} />
             {/* Next stays on screen even when a question is taller than the window. */}
-            <div className="sticky bottom-0 -mx-4 mt-4 flex justify-end rounded-b-3xl bg-white/95 px-4 py-3 sm:-mx-6 sm:px-6">
+            <div className="sticky bottom-0 -mx-4 mt-4 flex justify-end rounded-b-3xl bg-white/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:px-6">
               <Btn disabled={!ready || locked} onClick={submit}>{t.next} <ArrowRight size={18} className="rtl:rotate-180" /></Btn>
             </div>
           </Card>
