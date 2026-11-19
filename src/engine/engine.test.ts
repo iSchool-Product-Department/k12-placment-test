@@ -7,6 +7,7 @@ import type { Question, TestRecord } from './types'
 import { blockIndents, codeIndents, isBlockOrder, isCodeOrder } from '../question/codeLines'
 import { ICONS } from '../question/icons'
 import { SIM_IDS } from '../question/Visual'
+import { SCENE_IDS } from '../question/Scene'
 
 const bank = bankJson as Question[]
 const byId = new Map(bank.map(q => [q.id, q]))
@@ -87,6 +88,9 @@ describe('answer keys', () => {
       if (q.oicon?.[i]) expect(ICONS[q.oicon[i]], q.oicon[i]).toBeDefined()
     }
     expect(byId.get('L2-DL-04')!.oicon).toEqual(['search', 'sound', 'trash', ''])
+    // Icons drawn from card words (ages 6 to 9) are all different, so a Sort never hints with two matching icons.
+    expect(byId.get('L1-G1-34')!.oicon).toEqual(['coin', 'star', 'spike', 'flame'])
+    for (const q of bank.filter(q => q.oicon && q.t === 'Sort')) expect(new Set(q.oicon!.filter(Boolean)).size, q.id).toBe(q.o.filter(Boolean).length)
   })
   it('block programs nest with the ">" sheet rule or code colons', () => {
     expect(bank.filter(isBlockOrder).map(q => q.id)).toEqual(['L1-T-01', 'L1-T-06', 'L2-T-01', 'L2-T-03', 'L2-T-05'])
@@ -98,6 +102,7 @@ describe('answer keys', () => {
   })
   it('every stage belongs to a real question, and questions keep the age word limits (sheet Settings)', () => {
     for (const id of SIM_IDS) expect(byId.has(id), id).toBe(true)
+    for (const id of SCENE_IDS) expect(byId.has(id), id).toBe(true)
     const limit: Record<number, number> = { 1: 10, 2: 14, 3: 18, 4: 20, 5: 22, 6: 22 }
     for (const q of bank) expect(q.q.split(/\s+/).filter(Boolean).length, q.id).toBeLessThanOrEqual(limit[q.lv])
   })

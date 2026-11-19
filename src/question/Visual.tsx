@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { Question } from '../engine/types'
+import type { Lang } from '../i18n'
+import { Scene, hasScene } from './Scene'
 
 /* ------------------------------------------------------------------ live stages (grid and number line)
    Keyed by question ID. Check the stage again whenever its question changes in the sheet. */
@@ -34,6 +36,9 @@ const SIM: Record<string, Sim> = {
   'L1-T-01': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['battery', [2, 1]], run: (seq: string[]) => seq.map(x => (/left/.test(x) ? 'L' : 'F')) },
   'L1-T-06': { g: [4, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (seq: string[]) => { const out: string[] = []; for (let i = 0; i < seq.length; i++) { const x = seq[i]; if (/repeat/.test(x)) { const nx = seq[i + 1]; if (nx) { out.push(...rep(3, /nectar/.test(nx) ? ['N'] : ['F'])); i++ } } else out.push(/nectar/.test(x) ? 'N' : 'F') } return out } },
   'L1-G2-02': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [4, 0], run: (o: string) => { const m = o.match(/repeat (\d+)/); return rep(m ? +m[1] : 1, ['F']) } },
+  'L1-G2-21': { g: [5, 1], a: 'robot', s: [0, 0], f: 'r', count: 'F', run: () => rep(2, ['F']) },
+  'L1-G2-22': { g: [3, 1], a: 'robot', s: [0, 0], f: 'r', walls: [[1, 0]], run: (o: string) => (/wait/i.test(o) ? ['W'] : ['F']) },
+  'L1-G2-23': { g: [3, 3], a: 'robot', s: [1, 1], f: 'u', run: () => rep(4, ['R']) },
   'L1-G2-15': { g: [5, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (o: string) => rep(+o || 0, ['F']) },
   'L1-G2-19': { g: [3, 1], a: 'bee', s: [1, 0], f: 'r', walls: [[2, 0]], run: (o: string) => (/forward/i.test(o) ? ['F'] : /left/i.test(o) ? ['L'] : ['W']) },
   'L1-T-02': { g: [4, 4], a: 'robot', s: [0, 3], f: 'u', count: 'F', run: () => rep(3, ['F', 'F', 'R']) },
@@ -236,11 +241,12 @@ export function Code({ src }: { src: string }) {
 export const looksLikeCode = (q: Question) => q.t === 'Code MCQ' || /\n|[=;{}<>]|\w\(|\/\/|\[\d/.test(q.scr) && !/^(A |An |Three|Four|Two|Grid|Six|Pictures)/.test(q.scr)
 
 /** True when QuestionVisual draws something (keep in step with it). */
-export const hasVisual = (q: Question) => hasSim(q) || !!parsePattern(q) || (!!q.scr && (looksLikeBlocks(q) || looksLikeCode(q) || (/[:\d]/.test(q.scr) && q.scr.length < 160)))
+export const hasVisual = (q: Question) => hasSim(q) || hasScene(q) || !!parsePattern(q) || (!!q.scr && (looksLikeBlocks(q) || looksLikeCode(q) || (/[:\d]/.test(q.scr) && q.scr.length < 160)))
 
 /** Picks the right compact visual for a question, or nothing when the on-screen note was only for designers. */
-export function QuestionVisual({ q, choice, play, onDone }: { q: Question; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
+export function QuestionVisual({ q, lang = 'en', choice, play, onDone }: { q: Question; lang?: Lang; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
   if (hasSim(q)) return <Stage q={q} choice={choice} play={play} onDone={onDone} />
+  if (hasScene(q)) return <Scene q={q} lang={lang} choice={choice} play={play} onDone={onDone} />
   const pat = parsePattern(q)
   if (pat) return <Pattern items={pat} />
   if (!q.scr) return null
