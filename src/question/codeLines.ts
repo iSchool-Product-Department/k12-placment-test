@@ -31,3 +31,13 @@ export function codeIndents(lines: string[]): number[] {
     return indent
   })
 }
+
+/** Block programs for levels 1 and 2: Order questions about blocks (L1-T-01, L1-T-06, L2-T-01, L2-T-03, L2-T-05). */
+export const isBlockOrder = (q: Question) => q.t === 'Order' && q.lv <= 2 && /block/i.test(q.q + ' ' + q.scr)
+
+/** Sheet rule: an option that starts with ">" sits inside the block above it (one ">" per level). Otherwise read like code. */
+export function blockIndents(lines: string[]): number[] {
+  const code = codeIndents(lines.map(l => l.replace(/^\s*>+\s*/, '')))
+  return lines.map((l, i) => l.match(/^\s*(>+)/)?.[1].length ?? code[i])
+}
+export const blockText = (l: string) => l.replace(/^\s*>+\s*/, '').replace(/:$/, '')

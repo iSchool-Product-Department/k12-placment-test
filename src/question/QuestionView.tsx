@@ -3,8 +3,8 @@ import { Check, Volume2, X } from 'lucide-react'
 import clsx from 'clsx'
 import type { AnswerValue, Question } from '../engine/types'
 import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes, splitPair } from '../engine/engine'
-import { CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer } from './DragAnswers'
-import { isCodeOrder } from './codeLines'
+import { BlockOrderAnswer, CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer } from './DragAnswers'
+import { blockText, isBlockOrder, isCodeOrder } from './codeLines'
 import { ICONS } from './icons'
 import { T, type Band, type Lang } from '../i18n'
 import { QuestionVisual, hasSim } from './Visual'
@@ -19,7 +19,9 @@ export const stableShuffle = <T,>(arr: T[], salt: string) => {
 export const qText = (q: Question, lang: Lang) => (lang === 'ar' && q.qa) || q.q
 /** Option text. For Sort, only the item (the box is the answer). */
 export function optText(q: Question, i: number, lang: Lang) {
-  return q.t === 'Sort' ? splitPair(q, i, lang).left : (lang === 'ar' && q.oa[i]) || q.o[i] || ''
+  if (q.t === 'Sort') return splitPair(q, i, lang).left
+  const t = (lang === 'ar' && q.oa[i]) || q.o[i] || ''
+  return q.t === 'Order' && isBlockOrder(q) ? blockText(t) : t
 }
 export const picSrc = (p: string) => import.meta.env.BASE_URL + p
 const isCodey = (s: string) => !/[؀-ۿ]/.test(s) && (/[;{}=<>$#]|^\w[\w.]*\(.*\)$|\(\)/.test(s))
@@ -97,7 +99,9 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
         : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
       <div className="contents" {...(locked ? { inert: '' } : {})}>
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
-      {q.t === 'Order' && (isCodeOrder(q)
+      {q.t === 'Order' && (isBlockOrder(q)
+        ? <BlockOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.blockOrder} clear={t.clear} />
+        : isCodeOrder(q)
         ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.codeOrder} clear={t.clear} />
         : <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.tapOrder} clear={t.clear} />)}
       {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.sortHint} />}

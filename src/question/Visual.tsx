@@ -165,7 +165,7 @@ export function Pattern({ items }: { items: { kind: string; color: string }[] })
 
 /* ------------------------------------------------------------------ block code for ages 6 to 9 */
 type Blk = { text: string; kids?: Blk[] }
-const blockColor = (t: string) =>
+export const blockColor = (t: string) =>
   /^(repeat|forever)/i.test(t) ? 'bg-gold text-ink' : /^(when|on )/i.test(t) ? 'bg-orange text-white' :
   /^(set|change)/i.test(t) ? 'bg-[#FF9F4A] text-white' : /^(if|else)/i.test(t) ? 'bg-bright text-white' :
   /^(say|play)/i.test(t) ? 'bg-[#9B6BFF] text-white' : 'bg-blue text-white'

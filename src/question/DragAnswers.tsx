@@ -12,13 +12,13 @@ import {
   type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from '@dnd-kit/core'
 import clsx from 'clsx'
-import { ChevronDown, ChevronUp, GripVertical } from 'lucide-react'
+import { ChevronDown, ChevronUp, GripVertical, Play } from 'lucide-react'
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Question } from '../engine/types'
 import { correctAnswer, keysOf, matchPairs, sortBoxes } from '../engine/engine'
-import { codeFile, codeIndents } from './codeLines'
-import { CodeText } from './Visual'
+import { blockIndents, blockText, codeFile, codeIndents } from './codeLines'
+import { CodeText, blockColor } from './Visual'
 import type { Lang } from '../i18n'
 
 const L = 'ABCD'
@@ -197,6 +197,127 @@ function CodeLine({ id, n, disabled, selected, status, onTap, onMove, first, las
         <button type="button" className={arrow} disabled={first} onClick={() => onMove(-1)} aria-label={lang === 'ar' ? 'انقل السطر لأعلى' : 'Move line up'}><ChevronUp size={18} /></button>
         <button type="button" className={arrow} disabled={last} onClick={() => onMove(1)} aria-label={lang === 'ar' ? 'انقل السطر لأسفل' : 'Move line down'}><ChevronDown size={18} /></button>
       </span>
+    </li>
+  )
+}
+
+// ---------------------------------------------------------------- Blocks (levels 1 and 2)
+/**
+ * Scratch-style: blocks wait in the palette, the student snaps them into the script.
+ * Drag a block in (it lands where you drop it), drag it to reorder, drag it out to remove.
+ * Or tap: a palette block goes to the bottom of the script, a script block goes back.
+ * Loops and "if" wrap the blocks that sit inside them, read from the sheet's ">" rule.
+ */
+export function BlockOrderAnswer({ q, lang, value, set, salt, review, hint, big, shuffle }: OrderProps) {
+  const keys = keysOf(q).map(i => L[i])
+  const script = value.filter(Boolean)
+  const pool = useMemo(() => shuffle(keys, q.id + salt), [q.id])
+  const palette = pool.filter(k => !script.includes(k))
+  const depths = blockIndents(keys.map(k => q.o[L.indexOf(k)]))
+  const at = (k: string) => L.indexOf(k)
+  const label = (k: string) => blockText((lang === 'ar' && q.oa[at(k)]) || q.o[at(k)])
+  const color = (k: string) => blockColor(blockText(q.o[at(k)]))
+  const opens = (k: string) => depths[at(k) + 1] > depths[at(k)]
+  const hat = (k: string) => /^when\b/i.test(blockText(q.o[at(k)]))
+  const hasHat = keys.some(hat)
+  const [active, setActive] = useState<string | null>(null)
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
+  const save = (s: string[]) => set(s.length ? s : null)
+  // Prefer a block under the finger over the script area around it.
+  const collideBlocks: CollisionDetection = a => {
+    if (!a.pointerCoordinates) return closestCenter(a)
+    const hits = pointerWithin(a), blocks = hits.filter(h => h.id !== 'script' && h.id !== 'palette')
+    return blocks.length ? blocks : hits
+  }
+  const end = ({ active: a, over }: DragEndEvent) => {
+    setActive(null)
+    const k = String(a.id), o = over ? String(over.id) : 'palette', rest = script.filter(x => x !== k)
+    if (o === 'palette') return script.includes(k) && save(rest)
+    if (o === 'script') return save([...rest, k])
+    if (script.includes(k)) return save(arrayMove(script, script.indexOf(k), script.indexOf(o)))
+    const s2 = [...script]; s2.splice(script.indexOf(o), 0, k); save(s2)
+  }
+
+  // Lay the script out: blocks inside a loop get the loop's arm on their left, and the loop closes with a cap.
+  type Open = { k: string; d: number; hat: boolean; kids: number }
+  const rows: ReactNode[] = [], stack: Open[] = []
+  const arms = () => stack.filter(o => !o.hat).map(o => o.k)
+  const close = () => {
+    const o = stack.pop()!
+    if (o.hat) return
+    if (!o.kids) rows.push(<Arms key={'m' + o.k} arms={[...arms(), o.k]} color={color} className="h-6" />)
+    rows.push(<Arms key={'c' + o.k} arms={arms()} color={color}><span className={clsx('h-4 w-24 rounded-e-md rounded-bl-md', color(o.k).split(' ')[0])} /></Arms>)
+  }
+  script.forEach((k, i) => {
+    while (stack.length && stack[stack.length - 1].d >= depths[at(k)]) close()
+    if (stack.length) stack[stack.length - 1].kids++
+    const ok = review ? q.o[at(k)] === q.o[i] : undefined
+    rows.push(
+      <ScriptBlock key={k} id={k} arms={arms()} color={color} disabled={review} big={big} hat={hat(k)} opens={opens(k)} ok={ok}
+        onTap={() => save(script.filter(x => x !== k))}>{label(k)}</ScriptBlock>,
+    )
+    if (opens(k)) stack.push({ k, d: depths[at(k)], hat: hat(k), kids: 0 })
+  })
+  while (stack.length) close()
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={collideBlocks} onDragStart={e => setActive(String(e.active.id))} onDragEnd={end} onDragCancel={() => setActive(null)}>
+      <div className="flex flex-col gap-3">
+        <p className="m-0 text-sm text-soft">{hint}</p>
+        <SortableContext items={script} strategy={verticalListSortingStrategy}>
+          <ScriptArea>
+            {!hasHat && <div className="mb-px flex w-fit items-center gap-2 rounded-t-2xl rounded-b-md bg-orange px-4 pb-2 pt-3 text-sm font-extrabold text-white"><Play size={16} className="fill-white" />{lang === 'ar' ? 'عند التشغيل' : 'when Run it'}</div>}
+            {rows}
+            {!script.length && <div className="mt-1 rounded-md border-2 border-dashed border-bright/60 px-4 py-2 text-sm font-bold text-soft">{lang === 'ar' ? 'ضع الكتل هنا' : 'Snap blocks here'}</div>}
+          </ScriptArea>
+        </SortableContext>
+        {!review && (
+          <Zone id="palette" className="flex min-h-[56px] flex-wrap items-start gap-2 rounded-2xl border-2 border-transparent p-1">
+            {palette.map(k => (
+              <Card key={k} id={k} onTap={() => save([...script, k])}
+                className={clsx('relative rounded-md px-3 font-extrabold', big ? 'py-3 text-base' : 'py-2 text-sm', color(k), hat(k) && 'rounded-t-2xl pt-3')}>
+                {label(k)}
+              </Card>
+            ))}
+          </Zone>
+        )}
+      </div>
+      <DragOverlay dropAnimation={null}>
+        {active && <div className={clsx('w-fit rounded-md px-3 font-extrabold shadow-[var(--shadow-pop)]', big ? 'py-3 text-base' : 'py-2 text-sm', color(active))}>{label(active)}</div>}
+      </DragOverlay>
+    </DndContext>
+  )
+}
+
+/** The canvas the program is built on: a light dotted grid, like the Scratch stage area. */
+function ScriptArea({ children }: { children: ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: 'script' })
+  return (
+    <ol ref={setNodeRef} className={clsx('m-0 flex min-h-[140px] list-none flex-col rounded-2xl border border-line p-4', isOver && 'border-bright')}
+      style={{ backgroundColor: 'var(--color-mist)', backgroundImage: 'radial-gradient(var(--color-line) 1.2px, transparent 1.2px)', backgroundSize: '16px 16px' }}>
+      {children}
+    </ol>
+  )
+}
+
+/** One row of the script: the arms of the loops it sits in, then the content. */
+function Arms({ arms, color, className, children }: { arms: string[]; color: (k: string) => string; className?: string; children?: ReactNode }) {
+  return <li className={clsx('flex items-stretch', className)}>{arms.map(k => <span key={k} className={clsx('w-4 shrink-0', color(k).split(' ')[0])} />)}{children}</li>
+}
+
+function ScriptBlock({ id, arms, color, disabled, big, hat, opens, ok, onTap, children }: {
+  id: string; arms: string[]; color: (k: string) => string; disabled?: boolean; big?: boolean; hat: boolean; opens: boolean; ok?: boolean; onTap: () => void; children: ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
+  return (
+    <li ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform), transition }} className={clsx('flex items-stretch', isDragging && 'opacity-30')}>
+      {arms.map(k => <span key={k} className={clsx('w-4 shrink-0', color(k).split(' ')[0])} />)}
+      <button type="button" {...attributes} {...listeners} onClick={() => !disabled && onTap()}
+        className={clsx('relative w-fit rounded-md px-3 text-start font-extrabold', big ? 'py-3 text-base' : 'py-2 text-sm', color(id),
+          hat && 'rounded-t-2xl pt-3', opens && !hat && 'rounded-bl-none', ok === true && 'ring-4 ring-ok', ok === false && 'ring-4 ring-bad',
+          !disabled && 'cursor-grab touch-none active:cursor-grabbing')}>
+        {children}
+      </button>
     </li>
   )
 }
