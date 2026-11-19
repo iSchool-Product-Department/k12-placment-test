@@ -11,6 +11,7 @@ import {
   type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from '@dnd-kit/core'
 import clsx from 'clsx'
+import { GripVertical } from 'lucide-react'
 import type { Question } from '../engine/types'
 import { correctAnswer, keysOf, matchPairs, sortBoxes } from '../engine/engine'
 import type { Lang } from '../i18n'
@@ -22,6 +23,8 @@ interface Common { q: Question; lang: Lang; salt: string; review?: boolean; hint
 // Pointer: drop where the finger is. Keyboard: drop on the closest place.
 const collide: CollisionDetection = a => (a.pointerCoordinates ? pointerWithin(a) : closestCenter(a))
 const useDragSensors = () => useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor))
+
+const Grip = () => <GripVertical size={18} className="ms-auto shrink-0 text-soft" aria-hidden="true" />
 
 const cardCls = (big?: boolean) => clsx(
   'flex w-full select-none items-center gap-2 rounded-xl border-2 bg-white px-3 py-2 text-start font-bold transition-colors',
@@ -83,7 +86,7 @@ export function OrderAnswer({ q, value, set, salt, review, hint, big, shuffle, l
                 {k && (
                   <Card id={k} disabled={review} onTap={() => put(k, 'tray')}
                     className={clsx(cardCls(big), review ? (right(i) ? 'border-ok bg-green-50' : 'border-bad bg-red-50') : 'border-blue')}>
-                    {label(k)}
+                    {label(k)}{!review && <Grip />}
                   </Card>
                 )}
               </Zone>
@@ -93,7 +96,7 @@ export function OrderAnswer({ q, value, set, salt, review, hint, big, shuffle, l
         {!review && (
           <Zone id="tray" className="flex min-h-[60px] flex-wrap gap-2 rounded-2xl border-2 border-transparent p-1">
             {tray.map(k => (
-              <Card key={k} id={k} onTap={() => put(k, slots.indexOf(''))} className={clsx(cardCls(big), 'w-auto border-line hover:border-bright')}>{label(k)}</Card>
+              <Card key={k} id={k} onTap={() => put(k, slots.indexOf(''))} className={clsx(cardCls(big), 'w-auto border-line hover:border-bright')}>{label(k)}<Grip /></Card>
             ))}
             {slots.some(Boolean) && <button type="button" onClick={() => set(null)} className="rounded-xl px-3 py-2 text-sm font-bold text-soft hover:bg-sky">{clear}</button>}
           </Zone>
@@ -126,7 +129,7 @@ export function SortAnswer({ q, lang, value, set, salt, review, hint, big, shuff
     <Card key={k} id={k} disabled={review} onTap={() => setSel(sel === k ? null : k)}
       className={clsx(cardCls(big), 'w-auto',
         review ? (value[k] === key[k] ? 'border-ok bg-green-50' : 'border-bad bg-red-50') : sel === k ? 'border-blue bg-sky' : 'border-line hover:border-bright')}>
-      {label(k)}
+      {label(k)}{!review && <Grip />}
     </Card>
   )
   const tray = items.filter(k => value[k] == null)
@@ -244,7 +247,16 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
   const colorOf = (l: number) => (review ? (value[l] === l ? '#12A150' : '#D93A3A') : PAIR[l % PAIR.length])
   const badge = (l: number) => <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-extrabold text-white" style={{ background: colorOf(l) }}>{l + 1}</span>
   const target = (side: string) => (drag && sideOf(drag.from) !== side) || (sel && sideOf(sel) !== side)
-  const cls = (id: string, linked: boolean, side: string) => clsx(cardCls(big), side === 'R' && 'font-semibold',
+  // The dot on the edge facing the other column: where you drag from, and where the line lands.
+  const handle = (side: string, color: string | undefined, hint: boolean) => (
+    <span aria-hidden="true" style={{ borderColor: color ?? '#05ACFF' }}
+      className={clsx('absolute top-1/2 grid h-5 w-5 -translate-y-1/2 place-items-center rounded-full border-2 bg-white transition-transform group-hover:scale-125', side === 'L' ? '-end-2.5' : '-start-2.5')}>
+      <span className="h-2 w-2 rounded-full" style={{ background: color ?? '#05ACFF' }} />
+      {hint && <span className="absolute -inset-1 rounded-full border-2 border-bright motion-safe:animate-ping" />}
+    </span>
+  )
+  const showHint = !review && !drag && !sel && Object.keys(value).length === 0
+  const cls = (id: string, linked: boolean, side: string) => clsx(cardCls(big), 'group relative', side === 'R' && 'font-semibold',
     sel === id ? 'border-blue bg-sky' : target(side) && !linked ? 'border-dashed border-bright' : !linked && 'border-line hover:border-bright')
 
   return (
@@ -256,13 +268,12 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
             {lines.map(({ l, a, b }) => (
               <g key={l} stroke={colorOf(l)} fill={colorOf(l)}>
                 <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} strokeWidth={3} strokeLinecap="round" />
-                <circle cx={a.x} cy={a.y} r={5} /><circle cx={b.x} cy={b.y} r={5} />
               </g>
             ))}
             {drag && (
               <g stroke="#05ACFF" fill="#05ACFF">
                 <line x1={drag.a.x} y1={drag.a.y} x2={drag.b.x} y2={drag.b.y} strokeWidth={3} strokeDasharray="6 6" strokeLinecap="round" />
-                <circle cx={drag.a.x} cy={drag.a.y} r={5} /><circle cx={drag.b.x} cy={drag.b.y} r={8} fillOpacity={0.35} />
+                <circle cx={drag.b.x} cy={drag.b.y} r={9} fillOpacity={0.3} />
               </g>
             )}
           </svg>
@@ -272,8 +283,9 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
               return (
                 <MatchCard key={id} id={id} disabled={review} onTap={() => tap(id)} cardRef={n => { cards.current[id] = n }}
                   className={cls(id, linked, 'L')} style={linked ? { borderColor: colorOf(l) } : undefined}>
-                  {linked ? badge(l) : <span className="h-6 w-6 shrink-0 rounded-full border-2 border-line" />}
+                  {linked && badge(l)}
                   <span>{p.left}</span>
+                  {handle('L', linked ? colorOf(l) : undefined, showHint && l === 0)}
                 </MatchCard>
               )
             })}
@@ -284,8 +296,9 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
               return (
                 <MatchCard key={id} id={id} disabled={review} onTap={() => tap(id)} cardRef={n => { cards.current[id] = n }}
                   className={cls(id, l != null, 'R')} style={l != null ? { borderColor: colorOf(+l) } : undefined}>
-                  {l != null ? badge(+l) : <span className="h-6 w-6 shrink-0 rounded-full border-2 border-line" />}
+                  {l != null && badge(+l)}
                   <span>{pairs[r].right}</span>
+                  {handle('R', l != null ? colorOf(+l) : undefined, false)}
                 </MatchCard>
               )
             })}
