@@ -28,7 +28,7 @@ function loadLocal(): TestRecord[] | null {
 }
 function persist() { safeSet(KEY, JSON.stringify(tests)); emit() }
 
-/** Cloud: every real save goes to Supabase. Ids that failed stay queued and are sent again on the next save or page load. */
+/** Cloud: a finished test goes to Supabase. Ids that failed stay queued and are sent again on the next save or page load. */
 let pending: string[] = JSON.parse(safeGet(PENDING) || '[]')
 async function push(ids: string[]) {
   pending = [...new Set([...pending, ...ids])]; safeSet(PENDING, JSON.stringify(pending))
@@ -59,7 +59,7 @@ export const store = {
     const i = tests.findIndex(t => t.id === rec.id)
     tests = i >= 0 ? tests.map(t => (t.id === rec.id ? rec : t)) : [rec, ...tests]
     persist()
-    if (cloudOn && !rec.simulated) push([rec.id])
+    if (cloudOn && !rec.simulated && rec.status === 'done') push([rec.id]) // only finished tests go to Supabase
   },
   /** PRD 6.8: the open test in this browser, if it is less than 24 hours old. */
   resumable: () => tests.find(t => t.status === 'in_progress' && !t.simulated && !isExpired(t)),
