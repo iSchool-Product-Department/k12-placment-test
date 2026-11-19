@@ -1,5 +1,5 @@
 import {
-  Apple, Armchair, ArrowRight, Car, Cat, CircleCheck, Dices, DoorOpen, EyeOff, Flower2, Hand, Hash, Headphones, Image, Images, Keyboard, Lamp, Laptop,
+  Apple, Armchair, Bell, Share2, Smartphone, X, ArrowRight, Car, Cat, CircleCheck, Dices, DoorOpen, EyeOff, Flower2, Hand, Hash, Headphones, Image, Images, Keyboard, Lamp, Laptop,
   Maximize2, Megaphone, MessageCircle, Mouse, MousePointerClick, Music, OctagonX, Package, Palette, Plug, Power, Printer, Save, Scissors, Search, Shirt,
   Speaker, Trash2, Volume2, type LucideProps,
 } from 'lucide-react'
@@ -21,4 +21,5 @@ export const ICONS: Record<string, (p: LucideProps) => React.ReactNode> = {
   power: Power, plug: Plug, cat: Cat, image: Image, music: Music, box: Package, shirt: Shirt, hide: EyeOff, bigger: Maximize2,
   click: MousePointerClick, palette: Palette, number: Hash, yesno: CircleCheck, door: DoorOpen, clap: Hand, talk: MessageCircle,
   forward: ArrowRight, flower: Flower2, stop: OctagonX, pictures: Images, guess: Dices, lamp: Lamp, car: Car,
+  close: X, share: Share2, phone: Smartphone, bell: Bell,
 }

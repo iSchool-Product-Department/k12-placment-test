@@ -41,6 +41,7 @@ const ICON = {
   '🔘': 'power', '🔌': 'plug', '🐱': 'cat', '🖼': 'image', '🎵': 'music', '📦': 'box', '👕': 'shirt', '🙈': 'hide',
   '🔲': 'bigger', '👆': 'click', '🎨': 'palette', '🔢': 'number', '✅': 'yesno', '🚪': 'door', '👏': 'clap',
   '💬': 'talk', '➡': 'forward', '🌸': 'flower', '🛑': 'stop', '📚': 'pictures', '🎲': 'guess', '💡': 'lamp', '🚗': 'car',
+  '❌': 'close', '📤': 'share', '📱': 'phone', '🔔': 'bell',
 }
 const EMOJI = /(\p{Extended_Pictographic})️?\s*/u
 function iconOf(s, id) {
