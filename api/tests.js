@@ -12,7 +12,7 @@ export async function POST(request) {
     await new Promise(r => setTimeout(r, 1000)) // ponytail: slows guessing, add real rate limiting if the link spreads
     return Response.json({ error: 'Wrong password.' }, { status: 401 })
   }
-  const r = await fetch(`${url}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: key, Authorization: `Bearer ${key}` } })
+  const r = await fetch(`${url}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: key } })
   if (!r.ok) return Response.json({ error: `Could not load tests (${r.status}).` }, { status: 502 })
   return Response.json((await r.json()).map(x => x.data))
 }
