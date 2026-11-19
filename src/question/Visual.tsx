@@ -65,7 +65,8 @@ function stageSvg(sp: Sim) {
 }
 
 let simTok = 0
-function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null) {
+/** Draws the start, marks the student's choice, and with `play` runs it. Resolves when the run ends. */
+function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null, play: boolean): Promise<void> {
   const tok = ++simTok, ag = svg.querySelector<SVGGElement>('#ag')!, mk = svg.querySelector('#mk')!
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, wait = (ms: number) => new Promise(r => setTimeout(r, reduce ? 0 : ms))
   const sk = ag.querySelector('.spr')!
@@ -76,7 +77,8 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null)
     const pick = typeof choice === 'string' && /^-?\d+$/.test(choice) ? +choice : null
     mk.innerHTML = pick != null ? `<rect x="${X(pick) - 18}" y="70" width="36" height="66" rx="8" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="6 5"/>` : ''
     ag.style.transform = `translate(${X(sp.s as number)}px,92px)`
-    ;(async () => {
+    if (!play) return Promise.resolve()
+    return (async () => {
       await wait(60); ag.style.transition = 'transform .45s ease'; let v = sp.s as number
       for (const h of sp.hops!()) {
         if (tok !== simTok) return
@@ -85,16 +87,16 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null)
         v = nv; ag.style.transform = `translate(${X(v)}px,92px)`; await wait(600)
       }
     })()
-    return
   }
   const [cw, ch] = sp.g!, P = 10, tr = (c: number, r: number, a: number) => `translate(${P + c * C + C / 2}px,${P + r * C + C / 2}px) rotate(${NOROT.has(sp.a) ? 0 : a}deg)`
   let [c, r] = sp.s as [number, number]; let a = ANG[sp.f!], n = 0
   ag.style.transform = tr(c, r, a); svg.querySelector('#goal .spr')?.classList.remove('won')
   const cnt = svg.querySelector('#cnt'); if (cnt) cnt.textContent = ''; mk.innerHTML = ''
   if (sp.mark && typeof choice === 'string') { const [mc, mr] = sp.mark(choice); mk.innerHTML = `<rect x="${P + mc * C + 6}" y="${P + mr * C + 6}" width="${C - 12}" height="${C - 12}" rx="10" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="8 6"/>` }
+  if (!play) return Promise.resolve()
   const acts = sp.run!(Array.isArray(choice) ? choice : String(choice || ''))
   const blocked = (nc: number, nr: number) => (sp.rocks || []).some(([x, y]) => x === nc && y === nr) || (sp.walls || []).some(([x, y]) => x === nc && y === nr)
-  ;(async () => {
+  return (async () => {
     await wait(80); ag.style.transition = 'transform .42s ease, opacity .3s'
     for (const act of acts) {
       if (tok !== simTok) return
@@ -116,14 +118,20 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null)
   })()
 }
 
-export function Stage({ q, choice }: { q: Question; choice: string | string[] | null }) {
+/**
+ * The stage stays still while the student answers (it only marks their choice).
+ * Once the answer is locked, `play` runs it, so it never becomes trial and error.
+ */
+export function Stage({ q, choice, play = false, onDone }: { q: Question; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
   const box = useRef<HTMLDivElement>(null)
   const sp = SIM[q.old || q.id]
   useEffect(() => { if (box.current && sp) box.current.innerHTML = stageSvg(sp) }, [q.id])
   useEffect(() => {
     const svg = box.current?.querySelector('svg')
-    if (svg && sp && (choice != null || sp.count || sp.hops)) runStage(svg as SVGSVGElement, sp, choice)
-  }, [q.id, JSON.stringify(choice)])
+    let alive = true
+    if (svg && sp) runStage(svg as SVGSVGElement, sp, choice, play).then(() => alive && play && onDone?.())
+    return () => { alive = false }
+  }, [q.id, JSON.stringify(choice), play])
   return <div ref={box} className="mx-auto w-full max-w-[360px] [&_svg]:block [&_svg]:max-h-[220px] [&_svg]:w-full [&_svg]:rounded-2xl [&_svg]:border [&_svg]:border-line [&_svg]:bg-white" aria-hidden="true" />
 }
 
@@ -226,8 +234,8 @@ export function Code({ src }: { src: string }) {
 export const looksLikeCode = (q: Question) => q.t === 'Code MCQ' || /\n|[=;{}<>]|\w\(|\/\/|\[\d/.test(q.scr) && !/^(A |An |Three|Four|Two|Grid|Six|Pictures)/.test(q.scr)
 
 /** Picks the right compact visual for a question, or nothing when the on-screen note was only for designers. */
-export function QuestionVisual({ q, choice }: { q: Question; choice: string | string[] | null }) {
-  if (hasSim(q)) return <Stage q={q} choice={choice} />
+export function QuestionVisual({ q, choice, play, onDone }: { q: Question; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
+  if (hasSim(q)) return <Stage q={q} choice={choice} play={play} onDone={onDone} />
   const pat = parsePattern(q)
   if (pat) return <Pattern items={pat} />
   if (!q.scr) return null

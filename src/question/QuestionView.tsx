@@ -7,7 +7,7 @@ import { CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer } from './DragAns
 import { isCodeOrder } from './codeLines'
 import { ICONS } from './icons'
 import { T, type Band, type Lang } from '../i18n'
-import { QuestionVisual } from './Visual'
+import { QuestionVisual, hasSim } from './Visual'
 
 const L = 'ABCD'
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
@@ -67,11 +67,14 @@ interface Props {
   salt?: string
   review?: boolean
   showListen?: boolean
+  /** The answer is in: inputs stop, and a stage (if any) plays the answer, then calls onPlayed. */
+  locked?: boolean
+  onPlayed?: () => void
 }
 
-export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '', review, showListen = true }: Props) {
+export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '', review, showListen = true, locked, onPlayed }: Props) {
   const t = T[lang]
-  const set = (v: AnswerValue | null) => !review && onChange?.(v)
+  const set = (v: AnswerValue | null) => !review && !locked && onChange?.(v)
   const keys = keysOf(q)
   const label = (k: string) => <OptLabel text={optText(q, L.indexOf(k), lang)} pic={q.oimg?.[L.indexOf(k)]} icon={q.oicon?.[L.indexOf(k)]} big={band === 'kids'} />
   const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={band === 'kids' ? 48 : 36} />
@@ -89,9 +92,10 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           </button>
         )}
       </div>
-      {q.img
+      {q.img && !hasSim(q)
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[30vh] w-auto max-w-full rounded-2xl object-contain" />
-        : <QuestionVisual q={q} choice={stageChoice} />}
+        : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
+      <div className="contents" {...(locked ? { inert: '' } : {})}>
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
       {q.t === 'Order' && (isCodeOrder(q)
         ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.codeOrder} clear={t.clear} />
@@ -118,6 +122,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           })}
         </div>
       )}
+      </div>
     </div>
   )
 }
