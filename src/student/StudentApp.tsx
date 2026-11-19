@@ -8,7 +8,7 @@ import type { AnswerValue, StepName, TestRecord } from '../engine/types'
 import { AVATARS, BANK, BY_ID, LEARN, LEVELS } from '../data/ladder'
 import { STRAND_AR, T, bandOf, type Band, type Lang } from '../i18n'
 import { store, useConfig } from '../store'
-import { QuestionView, speak } from '../question/QuestionView'
+import { QuestionView } from '../question/QuestionView'
 import { hasSim } from '../question/Visual'
 
 type Phase = 'welcome' | 'practice' | 'test' | 'result'
@@ -143,7 +143,6 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const t0 = useRef(Date.now())
   useEffect(() => {
     setValue(null); setLocked(false); setPlayed(false); t0.current = Date.now()
-    if (rec.age <= 7) { const id = setTimeout(() => speak(q, lang), 350); return () => clearTimeout(id) }
   }, [q?.id])
   if (!q) return null
   const n = rec.answers.length
