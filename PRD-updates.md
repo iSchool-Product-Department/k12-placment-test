@@ -30,7 +30,7 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - A question should fit on one screen. On wider screens: a picture, stage, code or block program sits beside the answers; order cards sit beside their numbered slots; the block palette sits beside the script; four short options go in two columns.
 - Next stays pinned to the bottom of the screen, so it is never scrolled away.
 - Text-only questions use a narrower card with bigger answers (64 px tall, larger text). Questions with a picture, code, stage or drag answers use the full width.
-- The student's buddy rides the progress bar. After each answer it steps forward and shows one short line ("Nice work", "Keep going", "Good thinking"...). The line never depends on whether the answer was right.
+- A small rocket rides the progress bar. After each answer it moves forward and one short line pops up ("Nice work", "Keep going", "Good thinking"...). The line never depends on whether the answer was right.
 
 ## 6.4 Question types
 - Stage questions (robot, bee, number line). The stage stays still while the student answers. Next locks the answer, the stage plays it, then the test moves to the next question by itself. There is no separate Run button, and no trying again.
@@ -44,14 +44,14 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - Emoji in the sheet are shown as drawn icons, never as emoji. A new emoji needs an icon added first; the bank script stops with a message until it is.
 
 ## 6.7 Buddy
-- Five parts: color (6), face (4), top (5), outfit (4), extra (4). Built on the name and age screen, no extra screen. Saved as a short code so a designer can swap the drawings later without changing saved tests.
+- Removed. A made-up character did not feel real or close to our students' culture. The name and age screen has only name and age; the admin shows the student's initials where the iSchool admin shows a photo.
 
 ## 6.9 The end
 - Replace the ending with: "You're a Creator in Grade 4! Our team will contact you soon." (Explorer, Creator or Innovator). The student sees only their own tier name, never the other names, an order or a score. Arabic: "أنت من المبدعين في الصف 4!"
 - In the demo only, a small "New student" link lets the next person on the same device start.
 
 ## 7.2 One test (roadmap)
-- The first milestone shows the student's buddy, not its saved code.
+- Each level row starts with its two grade icons from the iSchool K12 V2.0 roadmap (2026 deck), with the track name on hover. The final milestone shows the placed grade's icon; clicking it shows the track and what the grade covers. Clicking a step shows its level's two grades.
 
 ## 7.1 Test list
 - The student code is click to copy for now. Linking it to the iSchool admin needs the URL format of the student page (open question).
@@ -73,8 +73,8 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - Test status values: in progress, finished, expired.
 
 ## 10 Brand
-- One background for every age: Neutral-100 with a faint dot grid. It used to change by age (sky with clouds, dots, grid).
-- The logo stays still. The brand rules forbid moving or changing its parts, so the buddy is what feels alive.
+- The name and age screen has a plain background. When the student presses Start, it fades (about 1 second) into their age's background, all in brand colors: sky with clouds (6 to 9), dots with soft shapes (10 to 13), a fine grid (14 to 18).
+- The logo stays still. The brand rules forbid moving or changing its parts, so the rocket on the progress bar is what feels alive.
 
 ## 12 Open questions
 - What is the URL of a student's page in the iSchool admin, so the student code can link to it?

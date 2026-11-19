@@ -265,7 +265,7 @@ export function aboutTotal(rec: TestRecord) {
 // ---------------------------------------------------------------- simulator
 const OFFSET: Record<Diff, number> = { Starter: -1.6, Easy: -0.7, Medium: 0, Hard: 0.7 }
 export function simulate(ability: number, age: number, bank: Question[], cfg: Config = DEFAULT_CONFIG, rng: Rng = Math.random, name = 'Simulated student'): TestRecord {
-  let rec = newTest({ name, age, avatar: 'robot', lang: 'en' }, bank, rng)
+  let rec = newTest({ name, age, lang: 'en' }, bank, rng)
   rec.simulated = true
   const byId = new Map(bank.map(q => [q.id, q]))
   let guard = 0

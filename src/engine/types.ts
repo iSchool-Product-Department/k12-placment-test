@@ -75,8 +75,8 @@ export interface TierResult {
   byDiff: Record<Diff | 'Grade task', { right: number; total: number }>
 }
 
-/** avatar: the buddy, encoded by src/student/Buddy.tsx. code, phone, email come from the iSchool admin record (fake in the demo). */
-export interface Student { name: string; age: number; avatar: string; lang: 'en' | 'ar'; code?: string; phone?: string; email?: string }
+/** code, phone, email come from the iSchool admin record (fake in the demo). avatar is unused (old tests may have one). */
+export interface Student { name: string; age: number; avatar?: string; lang: 'en' | 'ar'; code?: string; phone?: string; email?: string }
 
 /** The practice question (PRD 6.2). Wrong or slow: the Listen button stands out. Young student who could not drag: tap mode. */
 export interface Practice { ok: boolean; sec: number; readHelp: boolean; tapMode: boolean }

@@ -10,7 +10,6 @@ import { store, useConfig } from '../store'
 import { QuestionView, KeyLine } from '../question/QuestionView'
 import { Panel, Seg, TierBadge } from '../admin/AdminApp'
 import { TIER_STYLE } from '../admin/labels'
-import { randomBuddy } from '../student/Buddy'
 
 type Tab = 'bank' | 'settings' | 'flow' | 'tiers' | 'sim'
 export default function ContentApp({ route, go }: { route: string[]; go: (h: string) => void }) {
@@ -293,7 +292,7 @@ function Sim({ go }: { go: (h: string) => void }) {
     }
     setRes({ grades, q: q / N, m: m / N })
   }
-  const one = () => { const r = simulate(ab, age, BANK, cfg, Math.random, 'Simulated student'); r.avatar = randomBuddy(); store.save(r); go(`admin/${r.id}`) }
+  const one = () => { const r = simulate(ab, age, BANK, cfg, Math.random, 'Simulated student'); store.save(r); go(`admin/${r.id}`) }
   const max = res ? Math.max(...Object.values(res.grades).map(g => g.Explorers + g.Creators + g.Innovators)) : 1
   return (
     <div className="grid gap-4 md:grid-cols-[340px_minmax(0,1fr)]">

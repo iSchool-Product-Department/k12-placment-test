@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core'
-import { Apple, ArrowRight, Minus, Plus, ShoppingBasket, Star, Volleyball } from 'lucide-react'
+import { Apple, ArrowRight, Minus, Plus, Rocket, ShoppingBasket, Star, Volleyball } from 'lucide-react'
 import clsx from 'clsx'
 import { aboutTotal, answer, currentQuestion, newTest } from '../engine/engine'
 import type { AnswerValue, Practice, TestRecord } from '../engine/types'
@@ -11,7 +11,6 @@ import { store, useConfig } from '../store'
 import { QuestionView, roomy, stableShuffle } from '../question/QuestionView'
 import { hasSim } from '../question/Visual'
 import { useDragSensors } from '../question/DragAnswers'
-import { BODY, Buddy, PARTS, encode, parse, randomBuddy, type Part } from './Buddy'
 
 type Phase = 'welcome' | 'resume' | 'practice' | 'test' | 'result'
 type Tx = typeof T.en
@@ -26,27 +25,25 @@ export default function StudentApp({ lang }: { lang: Lang }) {
   const [phase, setPhase] = useState<Phase>(open ? 'resume' : 'welcome')
   const [name, setName] = useState('')
   const [age, setAge] = useState<number | null>(null)
-  const [buddy, setBuddy] = useState(() => randomBuddy())
   const band = bandOf(rec?.age ?? age)
 
   const begin = (practice: Practice) => {
-    const r = { ...newTest({ name: name.trim(), age: age!, avatar: buddy, lang }, BANK), practice }
+    const r = { ...newTest({ name: name.trim(), age: age!, lang }, BANK), practice }
     store.save(r); setRec(r); setPhase('test')
   }
-  const fresh = () => { setRec(null); setName(''); setAge(null); setBuddy(randomBuddy()); setPhase('welcome') }
+  const fresh = () => { setRec(null); setName(''); setAge(null); setPhase('welcome') }
   const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -12 }, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } } as const
 
   return (
     <div className="relative min-h-[calc(100dvh-64px)] overflow-hidden">
-      <Backdrop />
+      <Backdrop theme={phase === 'welcome' || phase === 'resume' ? 'none' : band} />
       <div className={clsx('relative mx-auto px-4 pb-10 pt-4 sm:pt-6', phase === 'test' ? 'max-w-5xl' : 'max-w-3xl')}>
         <AnimatePresence mode="wait">
-          {phase === 'welcome' && <motion.div key="w" {...fade}><Welcome {...{ t, band, name, setName, age, setAge, buddy, setBuddy }} onStart={() => setPhase('practice')} /></motion.div>}
+          {phase === 'welcome' && <motion.div key="w" {...fade}><Welcome {...{ t, band, name, setName, age, setAge }} onStart={() => setPhase('practice')} /></motion.div>}
           {phase === 'resume' && rec && (
             <motion.div key="re" {...fade}>
               <Card className="text-center">
-                <div className="mx-auto w-fit"><Buddy code={rec.avatar} size={110} mood="wave" /></div>
-                <h1 className="m-0 mt-2 text-3xl text-deep">{t.welcomeBack(rec.name)}</h1>
+                <h1 className="m-0 text-3xl text-deep">{t.welcomeBack(rec.name)}</h1>
                 <p className="mb-5 mt-1 text-soft">{t.resumeNote}</p>
                 <div className="flex flex-col items-center gap-3">
                   <Btn onClick={() => setPhase('test')}>{t.resume} <ArrowRight size={18} className="rtl:rotate-180" /></Btn>
@@ -67,7 +64,8 @@ export default function StudentApp({ lang }: { lang: Lang }) {
           {phase === 'result' && rec && (
             <motion.div key="r" {...fade}>
               <Card className="py-10 text-center">
-                <div className="mx-auto w-fit"><Buddy code={rec.avatar} size={130} mood="cheer" /></div>
+                <motion.div initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-blue text-white"><Rocket size={46} strokeWidth={1.75} /></motion.div>
                 <p className="m-0 mt-3 text-2xl font-bold text-orange-deep">{t.youAre[rec.tier!.tier]}</p>
                 <h1 className="m-0 text-4xl text-deep sm:text-5xl">{t.inGrade(rec.placement!.grade)}</h1>
                 <p className="mx-auto mb-0 mt-2 max-w-sm text-lg text-soft">{t.contact}</p>
@@ -82,20 +80,18 @@ export default function StudentApp({ lang }: { lang: Lang }) {
   )
 }
 
-/* ---------------------------------------------------------------- welcome: name, age, buddy on one screen */
-function Welcome({ t, band, name, setName, age, setAge, buddy, setBuddy, onStart }: {
-  t: Tx; band: Band; name: string; setName: (s: string) => void; age: number | null; setAge: (n: number) => void; buddy: string; setBuddy: (s: string) => void; onStart: () => void
+/* ---------------------------------------------------------------- welcome: name and age */
+function Welcome({ t, band, name, setName, age, setAge, onStart }: {
+  t: Tx; band: Band; name: string; setName: (s: string) => void; age: number | null; setAge: (n: number) => void; onStart: () => void
 }) {
   const set = (v: number) => setAge(Math.min(18, Math.max(6, v)))
-  const c = parse(buddy)
-  const pick = (k: Part, i: number) => setBuddy(encode({ ...c, [k]: i }))
   return (
     <div className="flex flex-col gap-4">
       <div className="text-center">
         <h1 className={clsx('m-0 text-deep', band === 'kids' ? 'text-4xl' : 'text-3xl')}>{t.hero[band]}</h1>
         <p className="mx-auto mb-0 mt-1 max-w-md text-soft">{t.sub[band]}</p>
       </div>
-      <Card className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <Card className="mx-auto w-full max-w-md">
         <div>
           <label className="mb-1 block text-sm font-extrabold text-orange-deep" htmlFor="nm">{t.name}</label>
           <input id="nm" value={name} onChange={e => setName(e.target.value)} placeholder={t.namePh} autoComplete="off"
@@ -110,27 +106,8 @@ function Welcome({ t, band, name, setName, age, setAge, buddy, setBuddy, onStart
             <button onClick={() => set((age || 11) + 1)} className="grid h-12 w-12 place-items-center rounded-full border-2 border-line bg-sky text-blue hover:border-blue" aria-label="older"><Plus /></button>
           </div>
           <input type="range" min={6} max={18} value={age ?? 12} onChange={e => set(+e.target.value)} className="mt-3 block w-full accent-[#FF7F1C]" aria-label={t.age} />
-          <div className="mt-6 flex justify-center sm:justify-start">
+          <div className="mt-6 flex justify-center">
             <Btn variant="cta" disabled={!age || !name.trim()} onClick={onStart}>{t.start} <ArrowRight size={20} className="rtl:rotate-180" /></Btn>
-          </div>
-        </div>
-        <div className="flex gap-3 rounded-2xl bg-mist p-3">
-          <div className="grid shrink-0 place-items-center"><Buddy code={buddy} size={band === 'kids' ? 120 : 100} mood="wave" /></div>
-          <div className="min-w-0 flex-1">
-            <span className="mb-1.5 block text-sm font-extrabold text-orange-deep">{t.avatar}</span>
-            {(Object.keys(PARTS) as Part[]).map(k => (
-              <div key={k} className="mb-1.5 flex items-center gap-1.5">
-                <span className="w-12 shrink-0 text-xs font-bold text-soft">{t.parts[k]}</span>
-                <div className="flex flex-wrap gap-1">
-                  {Array.from({ length: PARTS[k] }, (_, i) => (
-                    <button key={i} onClick={() => pick(k, i)} aria-pressed={c[k] === i} aria-label={`${t.parts[k]} ${i + 1}`}
-                      className={clsx('grid h-8 w-8 place-items-center overflow-hidden rounded-lg border-2', c[k] === i ? 'border-blue bg-white' : 'border-transparent bg-white/70 hover:border-line')}>
-                      {k === 'b' ? <i className="h-5 w-5 rounded-full" style={{ background: BODY[i] }} /> : <Buddy code={encode({ ...c, [k]: i })} size={26} />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </Card>
@@ -224,7 +201,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const t0 = useRef(Date.now())
   useEffect(() => { t0.current = Date.now() }, [q?.id])
   useEffect(() => { if (played) { const id = setTimeout(finish, 700); return () => clearTimeout(id) } }, [played])
-  // After each answer the buddy steps along the bar and says something kind. Never tied to right or wrong.
+  // After each answer the rocket moves along the bar and a kind line pops up. Never tied to right or wrong.
   const done = rec.answers.length
   const [cheer, setCheer] = useState(0)
   useEffect(() => { if (!done) return; setCheer(done); const id = setTimeout(() => setCheer(0), 1800); return () => clearTimeout(id) }, [done])
@@ -256,8 +233,9 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
           </div>
           <motion.div className="absolute top-0 -translate-x-1/2 rtl:translate-x-1/2" style={{ insetInlineStart: 0 }} initial={false}
             animate={{ insetInlineStart: `${pct}%` }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-            <motion.div animate={still ? undefined : { y: [0, -3, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
-              <Buddy code={rec.avatar} size={34} mood={cheer ? 'cheer' : 'idle'} />
+            <motion.div animate={still ? undefined : cheer ? { y: [0, -8, 0] } : { y: [0, -2, 0] }} transition={cheer ? { duration: 0.6 } : { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative grid h-9 w-9 place-items-center rounded-full bg-blue text-white shadow-[var(--shadow-card)]">
+              <Rocket size={20} strokeWidth={2} className="rotate-45 rtl:-rotate-[135deg]" />
             </motion.div>
             <AnimatePresence>
               {cheer > 0 && (
@@ -301,7 +279,24 @@ export function Btn({ children, variant = 'primary', ...p }: React.ButtonHTMLAtt
 }
 
 /** Quiet backgrounds: clouds for the youngest, a dot grid for teens, a line grid for the oldest. */
-/** One calm background for every age (brand Neutral-100 with a faint dot grid), so nothing jumps between ages. */
-function Backdrop() {
-  return <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(#DCEAF3_1.5px,transparent_1.5px)] [background-size:22px_22px]" aria-hidden="true" />
+/**
+ * The page behind the test. The name and age screen is plain; once the student presses Start it fades
+ * into their age's background. Brand colors only: sky with clouds (6 to 9), dots (10 to 13), a fine grid (14 to 18).
+ */
+type Theme = 'none' | Band
+function Backdrop({ theme }: { theme: Theme }) {
+  const layer = (k: Theme, el: React.ReactNode) => (
+    <motion.div key={k} className="absolute inset-0" initial={false} animate={{ opacity: theme === k ? 1 : 0 }} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}>{el}</motion.div>
+  )
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {layer('none', <div className="absolute inset-0 [background-image:radial-gradient(#DCEAF3_1.5px,transparent_1.5px)] [background-size:22px_22px]" />)}
+      {layer('kids', <div className="absolute inset-0 bg-sky"><Cloud className="left-[4%] top-[6%] w-28" /><Cloud className="right-[6%] top-[30%] w-36" /><Cloud className="bottom-[8%] left-[10%] w-24" /></div>)}
+      {layer('teen', <div className="absolute inset-0 [background-image:radial-gradient(#B9DDF7_2px,transparent_2px)] [background-size:26px_26px]"><span className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-sky" /><span className="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-warm" /></div>)}
+      {layer('pro', <div className="absolute inset-0 bg-white [background-image:linear-gradient(#E6EDF1_1px,transparent_1px),linear-gradient(90deg,#E6EDF1_1px,transparent_1px)] [background-size:32px_32px]" />)}
+    </div>
+  )
 }
+const Cloud = ({ className }: { className: string }) => (
+  <svg viewBox="0 0 120 60" className={clsx('absolute', className)}><g fill="#fff"><circle cx="35" cy="35" r="20" /><circle cx="60" cy="25" r="25" /><circle cx="85" cy="37" r="18" /><rect x="18" y="35" width="85" height="20" rx="10" /></g></svg>
+)

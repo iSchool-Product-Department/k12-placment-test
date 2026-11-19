@@ -28,8 +28,8 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 ## Brand and copy
 - Colors in `src/index.css` (@theme). Blue leads, orange accents, a little gold. Light screens at every age, no dark mode.
 - Baloo 2 headings, Nunito Sans body, Noto Sans Arabic. Arabic is full RTL, code stays LTR.
-- No emoji as icons, no confetti, no gradient banners. The only praise is the buddy's short line after each answer ("Nice work"), never tied to right or wrong. See PRD section 10.
-- One background for every age (Neutral-100 with a faint dot grid). The logo never moves or changes (brand rule).
+- No emoji as icons, no confetti, no gradient banners. The only praise is the short line by the progress-bar rocket after each answer ("Nice work"), never tied to right or wrong. No characters or mascots. See PRD section 10.
+- Plain background on the name and age screen; after Start it fades into the age's background (brand colors only). The logo never moves or changes (brand rule).
 - Copy is short, warm and plain. Never use the long dash character.
 
 ## Stack

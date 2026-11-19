@@ -2,7 +2,6 @@ import { useSyncExternalStore } from 'react'
 import { DEFAULT_CONFIG, isExpired, seeded, simulate, startLevel } from './engine/engine'
 import type { Config, TestRecord } from './engine/types'
 import { BANK } from './data/ladder'
-import { randomBuddy } from './student/Buddy'
 
 /**
  * Storage adapter. The demo keeps everything in this browser (localStorage).
@@ -60,7 +59,7 @@ function seed(): TestRecord[] {
     r.answers.forEach(a => { a.sec = Math.round(9 + rng() * 55); t += a.sec * 1000 })
     const n = 1000 + Math.floor(rng() * 9000)
     return {
-      ...r, id: 'demo' + i, createdAt: created, finishedAt: t, avatar: randomBuddy(rng), lang: (rng() > 0.6 ? 'ar' : 'en') as 'ar' | 'en',
+      ...r, id: 'demo' + i, createdAt: created, finishedAt: t, lang: (rng() > 0.6 ? 'ar' : 'en') as 'ar' | 'en',
       code: `STA-ISCHOOL-S-${400 + i}`, phone: `+20 10 ${String(n).slice(0, 2)}${i % 10} ${n}`, email: `${name.toLowerCase()}.parent@example.com`,
     }
   }).sort((a, b) => b.createdAt - a.createdAt)

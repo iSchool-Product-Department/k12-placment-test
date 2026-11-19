@@ -7,7 +7,6 @@ import { groupName } from '../engine/engine'
 import { BY_ID } from '../data/ladder'
 import { store, useTests } from '../store'
 import { QuestionView, KeyLine, answerText } from '../question/QuestionView'
-import { Buddy } from '../student/Buddy'
 import { Journey } from './Journey'
 import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when } from './labels'
 
@@ -70,7 +69,7 @@ function TestsHome({ tests, open }: { tests: TestRecord[]; open: (id: string) =>
                 {list.map(t => (
                   <tr key={t.id} onClick={() => open(t.id)} className="cursor-pointer hover:bg-mist">
                     <td className="border-b border-line px-2 py-2" onClick={e => e.stopPropagation()}><Copy text={t.code || ''} /></td>
-                    <td className="border-b border-line px-2"><span className="flex items-center gap-2 font-bold"><Buddy code={t.avatar} size={26} />{t.name}</span></td>
+                    <td className="border-b border-line px-2"><span className="flex items-center gap-2 font-bold"><Initials name={t.name} size={26} />{t.name}</span></td>
                     <td className="whitespace-nowrap border-b border-line px-2" dir="ltr" onClick={e => e.stopPropagation()}><Copy text={t.phone || ''} /></td>
                     <td className="border-b border-line px-2">{t.age}</td>
                     <td className="whitespace-nowrap border-b border-line px-2 text-soft">{when(t.createdAt)}</td>
@@ -110,7 +109,7 @@ function Groups({ tests, open }: { tests: TestRecord[]; open: (id: string) => vo
                 return (
                   <td key={tr} className="border-b border-line px-2 py-2.5">
                     <div className="flex flex-wrap gap-1.5">
-                      {kids.map(k => <button key={k.id} onClick={() => open(k.id)} className="flex items-center gap-1 rounded-full border border-line bg-white py-0.5 pe-2.5 ps-1 font-bold hover:border-blue"><Buddy code={k.avatar} size={20} />{k.name}</button>)}
+                      {kids.map(k => <button key={k.id} onClick={() => open(k.id)} className="flex items-center gap-1 rounded-full border border-line bg-white py-0.5 pe-2.5 ps-1 font-bold hover:border-blue"><Initials name={k.name} size={20} />{k.name}</button>)}
                       {!kids.length && <span className="text-xs text-soft">Nobody yet</span>}
                     </div>
                   </td>
@@ -165,7 +164,7 @@ function SummaryCard({ rec }: { rec: TestRecord }) {
   const field = (label: string, v: React.ReactNode) => <div><dt className="text-xs font-bold text-soft">{label}</dt><dd className="m-0 font-bold">{v}</dd></div>
   return (
     <section className="grid gap-5 rounded-3xl border border-line bg-white p-5 shadow-[var(--shadow-card)] md:grid-cols-[auto_minmax(0,1fr)_auto]">
-      <div className="grid h-24 w-24 place-items-center rounded-2xl bg-mist"><Buddy code={rec.avatar} size={64} /></div>
+      <Initials name={rec.name} size={96} />
       <div>
         <h1 className="m-0 text-3xl text-deep">{rec.name}</h1>
         <dl className="m-0 mt-2 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3">
@@ -286,4 +285,10 @@ export function Seg<T extends string>({ value, set, items, small }: { value: T; 
       {items.map(([k, l]) => <button key={k} onClick={() => set(k)} aria-pressed={value === k} className={clsx('flex items-center gap-1.5 rounded-full font-bold', small ? 'px-2.5 py-0.5 text-xs' : 'px-3.5 py-1.5 text-sm', value === k ? 'bg-white text-deep shadow-sm' : 'text-soft')}>{l}</button>)}
     </div>
   )
+}
+
+/** First letters of the name, where the iSchool admin shows a student photo. */
+function Initials({ name, size }: { name: string; size: number }) {
+  const ini = name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase()
+  return <span className="grid shrink-0 place-items-center rounded-full bg-sky font-extrabold text-deep" style={{ width: size, height: size, fontSize: size * 0.4 }}>{ini}</span>
 }

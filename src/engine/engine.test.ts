@@ -15,7 +15,7 @@ const WRONG = (q: Question) => (q.t === 'Type answer' ? 'zzz' : q.t === 'Order' 
 /** Plays a test where `plan` says, per step, which answers are right (1) or wrong (0). */
 function play(age: number, plan: number[][], seed = 7): TestRecord {
   const rng = seeded(seed)
-  let rec = newTest({ name: 't', age, avatar: 'robot', lang: 'en' }, bank, rng)
+  let rec = newTest({ name: 't', age, lang: 'en' }, bank, rng)
   let s = 0
   while (rec.step) {
     const step = rec.steps.length
@@ -117,7 +117,7 @@ describe('tiers and resume (PRD 5.5, 6.8)', () => {
     expect(groupName(r)).toBe(`${r.tier!.tier} G8`)
   })
   it('an unfinished test expires after 24 hours; a finished one never does', () => {
-    const r = newTest({ name: 't', age: 9, avatar: '', lang: 'en' }, bank, seeded(1))
+    const r = newTest({ name: 't', age: 9, lang: 'en' }, bank, seeded(1))
     expect(isExpired(r, r.createdAt + 23 * 3600e3)).toBe(false)
     expect(isExpired(r, r.createdAt + 25 * 3600e3)).toBe(true)
     expect(isExpired({ ...r, status: 'done' }, r.createdAt + 99 * 3600e3)).toBe(false)
