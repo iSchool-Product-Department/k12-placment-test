@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { DEFAULT_CONFIG, POINTS, simulate } from '../engine/engine'
 import type { AnswerValue, Config, Question, Tier } from '../engine/types'
 import { BANK, LEVELS } from '../data/ladder'
+import changesJson from '../data/changes.json'
 import { store, useConfig } from '../store'
 import { QuestionView, KeyLine } from '../question/QuestionView'
 import { Panel, Seg, TierBadge } from '../admin/AdminApp'
@@ -28,11 +29,14 @@ export default function ContentApp({ route, go }: { route: string[]; go: (h: str
 }
 
 /* ---------------------------------------------------------------- bank */
+// v4 content edits, built from the sheet's Change log rows (ChangeLog-v4.csv) with each question's wording before.
+type Change = { what: string; why: string; q: string; o: string[]; scr: string }
+const CHANGES = changesJson as Record<string, Change>
 const POOLS = ['Starter', 'Logic', 'Lower grade', 'Upper grade', 'Grade task'] as const
 function Bank() {
-  const [f, setF] = useState({ lv: '', pool: '', d: '', t: '', q: '' })
+  const [f, setF] = useState({ lv: '', pool: '', d: '', t: '', q: '', ch: '' })
   const [sel, setSel] = useState<Question>(BANK[0])
-  const list = BANK.filter(q => (!f.lv || q.lv === +f.lv) && (!f.pool || q.pool === f.pool) && (!f.d || q.d === f.d) && (!f.t || q.t === f.t)
+  const list = BANK.filter(q => (!f.lv || q.lv === +f.lv) && (!f.pool || q.pool === f.pool) && (!f.d || q.d === f.d) && (!f.t || q.t === f.t) && (!f.ch || !!CHANGES[q.id])
     && (!f.q || `${q.id} ${q.old} ${q.q} ${q.qa} ${q.strand}`.toLowerCase().includes(f.q.toLowerCase())))
   const types = [...new Set(BANK.map(q => q.t))]
   const sel_ = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => setF({ ...f, [k]: e.target.value })
@@ -58,13 +62,14 @@ function Bank() {
             <select value={f.d} onChange={sel_('d')} className="rounded-xl border-2 border-line bg-white px-2 py-2"><option value="">All difficulty</option>{['Starter', 'Easy', 'Medium', 'Hard'].map(p => <option key={p}>{p}</option>)}</select>
             <select value={f.t} onChange={sel_('t')} className="rounded-xl border-2 border-line bg-white px-2 py-2"><option value="">All types</option>{types.map(p => <option key={p}>{p}</option>)}</select>
           </div>
+          <label className="mb-2 flex w-fit cursor-pointer items-center gap-2 text-sm font-bold"><input type="checkbox" checked={!!f.ch} onChange={e => setF({ ...f, ch: e.target.checked ? '1' : '' })} className="accent-orange" /> Changed in v4 only ({Object.keys(CHANGES).length})</label>
           <label className="mb-2 flex items-center gap-2 rounded-xl border-2 border-line px-3"><Search size={16} className="text-soft" /><input value={f.q} onChange={sel_('q')} placeholder="Search text, ID or old ID" className="min-w-0 flex-1 py-2 outline-none" /></label>
           <p className="m-0 mb-2 text-xs font-bold text-soft">{list.length} questions</p>
           <div className="max-h-[640px] overflow-y-auto pe-1">
             {list.map(q => (
               <button key={q.id} onClick={() => setSel(q)} className={clsx('mb-1.5 flex w-full items-start gap-3 rounded-xl border-2 px-3 py-2 text-start', sel.id === q.id ? 'border-blue bg-sky' : 'border-transparent hover:bg-mist')}>
                 <span className="w-[74px] shrink-0 text-xs font-extrabold text-deep">{q.id}</span>
-                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{q.q}</span><span className="text-xs text-soft">{q.pool} · {q.d} · {q.t}</span></span>
+                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{q.q}</span><span className="text-xs text-soft">{q.pool} · {q.d} · {q.t}{CHANGES[q.id] && <b className="ms-1.5 text-orange-deep">· changed</b>}</span></span>
                 <DiffDot d={q.d} />
               </button>
             ))}
@@ -76,6 +81,21 @@ function Bank() {
   )
 }
 const DiffDot = ({ d }: { d: string }) => <i className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: { Starter: '#12A150', Easy: '#05ACFF', Medium: '#FF7F1C', Hard: '#D93A3A' }[d] }} title={d} />
+
+function Changed({ c }: { c: Change }) {
+  return (
+    <details className="mb-3 rounded-2xl bg-warm p-3 text-sm">
+      <summary className="cursor-pointer font-bold text-deep">Changed in v4: {c.what}</summary>
+      <p className="m-0 mt-2 text-soft">{c.why}</p>
+      <div className="mt-2 rounded-xl border border-line bg-white p-3">
+        <p className="m-0 text-xs font-extrabold text-soft">Before</p>
+        <p className="m-0 mt-1 font-semibold">{c.q}</p>
+        {c.scr && <p className="m-0 mt-1 whitespace-pre-line font-mono text-xs text-soft">{c.scr}</p>}
+        <ol className="m-0 mt-1 ps-5 text-soft">{c.o.map((o, i) => <li key={i}>{o}</li>)}</ol>
+      </div>
+    </details>
+  )
+}
 
 function Preview({ q }: { q: Question }) {
   const [lang, setLang] = useState<'en' | 'ar'>('en')
@@ -92,6 +112,7 @@ function Preview({ q }: { q: Question }) {
           <button onClick={() => setShow(!show)} className="flex items-center gap-1 rounded-full border-2 border-line px-2.5 text-xs font-bold">{show ? <EyeOff size={14} /> : <Eye size={14} />} Key</button>
         </div>
       </div>
+      {CHANGES[q.id] && <Changed c={CHANGES[q.id]} />}
       <p className="m-0 mb-3 text-xs font-bold text-orange-deep">Student preview: what a {band === 'kids' ? '6 to 9' : band === 'teen' ? '10 to 13' : '14 to 18'} year old sees</p>
       <div className="rounded-2xl border border-dashed border-line bg-mist p-4" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
         <QuestionView key={q.id + lang + show} q={q} lang={lang} band={band} value={show ? v : v} onChange={setV} review={show} salt="preview" />

@@ -1,0 +1,1163 @@
+{
+"L1-G1-05": {
+"what": "Icons on the options",
+"why": "Ages 6 to 7 read pictures before words",
+"q": "What is the safe way to turn off a computer?",
+"o": [
+"Choose Shut down from the menu",
+"Pull out the power cable",
+"Close the screen very hard"
+],
+"scr": "Three pictures of ways to turn off a computer"
+},
+"L1-G1-10": {
+"what": "Asks what a game character does, without the Sprite Lab name. Icons on the options",
+"why": "New students may never have used Sprite Lab (Start here rule 5)",
+"q": "In Sprite Lab, what is a sprite?",
+"o": [
+"A character in your game",
+"The background color",
+"The computer screen"
+],
+"scr": "A game screen with a cat sprite on a background"
+},
+"L1-G1-11": {
+"what": "Plain words instead of the word variable. Icons on the options",
+"why": "New students have not learned the word variable yet",
+"q": "A game remembers your name. Where does it keep it?",
+"o": [
+"In a variable",
+"In a sound",
+"In a costume"
+],
+"scr": "A question box with a name typed in"
+},
+"L1-G1-18": {
+"what": "Icons on the options",
+"why": "Ages 6 to 7 read pictures before words",
+"q": "Scene 2 starts. What happens to scene 1 characters?",
+"o": [
+"Hide them",
+"Make them bigger",
+"Give them a sound"
+],
+"scr": "Two scene cards side by side"
+},
+"L1-G1-20": {
+"what": "Asks what to do, not the word broadcast. Icons on the options",
+"why": "Tests the idea, not a tool word (Start here rule 5)",
+"q": "One message makes all characters dance. What is it called?",
+"o": [
+"A broadcast",
+"A costume",
+"A backdrop"
+],
+"scr": ""
+},
+"L1-G2-01": {
+"what": "Runs an algorithm on a robot stage instead of defining the word",
+"why": "Ages 6 to 7 can follow steps long before they can define them",
+"q": "What is an algorithm?",
+"o": [
+"Steps in the right order",
+"A kind of computer screen",
+"A game you play on a tablet"
+],
+"scr": ""
+},
+"L1-G2-04": {
+"what": "Icons on the options",
+"why": "Ages 6 to 7 read pictures before words",
+"q": "This flower has no nectar. What does the bee do?",
+"o": [
+"Move forward",
+"Collect nectar",
+"Stop and do nothing"
+],
+"scr": "if nectar [ collect nectar ] else [ move forward ]"
+},
+"L1-G2-05": {
+"what": "Asks what starts a game instead of the word event. Icons on the options",
+"why": "New students do not know the word event yet",
+"q": "Which of these is an event?",
+"o": [
+"Clicking a button",
+"The color blue",
+"A big number"
+],
+"scr": ""
+},
+"L1-G2-06": {
+"what": "A real yes-or-no question instead of the definition of a condition",
+"why": "Ages 6 to 7 learn by example, not by definition",
+"q": "A condition is a question. What answers can it have?",
+"o": [
+"Yes or no",
+"Any number",
+"A color"
+],
+"scr": ""
+},
+"L1-G2-07": {
+"what": "Describes the loop instead of naming the Repeat Until block. Icons on the options",
+"why": "Tests the idea, not a block name (Start here rule 5)",
+"q": "Which job needs a Repeat Until loop?",
+"o": [
+"Walk until you reach the door",
+"Clap your hands exactly 3 times",
+"Say hello to a friend once"
+],
+"scr": ""
+},
+"L1-G2-08": {
+"what": "Icons on the options",
+"why": "Ages 6 to 7 read pictures before words",
+"q": "How do we teach AI to tell apples from bananas?",
+"o": [
+"Show it many labeled pictures",
+"Show it just one big picture",
+"Let it guess again and again"
+],
+"scr": "Pictures of apples and bananas"
+},
+"L1-G2-09": {
+"what": "Reads a variable in blocks instead of asking what a variable is like",
+"why": "Shows the skill instead of a definition; the blocks are drawn on screen",
+"q": "What is a variable like?",
+"o": [
+"A box that keeps a value",
+"A picture of the hero",
+"A sound in the game"
+],
+"scr": ""
+},
+"L1-G2-10": {
+"what": "Icons on the options",
+"why": "Ages 6 to 7 read pictures before words",
+"q": "Which of these uses AI?",
+"o": [
+"A speaker that answers questions",
+"A lamp that turns on with a switch",
+"A toy car that runs on batteries"
+],
+"scr": ""
+},
+"L1-G2-11": {
+"what": "A real wrong-order example instead of asking why order matters",
+"why": "Ages 6 to 7 learn by example, not by explaining",
+"q": "Why does the order of steps matter in an algorithm?",
+"o": [
+"The wrong order gives a wrong result",
+"Order does not change anything",
+"Only the last step is used"
+],
+"scr": ""
+},
+"L1-G2-13": {
+"what": "Uses a function (defined once, used twice) instead of defining the word",
+"why": "Shows the skill instead of a definition; the blocks are drawn on screen",
+"q": "What is a function?",
+"o": [
+"Blocks you name and use again",
+"A picture you draw once",
+"A sound you play once"
+],
+"scr": ""
+},
+"L2-DL-03": {
+"what": "Icons on the options",
+"why": "Ages 8 to 9 read pictures before words",
+"q": "A pop-up says \"Click to win a prize!\" What do you do?",
+"o": [
+"Close it, tell an adult",
+"Click it to win",
+"Share it with friends"
+],
+"scr": ""
+},
+"L2-DL-05": {
+"what": "Icons on the options",
+"why": "Ages 8 to 9 read pictures before words",
+"q": "You drew a picture on the computer. How do you keep it?",
+"o": [
+"Save it",
+"Close it without saving",
+"Turn off the computer"
+],
+"scr": ""
+},
+"L2-G4-01": {
+"what": "Icons on the options",
+"why": "Ages 8 to 9 read pictures before words",
+"q": "Which of these uses AI?",
+"o": [
+"A phone that unlocks with your face",
+"A light that turns on with a switch",
+"A calculator adding 2 + 2",
+"A doorbell that rings"
+],
+"scr": ""
+},
+"L2-G3-01": {
+"what": "A task that needs an event instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "In an app, what is an event?",
+"o": [
+"A click or key press that runs code",
+"The color and size of a button",
+"The name shown at the top of the app",
+"A picture placed on the screen"
+],
+"scr": ""
+},
+"L2-G3-02": {
+"what": "Asks what to draw first instead of the word wireframe",
+"why": "Shows the skill instead of a definition",
+"q": "What is a wireframe?",
+"o": [
+"A simple sketch of a screen",
+"The finished, colored app",
+"The code behind a button",
+"A list of the app users"
+],
+"scr": ""
+},
+"L2-G3-05": {
+"what": "Reads a comment line instead of defining the word",
+"why": "Shows the skill instead of a definition",
+"q": "What is a comment in code?",
+"o": [
+"A note for people that the computer skips",
+"A line that makes the app run faster",
+"A message the app shows to the user",
+"An error in the code"
+],
+"scr": "// move the car to the start"
+},
+"L2-G3-06": {
+"what": "A user problem instead of the definition of UX",
+"why": "Shows the skill instead of a definition",
+"q": "UI is how an app looks. What is UX?",
+"o": [
+"How easy and fun it is to use",
+"Another word for UI",
+"The code inside the app",
+"A kind of game design"
+],
+"scr": ""
+},
+"L2-G3-09": {
+"what": "App Lab name removed",
+"why": "New students may never have used App Lab (Start here rule 5)",
+"q": "In App Lab, which block takes the user to another screen?",
+"o": [
+"setScreen",
+"setText",
+"console.log",
+"onEvent"
+],
+"scr": ""
+},
+"L2-G3-11": {
+"what": "Tynker name removed",
+"why": "New students may never have used Tynker (Start here rule 5)",
+"q": "In a Tynker game, what does a forever loop do?",
+"o": [
+"Runs its blocks again and again",
+"Runs its blocks just once",
+"Runs when the sprite is clicked",
+"Waits, then stops the game"
+],
+"scr": ""
+},
+"L2-G3-17": {
+"what": "A task that needs clones instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is a clone in a game?",
+"o": [
+"A copy of a sprite made in the game",
+"A new background for a level",
+"A sound that plays on a hit",
+"A saved file of the game"
+],
+"scr": ""
+},
+"L2-G3-18": {
+"what": "Angry Birds name removed",
+"why": "Tests the idea, not a game the student may not know",
+"q": "In an Angry Birds-style game, what pulls the bird down?",
+"o": [
+"Gravity",
+"Velocity only",
+"The background",
+"The score"
+],
+"scr": ""
+},
+"L2-G3-19": {
+"what": "App Lab name removed from the picture note",
+"why": "Tests the idea, not one tool",
+"q": "y grows downward. A car goes (100, 200) to (100, 150). Which way?",
+"o": [
+"Up",
+"Left",
+"Right",
+"Down"
+],
+"scr": "A car on the App Lab screen with x and y arrows"
+},
+"L2-G4-02": {
+"what": "An example instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does text-to-speech do?",
+"o": [
+"The computer reads text out loud",
+"The computer understands what you say",
+"The computer takes a photo",
+"The computer types what you draw"
+],
+"scr": ""
+},
+"L2-G4-06": {
+"what": "A training task instead of defining dataset",
+"why": "Shows the skill instead of a definition",
+"q": "What is a dataset used for in machine learning?",
+"o": [
+"Examples for the AI to learn from",
+"The final scores of all players",
+"A list of sprites and their moves",
+"Backdrops used in each level"
+],
+"scr": ""
+},
+"L2-G4-07": {
+"what": "A real OR rule instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "When does OR give True?",
+"o": [
+"When at least one condition is true",
+"Only when all conditions are true",
+"Only when all conditions are false",
+"When no condition is checked"
+],
+"scr": ""
+},
+"L2-G4-08": {
+"what": "An example of the two steps instead of asking the difference",
+"why": "Shows the skill instead of a definition",
+"q": "What is the difference between face detection and face recognition?",
+"o": [
+"Detection finds a face; recognition says whose",
+"Recognition finds a face; detection says whose",
+"They mean exactly the same thing",
+"Detection works only on photos"
+],
+"scr": ""
+},
+"L2-G4-09": {
+"what": "An example prompt instead of naming the technique",
+"why": "Shows the skill instead of a definition",
+"q": "Which prompt technique tells the AI who it should act as?",
+"o": [
+"Giving a role",
+"Giving a task",
+"Giving context",
+"Giving an output format"
+],
+"scr": ""
+},
+"L2-G4-10": {
+"what": "An example instead of the definition of OCR",
+"why": "Shows the skill instead of a definition",
+"q": "Text recognition (OCR) lets the computer...",
+"o": [
+"read words in a picture",
+"say words out loud",
+"find faces in a photo",
+"play music from notes"
+],
+"scr": ""
+},
+"L3-DL-01": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Where do you type a website address?",
+"o": [
+"The address bar of the browser",
+"The search box inside Paint",
+"The wallpaper on the desktop"
+],
+"scr": ""
+},
+"L3-DL-02": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Which file is a picture?",
+"o": [
+"cat.png",
+"notes.txt",
+"song.mp3"
+],
+"scr": ""
+},
+"L3-DL-03": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "A stranger in an online game asks where you live. What do you do?",
+"o": [
+"Don't answer, block them, tell an adult",
+"Tell them only your street name",
+"Send them a photo of your house"
+],
+"scr": ""
+},
+"L3-DL-05": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Your files are messy. What is the best way to organize them?",
+"o": [
+"Put them in folders with clear names",
+"Keep them all on the desktop",
+"Rename them file1, file2, file3"
+],
+"scr": ""
+},
+"L4-DL-01": {
+"what": "A real situation instead of defining the cloud. Fourth option added",
+"why": "Shows the skill instead of a definition; three options are too easy to guess",
+"q": "What does \"save it to the cloud\" mean?",
+"o": [
+"Saved online, so you can open it anywhere",
+"Printed on paper and kept at home",
+"Saved only on one USB stick"
+],
+"scr": ""
+},
+"L4-DL-02": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Which is the safest password?",
+"o": [
+"purple-Rocket-river-42!",
+"ahmedahmedahmed2012",
+"password123"
+],
+"scr": ""
+},
+"L4-DL-03": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "A friend's account sends a strange link: \"Is this you??\" What do you do?",
+"o": [
+"Don't click; ask your friend another way",
+"Click it, it's from my friend anyway",
+"Forward it to the whole class group"
+],
+"scr": ""
+},
+"L4-DL-05": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Before you post a photo of a friend online, you should...",
+"o": [
+"Ask them first",
+"Post it, it is your phone",
+"Add a funny caption"
+],
+"scr": ""
+},
+"L5-DL-01": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Which address is safe to type your Facebook password into?",
+"o": [
+"https://www.facebook.com",
+"http://faceb00k-login.co",
+"http://free-likes.net/facebook"
+],
+"scr": ""
+},
+"L5-DL-02": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Your phone asks to install an update. Why are updates important?",
+"o": [
+"They fix security holes and bugs",
+"They only change the wallpaper",
+"They make the battery bigger"
+],
+"scr": ""
+},
+"L5-DL-03": {
+"what": "Google Drive name removed. Fourth option added",
+"why": "Tests the idea, not one tool; three options are too easy to guess",
+"q": "You need to send a 2 GB video to a friend. What is the best way?",
+"o": [
+"Share a cloud link, like Google Drive",
+"Attach it to a normal email",
+"Send it as a phone text message"
+],
+"scr": ""
+},
+"L5-DL-05": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "A calculator app asks for your contacts, camera and location. What does this suggest?",
+"o": [
+"It wants more than it needs, so deny it",
+"Calculators always need these",
+"It will calculate faster with them"
+],
+"scr": ""
+},
+"L6-DL-01": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "Which is the most reliable source for a school report?",
+"o": [
+"An official website or a published study",
+"A random comment on social media",
+"A meme"
+],
+"scr": ""
+},
+"L6-DL-02": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "A spreadsheet cell shows #####. What usually fixes it?",
+"o": [
+"Make the column wider",
+"Delete the file",
+"Restart the computer"
+],
+"scr": ""
+},
+"L6-DL-03": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "You use the same password on every site. One site gets hacked. What is the risk?",
+"o": [
+"Attackers can open your other accounts",
+"No risk, only that site is affected",
+"Your computer will slow down"
+],
+"scr": ""
+},
+"L6-DL-05": {
+"what": "Fourth option added",
+"why": "Three options let a guesser pass too often",
+"q": "An AI chatbot gives you a fact for your project. What should you do?",
+"o": [
+"Check it in a trusted source before using it",
+"Use it, AI is always right",
+"Ask the same chatbot if it is sure"
+],
+"scr": ""
+},
+"L3-G6-02": {
+"what": "Godot name and node term removed",
+"why": "Tests the idea, not one tool (Start here rule 5)",
+"q": "In a game engine like Godot, how is a scene built?",
+"o": [
+"A tree of nodes",
+"One big picture",
+"A list of sound files",
+"A list of players"
+],
+"scr": ""
+},
+"L3-G6-04": {
+"what": "GDScript name removed",
+"why": "Code reading, not one tool",
+"q": "What does this GDScript code print?",
+"o": [
+"4",
+"3",
+"dragon",
+"An error"
+],
+"scr": "var enemies = [\"bat\", \"slime\", \"ghost\"]\nenemies.append(\"dragon\")\nprint(enemies.size())"
+},
+"L3-G6-18": {
+"what": "GDScript name removed",
+"why": "Code reading, not one tool",
+"q": "What does this GDScript code print?",
+"o": [
+"6",
+"10",
+"4",
+"3"
+],
+"scr": "var total = 0\nfor i in range(4):\n    total += i\nprint(total)"
+},
+"L3-G6-19": {
+"what": "GDScript name removed",
+"why": "Code reading, not one tool",
+"q": "What does this GDScript code print?",
+"o": [
+"400",
+"An error",
+"[100, 200, 300, 400]",
+"300"
+],
+"scr": "var lanes = [100, 200, 300]\nlanes.append(400)\nprint(lanes[3])"
+},
+"L3-G6-14": {
+"what": "GDScript name removed",
+"why": "Tests the idea, not one tool",
+"q": "Which is a good variable name in GDScript?",
+"o": [
+"player_speed",
+"2speed",
+"player speed!",
+"a"
+],
+"scr": ""
+},
+"L3-G6-06": {
+"what": "Godot name removed",
+"why": "Tests the idea, not one tool",
+"q": "Which Godot function picks a random whole number from 1 to 6, like a dice?",
+"o": [
+"randi_range(1, 6)",
+"instantiate(1, 6)",
+"range(1, 6)",
+"print(1, 6)"
+],
+"scr": ""
+},
+"L3-G6-07": {
+"what": "A game moment instead of the Godot signal definition",
+"why": "Tests the idea, not one tool",
+"q": "In Godot, what is a signal used for?",
+"o": [
+"Tells other nodes an event happened",
+"Draws the background of the level",
+"Saves the score at the end",
+"Exports the whole game to a file"
+],
+"scr": ""
+},
+"L3-G6-08": {
+"what": "A problem to fix instead of defining Camera2D",
+"why": "Shows the skill instead of a definition",
+"q": "What does a Camera2D node do in a platformer?",
+"o": [
+"Follows the player around",
+"Plays background music",
+"Detects collisions",
+"Spawns new enemies"
+],
+"scr": ""
+},
+"L3-G6-09": {
+"what": "Godot node names replaced with plain game parts",
+"why": "Tests the idea, not one tool",
+"q": "Match each Godot node to its job.",
+"o": [
+"Sprite2D = Shows a picture",
+"CollisionShape2D = Gives the object a shape for hits",
+"Camera2D = Follows the player",
+"AudioStreamPlayer = Plays a sound"
+],
+"scr": ""
+},
+"L3-G6-11": {
+"what": "Godot node names replaced with plain game parts",
+"why": "Tests the idea, not one tool",
+"q": "Which Godot node shows the score as text on the screen?",
+"o": [
+"Label",
+"Camera2D",
+"Timer",
+"Tween"
+],
+"scr": ""
+},
+"L3-G6-13": {
+"what": "Asks why tiles help instead of the Godot TileMap definition",
+"why": "Tests the idea, not one tool",
+"q": "In Godot, what is a TileMap used for?",
+"o": [
+"Building levels from small tiles",
+"Saving the player's high score",
+"Playing the background music",
+"Writing the game's main code"
+],
+"scr": ""
+},
+"L4-G7-03": {
+"what": "A design task instead of the Figma frame definition",
+"why": "Tests the idea, not one tool",
+"q": "In Figma, what is a frame most like?",
+"o": [
+"A screen that holds your design",
+"A filter you add to photos",
+"A style of font for titles",
+"A sound effect for buttons"
+],
+"scr": ""
+},
+"L4-G7-05": {
+"what": "Pick a good How Might We question instead of defining it. Picture note removed (it showed the answer)",
+"why": "Shows the skill instead of a definition",
+"q": "What does a How Might We question do at the start of a design project?",
+"o": [
+"Turns a problem into a question for ideas",
+"Writes the first code for the app",
+"Tests the finished app with users",
+"Picks the final colors and fonts"
+],
+"scr": "How might we help new players learn the game?"
+},
+"L4-G7-06": {
+"what": "Figma name removed",
+"why": "Tests the idea, not one tool",
+"q": "Why do designers use templates and plugins in Figma?",
+"o": [
+"To save time with ready-made parts",
+"To store all the users' passwords",
+"To test the speed of the internet",
+"To make the app run on Android"
+],
+"scr": ""
+},
+"L4-G7-08": {
+"what": "What card sorting tells you instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is card sorting used for in app design?",
+"o": [
+"Grouping features the way users expect",
+"Picking the app colors at random",
+"Writing the code for each button",
+"Testing the speed of the internet"
+],
+"scr": ""
+},
+"L4-G7-09": {
+"what": "Describes the activity instead of asking for the Crazy 8s name",
+"why": "Shows the skill instead of a definition",
+"q": "What is the Crazy 4s (or Crazy 8s) sketching technique?",
+"o": [
+"Sketching many layout ideas fast",
+"Coding four apps at the same time",
+"Choosing four fonts for one app",
+"Testing the app on four phones"
+],
+"scr": ""
+},
+"L4-G7-14": {
+"what": "Figma name removed",
+"why": "Tests the idea, not one tool",
+"q": "In a clickable Figma prototype, the Start button should open the Home screen. What do you add?",
+"o": [
+"A prototype link from the button to Home",
+"A new font for the Start button",
+"A drop shadow under the Start button",
+"A color style for the Home screen"
+],
+"scr": ""
+},
+"L4-G8-01": {
+"what": "A team decision instead of the cross-platform definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is a cross-platform app?",
+"o": [
+"One codebase for Android and iOS",
+"An app for one phone only",
+"A website with no app",
+"An app for game consoles"
+],
+"scr": ""
+},
+"L4-G8-10": {
+"what": "Firebase name removed",
+"why": "Tests the idea, not one tool",
+"q": "What does Firebase Authentication handle in an app?",
+"o": [
+"Signing users up and logging in",
+"Drawing the app icons",
+"Playing sounds in the app",
+"Choosing the app fonts"
+],
+"scr": ""
+},
+"L4-G8-11": {
+"what": "FlutterFlow name removed",
+"why": "Tests the idea, not one tool",
+"q": "In FlutterFlow, what do Actions do?",
+"o": [
+"Run something when the user taps",
+"Draw the screen layout",
+"Change the app's name",
+"Store pictures in the app"
+],
+"scr": ""
+},
+"L4-T-01": {
+"what": "Figma name removed",
+"why": "Tests the idea, not one tool",
+"q": "Put the UI/UX design steps in order.",
+"o": [
+"Frame the problem with a How Might We question",
+"Brainstorm and sketch ideas",
+"Turn the best sketch into a Figma wireframe",
+"Test the prototype with users"
+],
+"scr": "Four step cards"
+},
+"L5-G9-05": {
+"what": "Names the part in an example instead of the definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is a domain name?",
+"o": [
+"A site's easy name, like ischooltech.com",
+"The computer that stores the website",
+"The secret password of the website",
+"The code that styles each page"
+],
+"scr": ""
+},
+"L5-G9-13": {
+"what": "A request in action instead of the web server definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does a web server do?",
+"o": [
+"Sends pages and data when browsers ask",
+"Draws each page on your own screen",
+"Turns your home Wi-Fi on and off",
+"Keeps a copy of your browser history"
+],
+"scr": ""
+},
+"L5-G9-19": {
+"what": "Node.js and Express names removed",
+"why": "Tests the idea, not one tool",
+"q": "In a Node.js and Express server, which route should return the list of all students?",
+"o": [
+"GET /students",
+"DELETE /students",
+"POST /students",
+"PATCH /students/1"
+],
+"scr": ""
+},
+"L5-G10-03": {
+"what": "Describes the job instead of asking what a red team does",
+"why": "Shows the skill instead of a definition",
+"q": "What does a red team do in cybersecurity?",
+"o": [
+"Acts like attackers to find weaknesses",
+"Defends and monitors the systems",
+"Designs the company logo",
+"Sells computers"
+],
+"scr": ""
+},
+"L5-G10-08": {
+"what": "A lookup in action instead of the DNS definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does DNS do?",
+"o": [
+"Turns a site name into an IP address",
+"Encrypts all of your passwords",
+"Blocks viruses on your computer",
+"Gives each device its Wi-Fi signal"
+],
+"scr": ""
+},
+"L5-G10-10": {
+"what": "A rule to set instead of the firewall definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does a firewall do?",
+"o": [
+"Allows or blocks traffic by rules",
+"Makes the internet faster",
+"Removes viruses from files",
+"Stores your passwords"
+],
+"scr": ""
+},
+"L5-G10-12": {
+"what": "An example instead of the virtualization definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is virtualization?",
+"o": [
+"Running a computer inside another computer",
+"Buying a faster computer for work",
+"Making a website look 3D on screen",
+"Cleaning old files off the computer"
+],
+"scr": ""
+},
+"L5-G10-13": {
+"what": "A network job instead of the router definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does a router mainly do?",
+"o": [
+"Moves data between networks",
+"Stores files for the network",
+"Shows web pages",
+"Protects against all viruses"
+],
+"scr": ""
+},
+"L5-G10-18": {
+"what": "An example instead of asking the difference",
+"why": "Shows the skill instead of a definition",
+"q": "What is the difference between symmetric and asymmetric encryption?",
+"o": [
+"Symmetric: one shared key. Asymmetric: public and private keys",
+"Symmetric: public and private keys. Asymmetric: one shared key",
+"Symmetric works only on images",
+"There is no real difference"
+],
+"scr": ""
+},
+"L5-T-04": {
+"what": "Express and MongoDB names removed",
+"why": "Tests the idea, not one tool",
+"q": "Sort each item into front end (runs in the browser) or back end (runs on the server).",
+"o": [
+"An HTML page = Front end",
+"CSS styles = Front end",
+"An Express route = Back end",
+"A MongoDB query = Back end"
+],
+"scr": "Four cards to drag into two boxes"
+},
+"L6-G11-01": {
+"what": "A need instead of the game engine definition",
+"why": "Shows the skill instead of a definition",
+"q": "What is a game engine?",
+"o": [
+"Software for making and running games",
+"A type of graphics card for gaming",
+"A controller you play games with",
+"A programming language for games"
+],
+"scr": ""
+},
+"L6-G11-02": {
+"what": "Unity name removed, asked as a task",
+"why": "Tests the idea, not one tool",
+"q": "In Unity, what is a prefab?",
+"o": [
+"A saved GameObject you can reuse",
+"A saved sound effect for a level",
+"A fixed camera angle for a scene",
+"A kind of error in a script"
+],
+"scr": ""
+},
+"L6-G11-03": {
+"what": "Replaced: asked which language Unity uses, now asks where behavior code goes",
+"why": "A fact about one tool tests nothing a new student can show (Start here rule 5)",
+"q": "Which programming language is used to write scripts in Unity?",
+"o": [
+"C#",
+"Python",
+"HTML",
+"Dart"
+],
+"scr": ""
+},
+"L6-G11-04": {
+"what": "A look to change instead of the Unity Material definition",
+"why": "Tests the idea, not one tool",
+"q": "In Unity, what does a Material control?",
+"o": [
+"How a surface looks: color, texture",
+"How heavy an object is",
+"Which keys the player presses",
+"Which scene loads next"
+],
+"scr": ""
+},
+"L6-G11-05": {
+"what": "A need instead of the Unity Asset Store definition",
+"why": "Tests the idea, not one tool",
+"q": "What is the Unity Asset Store used for?",
+"o": [
+"Ready-made models, sounds and tools",
+"Selling your finished game only",
+"Testing your internet speed",
+"Writing your C# code for you"
+],
+"scr": ""
+},
+"L6-G11-06": {
+"what": "A need instead of asking what WebGL is",
+"why": "Shows the skill instead of a definition",
+"q": "What is special about a WebGL build of a Unity game?",
+"o": [
+"It runs in a web browser",
+"It cannot have sound",
+"It only runs on game consoles",
+"It only runs on Windows"
+],
+"scr": ""
+},
+"L6-G11-07": {
+"what": "Unity name removed",
+"why": "Tests the idea, not one tool",
+"q": "In a Unity script, Start() runs ___ and Update() runs ___.",
+"o": [
+"once at the beginning; every frame",
+"every frame; once at the beginning",
+"only on a click; never",
+"once; once"
+],
+"scr": ""
+},
+"L6-G11-08": {
+"what": "Unity name removed",
+"why": "Tests the idea, not one tool",
+"q": "Match each Unity component to its job.",
+"o": [
+"Rigidbody = Adds physics, like gravity",
+"Collider = Gives the object a shape for hits",
+"Transform = Position, rotation and scale",
+"Audio Source = Plays sound"
+],
+"scr": ""
+},
+"L6-G11-14": {
+"what": "Unity name removed",
+"why": "Code reading, not one tool",
+"q": "In Unity, Random.Range(0, 3) is used with whole numbers. Which values can it return?",
+"o": [
+"0, 1 or 2",
+"Any decimal from 0 to 3",
+"1, 2 or 3",
+"0, 1, 2 or 3"
+],
+"scr": "int i = Random.Range(0, 3);"
+},
+"L6-G11-18": {
+"what": "A task instead of the NavMesh Agent definition",
+"why": "Shows the skill instead of a definition",
+"q": "What does a NavMesh Agent do?",
+"o": [
+"Moves a character along walkable paths",
+"Plays the character's animations",
+"Creates particle effects",
+"Saves the player's progress"
+],
+"scr": ""
+},
+"L6-G12-04": {
+"what": "pandas name removed",
+"why": "Code reading, not one tool",
+"q": "What does this pandas line return?",
+"o": [
+"The average of the age column",
+"The sum of the age column",
+"How many rows have an age",
+"The largest age"
+],
+"scr": "df[\"age\"].mean()"
+},
+"L6-G12-14": {
+"what": "pandas name removed",
+"why": "Code reading, not one tool",
+"q": "What does this pandas line give?",
+"o": [
+"The total sales for each city",
+"The sales of the first city only",
+"The number of cities",
+"Every row sorted by city"
+],
+"scr": "df.groupby(\"city\")[\"sales\"].sum()"
+},
+"L6-G12-12": {
+"what": "Runs code on a tuple instead of asking what is special about it",
+"why": "Shows the skill instead of a definition",
+"q": "What is special about a Python tuple?",
+"o": [
+"It cannot be changed after it is made",
+"It can only hold numbers",
+"It stores key-value pairs",
+"It removes duplicates on its own"
+],
+"scr": "point = (3, 5)"
+},
+"L6-T-04": {
+"what": "Unity name removed",
+"why": "Tests the idea, not one tool",
+"q": "Sort the Unity methods: which run once, and which run again and again while the game plays?",
+"o": [
+"Start() = Once",
+"Awake() = Once",
+"Update() = Again and again",
+"FixedUpdate() = Again and again"
+],
+"scr": "Four cards to drag into two boxes"
+},
+"L1-G1-08": {
+"what": "Tool name removed from the picture note",
+"why": "Blocks are drawn plain, not as one tool",
+"q": "The cat jumps when clicked. Which block starts it?",
+"o": [
+"when cat clicked",
+"when run",
+"every 2 seconds"
+],
+"scr": "Three Sprite Lab event blocks"
+},
+"L1-G1-14": {
+"what": "Tool name removed from the picture note",
+"why": "Blocks are drawn plain, not as one tool",
+"q": "Which block makes the cat say Hello?",
+"o": [
+"cat says Hello",
+"move cat forward",
+"change cat size by 10"
+],
+"scr": "Three Sprite Lab action blocks"
+},
+"L1-G1-15": {
+"what": "Tool name removed from the picture note",
+"why": "Blocks are drawn plain, not as one tool",
+"q": "The coin should vanish when touched. Which block?",
+"o": [
+"hide coin",
+"show coin",
+"play sound"
+],
+"scr": "Three Sprite Lab blocks"
+},
+"L1-G1-17": {
+"what": "Tool name removed from the picture note",
+"why": "Blocks are drawn plain, not as one tool",
+"q": "Which code makes 4 stars with the fewest blocks?",
+"o": [
+"repeat 4 times: make new star",
+"make new star (4 blocks in a row)",
+"repeat 2 times: make new star"
+],
+"scr": "Three Sprite Lab programs"
+},
+"L1-G2-17": {
+"what": "Tool name removed from the picture note",
+"why": "Blocks are drawn plain, not as one tool",
+"q": "Which block keeps the clouds moving for the whole game?",
+"o": [
+"forever",
+"repeat 2 times",
+"on start"
+],
+"scr": "Three MakeCode Arcade blocks"
+},
+"L1-T-06": {
+"what": "\"> move forward\" marks the block that goes inside repeat",
+"why": "The block builder nests blocks with the \">\" rule",
+"q": "Use a loop: move 3 times, then get the nectar.",
+"o": [
+"repeat 3 times",
+"move forward (inside the loop)",
+"get nectar"
+],
+"scr": "Three blocks to drag into order. The move block snaps inside the loop."
+}
+}

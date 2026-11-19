@@ -1,0 +1,101 @@
+Version,ID,What changed,Why
+v4,L1-G1-05,Icons on the options,Ages 6 to 7 read pictures before words
+v4,L1-G1-10,"Asks what a game character does, without the Sprite Lab name. Icons on the options",New students may never have used Sprite Lab (Start here rule 5)
+v4,L1-G1-11,Plain words instead of the word variable. Icons on the options,New students have not learned the word variable yet
+v4,L1-G1-18,Icons on the options,Ages 6 to 7 read pictures before words
+v4,L1-G1-20,"Asks what to do, not the word broadcast. Icons on the options","Tests the idea, not a tool word (Start here rule 5)"
+v4,L1-G2-01,Runs an algorithm on a robot stage instead of defining the word,Ages 6 to 7 can follow steps long before they can define them
+v4,L1-G2-04,Icons on the options,Ages 6 to 7 read pictures before words
+v4,L1-G2-05,Asks what starts a game instead of the word event. Icons on the options,New students do not know the word event yet
+v4,L1-G2-06,A real yes-or-no question instead of the definition of a condition,"Ages 6 to 7 learn by example, not by definition"
+v4,L1-G2-07,Describes the loop instead of naming the Repeat Until block. Icons on the options,"Tests the idea, not a block name (Start here rule 5)"
+v4,L1-G2-08,Icons on the options,Ages 6 to 7 read pictures before words
+v4,L1-G2-09,Reads a variable in blocks instead of asking what a variable is like,Shows the skill instead of a definition; the blocks are drawn on screen
+v4,L1-G2-10,Icons on the options,Ages 6 to 7 read pictures before words
+v4,L1-G2-11,A real wrong-order example instead of asking why order matters,"Ages 6 to 7 learn by example, not by explaining"
+v4,L1-G2-13,"Uses a function (defined once, used twice) instead of defining the word",Shows the skill instead of a definition; the blocks are drawn on screen
+v4,L2-DL-03,Icons on the options,Ages 8 to 9 read pictures before words
+v4,L2-DL-05,Icons on the options,Ages 8 to 9 read pictures before words
+v4,L2-G4-01,Icons on the options,Ages 8 to 9 read pictures before words
+v4,L2-G3-01,A task that needs an event instead of the definition,Shows the skill instead of a definition
+v4,L2-G3-02,Asks what to draw first instead of the word wireframe,Shows the skill instead of a definition
+v4,L2-G3-05,Reads a comment line instead of defining the word,Shows the skill instead of a definition
+v4,L2-G3-06,A user problem instead of the definition of UX,Shows the skill instead of a definition
+v4,L2-G3-09,App Lab name removed,New students may never have used App Lab (Start here rule 5)
+v4,L2-G3-11,Tynker name removed,New students may never have used Tynker (Start here rule 5)
+v4,L2-G3-17,A task that needs clones instead of the definition,Shows the skill instead of a definition
+v4,L2-G3-18,Angry Birds name removed,"Tests the idea, not a game the student may not know"
+v4,L2-G3-19,App Lab name removed from the picture note,"Tests the idea, not one tool"
+v4,L2-G4-02,An example instead of the definition,Shows the skill instead of a definition
+v4,L2-G4-06,A training task instead of defining dataset,Shows the skill instead of a definition
+v4,L2-G4-07,A real OR rule instead of the definition,Shows the skill instead of a definition
+v4,L2-G4-08,An example of the two steps instead of asking the difference,Shows the skill instead of a definition
+v4,L2-G4-09,An example prompt instead of naming the technique,Shows the skill instead of a definition
+v4,L2-G4-10,An example instead of the definition of OCR,Shows the skill instead of a definition
+v4,L3-DL-01,Fourth option added,Three options let a guesser pass too often
+v4,L3-DL-02,Fourth option added,Three options let a guesser pass too often
+v4,L3-DL-03,Fourth option added,Three options let a guesser pass too often
+v4,L3-DL-05,Fourth option added,Three options let a guesser pass too often
+v4,L4-DL-01,A real situation instead of defining the cloud. Fourth option added,Shows the skill instead of a definition; three options are too easy to guess
+v4,L4-DL-02,Fourth option added,Three options let a guesser pass too often
+v4,L4-DL-03,Fourth option added,Three options let a guesser pass too often
+v4,L4-DL-05,Fourth option added,Three options let a guesser pass too often
+v4,L5-DL-01,Fourth option added,Three options let a guesser pass too often
+v4,L5-DL-02,Fourth option added,Three options let a guesser pass too often
+v4,L5-DL-03,Google Drive name removed. Fourth option added,"Tests the idea, not one tool; three options are too easy to guess"
+v4,L5-DL-05,Fourth option added,Three options let a guesser pass too often
+v4,L6-DL-01,Fourth option added,Three options let a guesser pass too often
+v4,L6-DL-02,Fourth option added,Three options let a guesser pass too often
+v4,L6-DL-03,Fourth option added,Three options let a guesser pass too often
+v4,L6-DL-05,Fourth option added,Three options let a guesser pass too often
+v4,L3-G6-02,Godot name and node term removed,"Tests the idea, not one tool (Start here rule 5)"
+v4,L3-G6-04,GDScript name removed,"Code reading, not one tool"
+v4,L3-G6-18,GDScript name removed,"Code reading, not one tool"
+v4,L3-G6-19,GDScript name removed,"Code reading, not one tool"
+v4,L3-G6-14,GDScript name removed,"Tests the idea, not one tool"
+v4,L3-G6-06,Godot name removed,"Tests the idea, not one tool"
+v4,L3-G6-07,A game moment instead of the Godot signal definition,"Tests the idea, not one tool"
+v4,L3-G6-08,A problem to fix instead of defining Camera2D,Shows the skill instead of a definition
+v4,L3-G6-09,Godot node names replaced with plain game parts,"Tests the idea, not one tool"
+v4,L3-G6-11,Godot node names replaced with plain game parts,"Tests the idea, not one tool"
+v4,L3-G6-13,Asks why tiles help instead of the Godot TileMap definition,"Tests the idea, not one tool"
+v4,L4-G7-03,A design task instead of the Figma frame definition,"Tests the idea, not one tool"
+v4,L4-G7-05,Pick a good How Might We question instead of defining it. Picture note removed (it showed the answer),Shows the skill instead of a definition
+v4,L4-G7-06,Figma name removed,"Tests the idea, not one tool"
+v4,L4-G7-08,What card sorting tells you instead of the definition,Shows the skill instead of a definition
+v4,L4-G7-09,Describes the activity instead of asking for the Crazy 8s name,Shows the skill instead of a definition
+v4,L4-G7-14,Figma name removed,"Tests the idea, not one tool"
+v4,L4-G8-01,A team decision instead of the cross-platform definition,Shows the skill instead of a definition
+v4,L4-G8-10,Firebase name removed,"Tests the idea, not one tool"
+v4,L4-G8-11,FlutterFlow name removed,"Tests the idea, not one tool"
+v4,L4-T-01,Figma name removed,"Tests the idea, not one tool"
+v4,L5-G9-05,Names the part in an example instead of the definition,Shows the skill instead of a definition
+v4,L5-G9-13,A request in action instead of the web server definition,Shows the skill instead of a definition
+v4,L5-G9-19,Node.js and Express names removed,"Tests the idea, not one tool"
+v4,L5-G10-03,Describes the job instead of asking what a red team does,Shows the skill instead of a definition
+v4,L5-G10-08,A lookup in action instead of the DNS definition,Shows the skill instead of a definition
+v4,L5-G10-10,A rule to set instead of the firewall definition,Shows the skill instead of a definition
+v4,L5-G10-12,An example instead of the virtualization definition,Shows the skill instead of a definition
+v4,L5-G10-13,A network job instead of the router definition,Shows the skill instead of a definition
+v4,L5-G10-18,An example instead of asking the difference,Shows the skill instead of a definition
+v4,L5-T-04,Express and MongoDB names removed,"Tests the idea, not one tool"
+v4,L6-G11-01,A need instead of the game engine definition,Shows the skill instead of a definition
+v4,L6-G11-02,"Unity name removed, asked as a task","Tests the idea, not one tool"
+v4,L6-G11-03,"Replaced: asked which language Unity uses, now asks where behavior code goes",A fact about one tool tests nothing a new student can show (Start here rule 5)
+v4,L6-G11-04,A look to change instead of the Unity Material definition,"Tests the idea, not one tool"
+v4,L6-G11-05,A need instead of the Unity Asset Store definition,"Tests the idea, not one tool"
+v4,L6-G11-06,A need instead of asking what WebGL is,Shows the skill instead of a definition
+v4,L6-G11-07,Unity name removed,"Tests the idea, not one tool"
+v4,L6-G11-08,Unity name removed,"Tests the idea, not one tool"
+v4,L6-G11-14,Unity name removed,"Code reading, not one tool"
+v4,L6-G11-18,A task instead of the NavMesh Agent definition,Shows the skill instead of a definition
+v4,L6-G12-04,pandas name removed,"Code reading, not one tool"
+v4,L6-G12-14,pandas name removed,"Code reading, not one tool"
+v4,L6-G12-12,Runs code on a tuple instead of asking what is special about it,Shows the skill instead of a definition
+v4,L6-T-04,Unity name removed,"Tests the idea, not one tool"
+v4,L1-G1-08,Tool name removed from the picture note,"Blocks are drawn plain, not as one tool"
+v4,L1-G1-14,Tool name removed from the picture note,"Blocks are drawn plain, not as one tool"
+v4,L1-G1-15,Tool name removed from the picture note,"Blocks are drawn plain, not as one tool"
+v4,L1-G1-17,Tool name removed from the picture note,"Blocks are drawn plain, not as one tool"
+v4,L1-G2-17,Tool name removed from the picture note,"Blocks are drawn plain, not as one tool"
+v4,L1-T-06,"""> move forward"" marks the block that goes inside repeat","The block builder nests blocks with the "">"" rule"
