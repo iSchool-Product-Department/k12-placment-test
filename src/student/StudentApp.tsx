@@ -68,7 +68,8 @@ export default function StudentApp({ lang }: { lang: Lang }) {
             <motion.div key="r" {...fade}>
               <Card className="py-10 text-center">
                 <div className="mx-auto w-fit"><Buddy code={rec.avatar} size={130} mood="cheer" /></div>
-                <h1 className="m-0 mt-3 text-4xl text-deep sm:text-5xl">{t.youreIn(rec.placement!.grade)}</h1>
+                <p className="m-0 mt-3 text-2xl font-bold text-orange-deep">{t.youAre[rec.tier!.tier]}</p>
+                <h1 className="m-0 text-4xl text-deep sm:text-5xl">{t.inGrade(rec.placement!.grade)}</h1>
                 <p className="mx-auto mb-0 mt-2 max-w-sm text-lg text-soft">{t.contact}</p>
               </Card>
               {/* Demo only: the next person on this device. A finished test is never retaken (PRD 3.2). */}

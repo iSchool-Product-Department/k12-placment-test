@@ -33,6 +33,7 @@ Newest decisions go at the bottom of each section.
 - Five parts: color (6), face (4), top (5), outfit (4), extra (4). Built on the name and age screen, no extra screen. Saved as a short code so a designer can swap the drawings later without changing saved tests.
 
 ## 6.9 The end
+- Replace the ending with: "You're a Creator in Grade 4! Our team will contact you soon." (Explorer, Creator or Innovator). The student sees only their own tier name, never the other names, an order or a score. Arabic: "أنت من المبدعين في الصف 4!"
 - In the demo only, a small "New student" link lets the next person on the same device start.
 
 ## 7.1 Test list

@@ -1,3 +1,5 @@
+import type { Tier } from './engine/types'
+
 export type Lang = 'en' | 'ar'
 export type Band = 'kids' | 'teen' | 'pro'
 export const bandOf = (age: number | null): Band => (!age || age <= 9 ? 'kids' : age <= 13 ? 'teen' : 'pro')
@@ -16,7 +18,9 @@ const en = {
   sortHint: 'Drag each card into a box, or tap a card and then a box.', matchHint: 'Drag from a dot to its partner, or tap a card and then its partner.',
   tapHint: 'Tap a card, then tap where it goes.',
   questionOf: (n: number, total: number) => `Question ${n} of about ${total}`,
-  youreIn: (g: number) => `You’re in Grade ${g}!`, contact: 'Our team will contact you soon.', newStudent: 'New student',
+  // The tier as a name only, never as a rank (no other tier names, no order, no score).
+  youAre: { Explorers: 'You’re an Explorer', Creators: 'You’re a Creator', Innovators: 'You’re an Innovator' } as Record<Tier, string>,
+  inGrade: (g: number) => `in Grade ${g}!`, contact: 'Our team will contact you soon.', newStudent: 'New student',
   welcomeBack: (name: string) => `Welcome back, ${name}`, resumeNote: 'Pick up where you stopped.', resume: 'Continue',
   pq: {
     kids: ['Put the apple in the basket.', ['Apple', 'Ball', 'Star']],
@@ -38,7 +42,8 @@ const ar: typeof en = {
   sortHint: 'اسحب كل بطاقة إلى صندوق، أو اضغط على البطاقة ثم على الصندوق.', matchHint: 'اسحب من النقطة إلى ما يناسبها، أو اضغط على بطاقة ثم على ما يناسبها.',
   tapHint: 'اضغط على بطاقة، ثم اضغط على مكانها.',
   questionOf: (n: number, total: number) => `السؤال ${n} من حوالي ${total}`,
-  youreIn: (g: number) => `أنت في الصف ${g}!`, contact: 'سيتواصل معك فريقنا قريبًا.', newStudent: 'طالب جديد',
+  youAre: { Explorers: 'أنت من المستكشفين', Creators: 'أنت من المبدعين', Innovators: 'أنت من المبتكرين' },
+  inGrade: (g: number) => `في الصف ${g}!`, contact: 'سيتواصل معك فريقنا قريبًا.', newStudent: 'طالب جديد',
   welcomeBack: (name: string) => `أهلًا بعودتك يا ${name}`, resumeNote: 'أكمل من حيث توقفت.', resume: 'أكمل',
   pq: {
     kids: ['ضع التفاحة في السلة.', ['تفاحة', 'كرة', 'نجمة']],

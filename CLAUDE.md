@@ -13,7 +13,7 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 - Numbers (pass marks, tier cut-offs 45 and 75) come from the sheet's Settings tab. Questions come from its Questions tab: export as CSV, run `npm run bank -- file.csv`, then `npm test`.
 - 3 to 15 scored questions. The first scored question is always a Starter.
 - Tiers: Explorers, Creators, Innovators. Group name is tier plus grade, like "Creators G4".
-- Students see only their grade. Never show them the tier, score, strength or right and wrong.
+- Students see only their grade and their tier as a name: "You're a Creator in Grade 4!". Never the other tier names, an order, the score, strength or right and wrong.
 - Read-aloud plays only when the student taps Listen. Never on its own.
 - Option pictures stay big enough to read. Students should not scroll to reach the answers.
 - Stages (robot, bee, number line) stay still while the student answers. Next locks the answer, plays it, then moves on by itself. Never let a student change an answer after Next.
