@@ -113,7 +113,7 @@ describe('tiers and resume (PRD 5.5, 6.8)', () => {
   it('a grade task is worth 3 points, and the group name is tier plus grade', () => {
     for (const q of bank.filter(q => q.pool === 'Grade task')) expect(pointsOf(q), q.id).toBe(3)
     expect(pointsOf(bank.find(q => q.pool === 'Lower grade' && q.d === 'Easy')!)).toBe(1)
-    const r = play(12, [[1, 1, 1], [1, 1, 0, 0], [1, 1, 1, 1]])
+    const r = play(12, [[1, 1, 1], [1, 1, 0], [1, 1, 1, 1]])
     expect(groupName(r)).toBe(`${r.tier!.tier} G8`)
   })
   it('an unfinished test expires after 24 hours; a finished one never does', () => {
@@ -125,59 +125,75 @@ describe('tiers and resume (PRD 5.5, 6.8)', () => {
 })
 
 describe('every possible score (Adaptive Rules tab)', () => {
-  it('first scored question is always a Starter', () => {
+  // Plans list the answers in the order they are shown. A step stops once the rest cannot change the result.
+  it('first question is always a Starter, and it does not count toward the warm-up', () => {
     for (let age = 6; age <= 18; age++) expect(byId.get(play(age, []).answers[0].qid)!.pool).toBe('Starter')
+    const r = play(10, [[0, 1, 1]]); expect(r.steps[0].outcome).toBe('warmPass'); expect(r.steps[0].total).toBe(2)
   })
-  it('warm-up 0 or 1 of 3 at Level 1 places Grade 1, Explorers, flagged', () => {
-    for (const w of [[0, 0, 0], [1, 0, 0]]) {
+  it('warm-up 0 or 1 of 2 logic at Level 1 places Grade 1, Explorers, flagged', () => {
+    for (const w of [[1, 0], [1, 1, 0], [0, 0]]) {
       const r = play(6, [w]); expect(grade(r)).toBe(1); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failL1')
+      expect(r.answers.length).toBe(w.length) // [1, 0]: the second logic question cannot help, so it is not asked
     }
   })
   it('warm-up fail above Level 1 goes one level down', () => {
-    const r = play(10, [[1, 0, 0], [1, 1, 0], [1, 1, 1, 1]]) // L3 fail, L2 pass, grade check 4/4
+    const r = play(10, [[1, 0], [1, 1, 1], [1, 1, 1, 1]]) // L3 fail, L2 pass, final check 3 right then the grade task
     expect(r.steps.map(s => s.name)).toEqual(['warmup', 'warmupDown', 'grade'])
-    expect(grade(r)).toBe(4)
+    expect(grade(r)).toBe(4); expect(r.answers.length).toBe(9)
   })
-  it('fails both warm-ups: lower grade of S-1, Explorers', () => {
-    const r = play(10, [[1, 0, 0], [0, 1, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth')
+  it('fails both warm-ups: lower grade of S-1, Explorers, in 4 questions', () => {
+    const r = play(10, [[1, 0], [1, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth'); expect(r.answers.length).toBe(4)
   })
-  it('knowledge 0 or 1 of 4 places the lower grade of S', () => {
-    expect(grade(play(12, [[1, 1, 1], [0, 0, 0, 0]]))).toBe(7)
-    expect(grade(play(12, [[1, 1, 1], [1, 0, 0, 0]]))).toBe(7)
+  it('skill check 0 or 1 of 3 places the lower grade of S', () => {
+    expect(grade(play(12, [[1, 1, 1], [0, 0]]))).toBe(7)
+    expect(grade(play(12, [[1, 1, 1], [1, 0, 0]]))).toBe(7)
   })
-  it('knowledge 2 of 4 (easy right, hard wrong) goes to the grade check at S', () => {
-    const r = play(12, [[1, 1, 1], [1, 1, 0, 0], [1, 1, 1, 0]])
+  it('skill check 2 of 3 goes to the final check at S', () => {
+    const r = play(12, [[1, 1, 1], [1, 1, 0], [1, 1, 1, 0]])
     expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(8)
   })
-  it('knowledge 2 of 4 (upper right, lower wrong) takes the same path and flags odd', () => {
-    const r = play(12, [[1, 1, 1], [0, 0, 1, 1], [0, 0, 0, 0]])
-    expect(r.steps[1].outcome).toBe('knowMid'); expect(grade(r)).toBe(7); expect(r.flags).toContain('odd')
-  })
-  it('knowledge 3+ goes up; up-check 0-1 => upper grade of S, 2 => lower of S+1, 3+ => grade check', () => {
-    expect(grade(play(8, [[1, 1, 1], [1, 1, 1, 0], [1, 0, 0, 0]]))).toBe(4)
-    expect(grade(play(8, [[1, 1, 1], [1, 1, 1, 0], [1, 1, 0, 0]]))).toBe(5)
-    expect(grade(play(8, [[1, 1, 1], [1, 1, 1, 0], [1, 1, 1, 0], [1, 1, 1, 0]]))).toBe(6)
+  it('skill check 3 of 3 goes up; up-check 0-1 => upper grade of S, 2 => lower of S+1, 3 => final check', () => {
+    expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 0, 0]]))).toBe(4)
+    expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 0]]))).toBe(5)
+    expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1, 0]]))).toBe(6)
   })
   it('perfect up-check flags and makes Innovators', () => {
-    const r = play(8, [[1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]])
+    const r = play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]])
     expect(r.flags).toContain('perfectUp'); expect(r.tier!.tier).toBe('Innovators'); expect(grade(r)).toBe(5)
   })
-  it('Level 6 with a high knowledge score goes straight to the grade check', () => {
-    const r = play(17, [[1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]); expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(12)
+  it('Level 6 with a high skill check goes straight to the final check', () => {
+    const r = play(17, [[1, 1, 1], [1, 1, 1], [1, 1, 1, 1]]); expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(12)
   })
-  it('sheet example: capped by digital basics (grade task counts 3)', () => {
-    const r = play(12, [[0, 1, 1], [1, 1, 0, 0], [1, 1, 1, 1]])
-    expect(grade(r)).toBe(8); expect(r.tier!.strength).toBe(76); expect(r.tier!.baseTier).toBe('Innovators'); expect(r.tier!.tier).toBe('Creators')
+  it('final check: a hard question (other than the grade task) only after every earlier one was right; the grade task is always shown', () => {
+    for (let seed = 0; seed < 150; seed++) {
+      const r = play(12, [[1, 1, 1], [1, 1, 0], [0, 1, 1, 1]], seed)
+      const fin = r.answers.filter(a => a.step === 'grade').map(a => byId.get(a.qid)!)
+      // Every grade task in the sheet is Hard, so it has no easier swap; only the other questions are checked.
+      expect(fin.slice(1).some(q => q.d === 'Hard' && q.pool !== 'Grade task'), `seed ${seed}`).toBe(false)
+      expect(fin.at(-1)!.pool).toBe('Grade task')
+    }
+    const decided = play(12, [[1, 1, 1], [1, 1, 0], [0, 0, 1]]) // 0 of 2: cannot reach 3, so straight to the grade task
+    expect(decided.answers.filter(a => a.step === 'grade').map(a => byId.get(a.qid)!.pool)).toEqual(['Lower grade', 'Lower grade', 'Grade task'])
+  })
+  it('a hard question right with an easy one wrong flags odd', () => {
+    const r = [...Array(300).keys()].map(s => play(12, [[1, 1, 1], [0, 1, 1], [1, 1, 1, 1]], s)).find(r => byId.get(r.answers.find(a => a.step === 'grade')!.qid)!.d === 'Hard')!
+    expect(r.flags).toContain('odd')
+  })
+  it('sheet example: capped by digital basics', () => {
+    const r = play(12, [[0, 1, 1], [1, 1, 0], [1, 1, 1, 1]])
+    expect(grade(r)).toBe(8); expect(r.tier!.baseTier).toBe('Innovators'); expect(r.tier!.tier).toBe('Creators'); expect(r.tier!.reasons).toContain('capStarter')
   })
   it('sheet example: smart beginner is Creators, not Explorers', () => {
-    const r = play(10, [[1, 1, 1], [1, 0, 0, 0]]); expect(grade(r)).toBe(5); expect(r.tier!.strength).toBe(50); expect(r.tier!.tier).toBe('Creators')
+    const r = play(10, [[1, 1, 1], [1, 0, 0]]); expect(grade(r)).toBe(5); expect(r.tier!.strength).toBe(60); expect(r.tier!.tier).toBe('Creators')
   })
-  it('test length is 7 to 15 questions', () => {
+  it('test length is 2 to 15; no hard question before the final check; every final check ends on the grade task', () => {
     const rng = seeded(3)
     for (let i = 0; i < 400; i++) {
       const r = simulate(1 + rng() * 6, 6 + Math.floor(rng() * 13), bank, DEFAULT_CONFIG, rng)
-      expect(r.answers.length).toBeGreaterThanOrEqual(6); expect(r.answers.length).toBeLessThanOrEqual(15)
+      expect(r.answers.length).toBeGreaterThanOrEqual(2); expect(r.answers.length).toBeLessThanOrEqual(15)
       expect(new Set(r.answers.map(a => a.qid)).size).toBe(r.answers.length)
+      expect(r.answers.filter(a => a.step !== 'grade' && !a.fallback).some(a => byId.get(a.qid)!.d === 'Hard')).toBe(false)
+      if (r.steps.some(s => s.name === 'grade')) expect(byId.get(r.answers.at(-1)!.qid)!.pool).toBe('Grade task')
     }
   })
 })

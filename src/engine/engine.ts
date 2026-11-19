@@ -17,18 +17,21 @@ export const groupName = (rec: TestRecord) => (rec.tier && rec.placement ? `${re
 export const RESUME_MS = 24 * 3600e3
 export const isExpired = (rec: TestRecord, now = Date.now()) => rec.status === 'in_progress' && now - rec.createdAt > RESUME_MS
 
-/** Which questions each step draws, in order. */
+/**
+ * Which questions each step draws, in order. No hard question in the warm-up or skill check:
+ * a student could only earn it by getting everything before it right, and by then the step is decided.
+ * The starter is for confidence and does not count toward the warm-up, so one slip on it changes nothing.
+ */
 export const STEP_SLOTS: Record<'warmup' | 'know' | 'grade', Slot[]> = {
   warmup: [
     { pool: 'Starter', diffs: ['Starter'] },
     { pool: 'Logic', diffs: ['Medium'] },
-    { pool: 'Logic', diffs: ['Hard'] },
+    { pool: 'Logic', diffs: ['Medium'] },
   ],
   know: [
     { pool: 'Lower grade', diffs: ['Easy'] },
     { pool: 'Lower grade', diffs: ['Medium'] },
     { pool: 'Upper grade', diffs: ['Medium'] },
-    { pool: 'Upper grade', diffs: ['Hard'] },
   ],
   grade: [
     { pool: 'Lower grade', diffs: ['Medium', 'Hard'] },
@@ -172,7 +175,7 @@ function evalStep(rec: TestRecord, cfg: Config, bank: Question[], rng: Rng) {
       outcome = c >= cfg.gradeUpper ? 'gradeUpper' : 'gradeLower'
       placement = place(rec, lv, c >= cfg.gradeUpper ? 'upper' : 'lower')
   }
-  rec.steps.push({ name: st.name, lv, right: c, total: st.draws.length, outcome })
+  rec.steps.push({ name: st.name, lv, right: c, total: st.draws.filter(d => d.slot.pool !== 'Starter').length, outcome })
   if (next) rec.step = buildStep(rec, next[0], next[1], bank, rng)
   else finish(rec, placement!, cfg, bank)
 }
@@ -225,17 +228,36 @@ export function answer(rec0: TestRecord, value: AnswerValue, sec: number, bank: 
   const q = bank.find(x => x.id === d.qid)!
   const ok = check(q, value)
   rec.answers.push({ qid: q.id, step: st.name, stepIndex: rec.steps.length, lv: st.lv, answer: value, ok, sec, candidates: d.candidates, fallback: d.fallback })
-  if (ok) st.right++
+  if (ok && q.pool !== 'Starter') st.right++
   st.i++
+  stopIfDecided(st, cfg)
   if (st.i >= st.draws.length) evalStep(rec, cfg, bank, rng)
+  else earnHard(rec, bank, rng)
   return rec
+}
+
+/** Scores where a step's result changes. A step stops once the questions left cannot cross one (the grade task is always shown). */
+const cutsOf = (n: StepName, c: Config) => (n === 'grade' ? [c.gradeUpper] : n === 'warmup' || n === 'warmupDown' ? [c.warmPass] : [c.knowLow + 1, c.knowUp])
+function stopIfDecided(st: StepState, cfg: Config) {
+  const left = st.draws.length - st.i
+  if (left && !cutsOf(st.name, cfg).some(c => st.right < c && st.right + left >= c))
+    st.draws = [...st.draws.slice(0, st.i), ...st.draws.slice(st.i).filter(d => d.slot.pool === 'Grade task')]
+}
+/** A hard question only after every earlier question in the step was right; otherwise the slot's medium or easy. */
+function earnHard(rec: TestRecord, bank: Question[], rng: Rng) {
+  const st = rec.step!, d = st.draws[st.i]
+  const easier = d.slot.diffs.filter(x => x !== 'Hard')
+  if (st.right === st.i || !easier.length || bank.find(q => q.id === d.qid)!.d !== 'Hard') return
+  const used = new Set(rec.used)
+  const n = draw(bank, used, st.lv, { ...d.slot, diffs: easier }, rng)
+  if (n && !n.fallback) { st.draws[st.i] = n; rec.used = [...used] }
 }
 
 /** "Question 3 of about 10" (PRD 6.3): answered, plus what is left in this step, plus one more step unless this is the last. */
 export function aboutTotal(rec: TestRecord) {
   const done = rec.answers.length
   if (!rec.step) return done
-  return done + rec.step.draws.length - rec.step.i + (rec.step.name === 'grade' ? 0 : 4)
+  return done + rec.step.draws.length - rec.step.i + (rec.step.name === 'grade' ? 0 : 3)
 }
 
 // ---------------------------------------------------------------- simulator

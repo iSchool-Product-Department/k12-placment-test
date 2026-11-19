@@ -134,22 +134,22 @@ function Settings() {
   const cfg = useConfig()
   const set = (k: keyof Config, v: number) => store.setConfig({ ...cfg, [k]: v })
   const fields: [keyof Config, string, number][] = [
-    ['warmPass', 'Warm-up: pass at (of 3)', 3], ['knowUp', 'Skill check: one level higher at (of 4)', 4], ['knowLow', 'Skill check: lower grade at or below (of 4)', 4],
+    ['warmPass', 'Warm-up: pass at (of 2 logic)', 2], ['knowUp', 'Skill check: one level higher at (of 3)', 3], ['knowLow', 'Skill check: lower grade at or below (of 3)', 3],
     ['gradeUpper', 'Final check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Creators starts at strength', 100], ['advAt', 'Tier: Innovators starts at strength', 100],
     ['fastSec', 'Fast answer: seconds', 10], ['fastCount', 'Fast answers before a flag', 15],
   ]
   const r = range
   const table: [string, string, string][] = [
-    ['Warm-up', r(cfg.warmPass, 3), 'Skill check at the age level'],
+    ['Warm-up', r(cfg.warmPass, 2), 'Skill check at the age level'],
     ['Warm-up', r(0, cfg.warmPass - 1), 'Warm-up one level lower. Ages 6 to 7: Grade 1, Explorers'],
-    ['Warm-up one level lower', r(cfg.warmPass, 3), 'Final check at that level'],
+    ['Warm-up one level lower', r(cfg.warmPass, 2), 'Final check at that level'],
     ['Warm-up one level lower', r(0, cfg.warmPass - 1), 'Lower grade of that level, Explorers'],
     ['Skill check', r(0, cfg.knowLow), 'Lower grade of the age level'],
     ['Skill check', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Final check at the age level'],
-    ['Skill check', r(cfg.knowUp, 4), 'Skill check one level higher. Ages 16 to 18: final check'],
+    ['Skill check', r(cfg.knowUp, 3), 'Skill check one level higher. Ages 16 to 18: final check'],
     ['Skill check one level higher', r(0, cfg.knowLow), 'Upper grade of the age level'],
     ['Skill check one level higher', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Lower grade of the higher level'],
-    ['Skill check one level higher', r(cfg.knowUp, 4), 'Final check at the higher level'],
+    ['Skill check one level higher', r(cfg.knowUp, 3), 'Final check at the higher level'],
     ['Final check', r(0, cfg.gradeUpper - 1), 'Lower grade'],
     ['Final check', r(cfg.gradeUpper, 4), 'Upper grade'],
   ]
@@ -200,11 +200,11 @@ function Flowchart() {
   const [sel, setSel] = useState<Node>('warm')
   const N: Record<Node, { title: string; qs: string; mix: string; out: Branch[] }> = {
     practice: { title: 'Practice', qs: '1, not scored', mix: 'Teaches the controls and checks reading. Ages 6 to 9 drag, older students tap.', out: [{ score: 'Always', to: 'warm' }] },
-    warm: { title: 'Warm-up', qs: '3 at the age level', mix: '1 starter, 1 medium logic, 1 hard logic', out: [{ score: r(cfg.warmPass, 3), to: 'know' }, { score: r(0, cfg.warmPass - 1), to: 'down', end: 'Ages 6 to 7: Grade 1, Explorers' }] },
-    down: { title: 'Warm-up one level lower', qs: '3', mix: 'Same mix, one level lower', out: [{ score: r(cfg.warmPass, 3), to: 'final' }, { score: r(0, cfg.warmPass - 1), to: null, end: 'Lower grade of that level, Explorers' }] },
-    know: { title: 'Skill check', qs: '4 at the age level', mix: 'Lower grade easy and medium, upper grade medium and hard', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Lower grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: 'final' }, { score: r(cfg.knowUp, 4), to: 'up', end: 'Ages 16 to 18 go to the final check' }] },
-    up: { title: 'Skill check one level higher', qs: '4', mix: 'Same mix, one level higher. Only for strong students.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Upper grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: null, end: 'Lower grade of the higher level' }, { score: r(cfg.knowUp, 4), to: 'final' }] },
-    final: { title: 'Final check', qs: '4', mix: '3 lower-grade questions (medium or hard) and 1 grade task', out: [{ score: r(0, cfg.gradeUpper - 1), to: 'tier', end: 'Lower grade' }, { score: r(cfg.gradeUpper, 4), to: 'tier', end: 'Upper grade' }] },
+    warm: { title: 'Warm-up', qs: 'Up to 3 at the age level', mix: '1 starter (not scored), then 2 medium logic. Stops once decided.', out: [{ score: r(cfg.warmPass, 2), to: 'know' }, { score: r(0, cfg.warmPass - 1), to: 'down', end: 'Ages 6 to 7: Grade 1, Explorers' }] },
+    down: { title: 'Warm-up one level lower', qs: 'Up to 3', mix: 'Same mix, one level lower', out: [{ score: r(cfg.warmPass, 2), to: 'final' }, { score: r(0, cfg.warmPass - 1), to: null, end: 'Lower grade of that level, Explorers' }] },
+    know: { title: 'Skill check', qs: 'Up to 3 at the age level', mix: 'Lower grade easy and medium, upper grade medium. No hard. Stops once decided.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Lower grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: 'final' }, { score: r(cfg.knowUp, 3), to: 'up', end: 'Ages 16 to 18 go to the final check' }] },
+    up: { title: 'Skill check one level higher', qs: 'Up to 3', mix: 'Same mix, one level higher. Only for strong students.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Upper grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: null, end: 'Lower grade of the higher level' }, { score: r(cfg.knowUp, 3), to: 'final' }] },
+    final: { title: 'Final check', qs: 'Up to 4', mix: '3 lower-grade questions and 1 grade task. A hard one only after all right so far. Stops once decided, the grade task is always shown.', out: [{ score: r(0, cfg.gradeUpper - 1), to: 'tier', end: 'Lower grade' }, { score: r(cfg.gradeUpper, 4), to: 'tier', end: 'Upper grade' }] },
     tier: { title: 'Tier', qs: 'No questions', mix: 'Strength from the answers at the placed level', out: [{ score: `below ${cfg.coreAt}`, to: null, end: 'Explorers' }, { score: `${cfg.coreAt} to ${cfg.advAt - 1}`, to: null, end: 'Creators' }, { score: `${cfg.advAt}+`, to: null, end: 'Innovators' }] },
   }
   const into = (n: Node) => (Object.keys(N) as Node[]).filter(k => N[k].out.some(b => b.to === n))
@@ -267,7 +267,7 @@ function Tiers() {
         <h4 className="mb-1 mt-4 text-deep">Caps</h4>
         <ul className="m-0 space-y-1 ps-5 text-sm">
           <li>Failed the warm-up at Level 1, or both warm-ups: <b>Explorers</b>.</li>
-          <li>4 of 4 on the skill check one level higher: <b>Innovators</b>.</li>
+          <li>3 of 3 on the skill check one level higher: <b>Innovators</b>.</li>
           <li>Missed a digital literacy starter: <b>at most Creators</b>.</li>
           <li>4 or more answers in under 3 seconds: <b>at most Creators</b>.</li>
         </ul>
