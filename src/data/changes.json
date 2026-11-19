@@ -22,7 +22,7 @@
 "scr": "A game screen with a cat sprite on a background"
 },
 "L1-G1-11": {
-"what": "Plain words instead of the word variable. Icons on the options",
+"what": "Plain words instead of the word variable. Icons on the options. Then v5: Smarter wrong options",
 "why": "New students have not learned the word variable yet",
 "q": "A game remembers your name. Where does it keep it?",
 "o": [
@@ -33,7 +33,7 @@
 "scr": "A question box with a name typed in"
 },
 "L1-G1-18": {
-"what": "Icons on the options",
+"what": "Icons on the options. Then v5: Smarter wrong options",
 "why": "Ages 6 to 7 read pictures before words",
 "q": "Scene 2 starts. What happens to scene 1 characters?",
 "o": [
@@ -44,7 +44,7 @@
 "scr": "Two scene cards side by side"
 },
 "L1-G1-20": {
-"what": "Asks what to do, not the word broadcast. Icons on the options",
+"what": "Asks what to do, not the word broadcast. Icons on the options. Then v5: Smarter wrong options",
 "why": "Tests the idea, not a tool word (Start here rule 5)",
 "q": "One message makes all characters dance. What is it called?",
 "o": [
@@ -77,7 +77,7 @@
 "scr": "if nectar [ collect nectar ] else [ move forward ]"
 },
 "L1-G2-05": {
-"what": "Asks what starts a game instead of the word event. Icons on the options",
+"what": "Asks what starts a game instead of the word event. Icons on the options. Then v5: Smarter wrong options",
 "why": "New students do not know the word event yet",
 "q": "Which of these is an event?",
 "o": [
@@ -187,7 +187,7 @@
 "scr": ""
 },
 "L2-G4-01": {
-"what": "Icons on the options",
+"what": "Icons on the options. Then v5: Smarter wrong options",
 "why": "Ages 8 to 9 read pictures before words",
 "q": "Which of these uses AI?",
 "o": [
@@ -199,7 +199,7 @@
 "scr": ""
 },
 "L2-G3-01": {
-"what": "A task that needs an event instead of the definition",
+"what": "A task that needs an event instead of the definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "In an app, what is an event?",
 "o": [
@@ -235,7 +235,7 @@
 "scr": "// move the car to the start"
 },
 "L2-G3-06": {
-"what": "A user problem instead of the definition of UX",
+"what": "A user problem instead of the definition of UX. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "UI is how an app looks. What is UX?",
 "o": [
@@ -271,7 +271,7 @@
 "scr": ""
 },
 "L2-G3-17": {
-"what": "A task that needs clones instead of the definition",
+"what": "A task that needs clones instead of the definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is a clone in a game?",
 "o": [
@@ -283,7 +283,7 @@
 "scr": ""
 },
 "L2-G3-18": {
-"what": "Angry Birds name removed",
+"what": "Angry Birds name removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not a game the student may not know",
 "q": "In an Angry Birds-style game, what pulls the bird down?",
 "o": [
@@ -319,7 +319,7 @@
 "scr": ""
 },
 "L2-G4-06": {
-"what": "A training task instead of defining dataset",
+"what": "A training task instead of defining dataset. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is a dataset used for in machine learning?",
 "o": [
@@ -379,7 +379,7 @@
 "scr": ""
 },
 "L3-DL-01": {
-"what": "Fourth option added",
+"what": "Fourth option added. Then v5: Smarter wrong options",
 "why": "Three options let a guesser pass too often",
 "q": "Where do you type a website address?",
 "o": [
@@ -478,7 +478,7 @@
 "scr": ""
 },
 "L5-DL-02": {
-"what": "Fourth option added",
+"what": "Fourth option added. Then v5: Smarter wrong options",
 "why": "Three options let a guesser pass too often",
 "q": "Your phone asks to install an update. Why are updates important?",
 "o": [
@@ -555,7 +555,7 @@
 "scr": ""
 },
 "L3-G6-02": {
-"what": "Godot name and node term removed",
+"what": "Godot name and node term removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool (Start here rule 5)",
 "q": "In a game engine like Godot, how is a scene built?",
 "o": [
@@ -627,7 +627,7 @@
 "scr": ""
 },
 "L3-G6-07": {
-"what": "A game moment instead of the Godot signal definition",
+"what": "A game moment instead of the Godot signal definition. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In Godot, what is a signal used for?",
 "o": [
@@ -639,7 +639,7 @@
 "scr": ""
 },
 "L3-G6-08": {
-"what": "A problem to fix instead of defining Camera2D",
+"what": "A problem to fix instead of defining Camera2D. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a Camera2D node do in a platformer?",
 "o": [
@@ -675,7 +675,7 @@
 "scr": ""
 },
 "L3-G6-13": {
-"what": "Asks why tiles help instead of the Godot TileMap definition",
+"what": "Asks why tiles help instead of the Godot TileMap definition. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In Godot, what is a TileMap used for?",
 "o": [
@@ -687,7 +687,7 @@
 "scr": ""
 },
 "L4-G7-03": {
-"what": "A design task instead of the Figma frame definition",
+"what": "A design task instead of the Figma frame definition. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In Figma, what is a frame most like?",
 "o": [
@@ -699,7 +699,7 @@
 "scr": ""
 },
 "L4-G7-05": {
-"what": "Pick a good How Might We question instead of defining it. Picture note removed (it showed the answer)",
+"what": "Pick a good How Might We question instead of defining it. Picture note removed (it showed the answer). Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a How Might We question do at the start of a design project?",
 "o": [
@@ -711,7 +711,7 @@
 "scr": "How might we help new players learn the game?"
 },
 "L4-G7-06": {
-"what": "Figma name removed",
+"what": "Figma name removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "Why do designers use templates and plugins in Figma?",
 "o": [
@@ -723,7 +723,7 @@
 "scr": ""
 },
 "L4-G7-08": {
-"what": "What card sorting tells you instead of the definition",
+"what": "What card sorting tells you instead of the definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is card sorting used for in app design?",
 "o": [
@@ -735,7 +735,7 @@
 "scr": ""
 },
 "L4-G7-09": {
-"what": "Describes the activity instead of asking for the Crazy 8s name",
+"what": "Describes the activity instead of asking for the Crazy 8s name. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is the Crazy 4s (or Crazy 8s) sketching technique?",
 "o": [
@@ -747,7 +747,7 @@
 "scr": ""
 },
 "L4-G7-14": {
-"what": "Figma name removed",
+"what": "Figma name removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In a clickable Figma prototype, the Start button should open the Home screen. What do you add?",
 "o": [
@@ -759,7 +759,7 @@
 "scr": ""
 },
 "L4-G8-01": {
-"what": "A team decision instead of the cross-platform definition",
+"what": "A team decision instead of the cross-platform definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is a cross-platform app?",
 "o": [
@@ -771,7 +771,7 @@
 "scr": ""
 },
 "L4-G8-10": {
-"what": "Firebase name removed",
+"what": "Firebase name removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "What does Firebase Authentication handle in an app?",
 "o": [
@@ -783,7 +783,7 @@
 "scr": ""
 },
 "L4-G8-11": {
-"what": "FlutterFlow name removed",
+"what": "FlutterFlow name removed. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In FlutterFlow, what do Actions do?",
 "o": [
@@ -807,7 +807,7 @@
 "scr": "Four step cards"
 },
 "L5-G9-05": {
-"what": "Names the part in an example instead of the definition",
+"what": "Names the part in an example instead of the definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is a domain name?",
 "o": [
@@ -819,7 +819,7 @@
 "scr": ""
 },
 "L5-G9-13": {
-"what": "A request in action instead of the web server definition",
+"what": "A request in action instead of the web server definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a web server do?",
 "o": [
@@ -843,7 +843,7 @@
 "scr": ""
 },
 "L5-G10-03": {
-"what": "Describes the job instead of asking what a red team does",
+"what": "Describes the job instead of asking what a red team does. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a red team do in cybersecurity?",
 "o": [
@@ -855,7 +855,7 @@
 "scr": ""
 },
 "L5-G10-08": {
-"what": "A lookup in action instead of the DNS definition",
+"what": "A lookup in action instead of the DNS definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does DNS do?",
 "o": [
@@ -867,7 +867,7 @@
 "scr": ""
 },
 "L5-G10-10": {
-"what": "A rule to set instead of the firewall definition",
+"what": "A rule to set instead of the firewall definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a firewall do?",
 "o": [
@@ -879,7 +879,7 @@
 "scr": ""
 },
 "L5-G10-12": {
-"what": "An example instead of the virtualization definition",
+"what": "An example instead of the virtualization definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is virtualization?",
 "o": [
@@ -891,7 +891,7 @@
 "scr": ""
 },
 "L5-G10-13": {
-"what": "A network job instead of the router definition",
+"what": "A network job instead of the router definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a router mainly do?",
 "o": [
@@ -927,7 +927,7 @@
 "scr": "Four cards to drag into two boxes"
 },
 "L6-G11-01": {
-"what": "A need instead of the game engine definition",
+"what": "A need instead of the game engine definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is a game engine?",
 "o": [
@@ -939,7 +939,7 @@
 "scr": ""
 },
 "L6-G11-02": {
-"what": "Unity name removed, asked as a task",
+"what": "Unity name removed, asked as a task. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In Unity, what is a prefab?",
 "o": [
@@ -951,7 +951,7 @@
 "scr": ""
 },
 "L6-G11-03": {
-"what": "Replaced: asked which language Unity uses, now asks where behavior code goes",
+"what": "Replaced: asked which language Unity uses, now asks where behavior code goes. Then v5: Smarter wrong options",
 "why": "A fact about one tool tests nothing a new student can show (Start here rule 5)",
 "q": "Which programming language is used to write scripts in Unity?",
 "o": [
@@ -963,7 +963,7 @@
 "scr": ""
 },
 "L6-G11-04": {
-"what": "A look to change instead of the Unity Material definition",
+"what": "A look to change instead of the Unity Material definition. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "In Unity, what does a Material control?",
 "o": [
@@ -975,7 +975,7 @@
 "scr": ""
 },
 "L6-G11-05": {
-"what": "A need instead of the Unity Asset Store definition",
+"what": "A need instead of the Unity Asset Store definition. Then v5: Smarter wrong options",
 "why": "Tests the idea, not one tool",
 "q": "What is the Unity Asset Store used for?",
 "o": [
@@ -987,7 +987,7 @@
 "scr": ""
 },
 "L6-G11-06": {
-"what": "A need instead of asking what WebGL is",
+"what": "A need instead of asking what WebGL is. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What is special about a WebGL build of a Unity game?",
 "o": [
@@ -1035,7 +1035,7 @@
 "scr": "int i = Random.Range(0, 3);"
 },
 "L6-G11-18": {
-"what": "A task instead of the NavMesh Agent definition",
+"what": "A task instead of the NavMesh Agent definition. Then v5: Smarter wrong options",
 "why": "Shows the skill instead of a definition",
 "q": "What does a NavMesh Agent do?",
 "o": [
@@ -1117,7 +1117,7 @@
 "scr": "Three Sprite Lab action blocks"
 },
 "L1-G1-15": {
-"what": "Tool name removed from the picture note",
+"what": "Tool name removed from the picture note. Then v5: Bigger block pictures",
 "why": "Blocks are drawn plain, not as one tool",
 "q": "The coin should vanish when touched. Which block?",
 "o": [
@@ -1230,5 +1230,392 @@
 "5"
 ],
 "scr": "repeat 4 times [ move forward ]"
+},
+"L1-DL-01": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which one is a computer?",
+"o": [
+"💻 Laptop",
+"🍎 Apple",
+"🪑 Chair"
+],
+"scr": ""
+},
+"L1-DL-02": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What do you click with?",
+"o": [
+"🖱️ Mouse",
+"🥄 Spoon",
+"🧸 Teddy bear"
+],
+"scr": ""
+},
+"L1-DL-03": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "You want to type your name. What do you use?",
+"o": [
+"⌨️ Keyboard",
+"🔈 Speaker",
+"🎧 Headphones"
+],
+"scr": ""
+},
+"L1-DL-05": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which one lets you hear sounds?",
+"o": [
+"🎧 Headphones",
+"🖨️ Printer",
+"🖱️ Mouse"
+],
+"scr": ""
+},
+"L1-G1-02": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "The game copies your smile. What helps it see you?",
+"o": [
+"AI",
+"A printer",
+"A speaker"
+],
+"scr": "A child smiling at a laptop camera, and a smiling character on screen"
+},
+"L1-G1-19": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "The coin appears somewhere new each time. Which block?",
+"o": [
+"Random position",
+"Play sound",
+"Change costume"
+],
+"scr": "A coin shown in three different places"
+},
+"L1-G2-14": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Robot walks 2 steps, not 3. What is the bug?",
+"o": [
+"A move block is missing",
+"The robot is too big",
+"The robot is the wrong color"
+],
+"scr": "Program: move forward, move forward"
+},
+"L2-DL-01": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which button saves your work?",
+"o": [
+"💾 Save",
+"🗑️ Delete",
+"✂️ Cut"
+],
+"scr": ""
+},
+"L2-DL-02": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which is the best password?",
+"o": [
+"Tiger!Blue7",
+"123",
+"Your own name"
+],
+"scr": ""
+},
+"L2-G3-03": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Your app shows an error when you click Start. What first?",
+"o": [
+"Read the error and check that line",
+"Add more buttons to the screen",
+"Change the app's colors",
+"Click Start again many times"
+],
+"scr": ""
+},
+"L2-G3-10": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Why use one list, not many variables, in a to-do app?",
+"o": [
+"One list keeps all tasks together",
+"Lists draw faster on screen",
+"Variables cannot hold text",
+"Lists change the screen color"
+],
+"scr": ""
+},
+"L2-G4-13": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which is an example of generative AI?",
+"o": [
+"A chatbot writes a short story for you",
+"A calculator adds two numbers",
+"A clock shows the time",
+"A light turns on when you press the switch"
+],
+"scr": ""
+},
+"L2-G4-16": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "A chatbot says giraffes live near the Pyramids. What is this called?",
+"o": [
+"AI hallucination",
+"Face detection",
+"Speech recognition",
+"Debugging"
+],
+"scr": ""
+},
+"L2-G4-18": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "An AI-made logo has spelling mistakes. What should you do?",
+"o": [
+"Check it and fix the spelling",
+"Use it, AI is always right",
+"Ask the AI if it is sure",
+"Make the words smaller"
+],
+"scr": ""
+},
+"L2-G4-20": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "An AI works on bright photos but fails in a dark room. Best fix?",
+"o": [
+"Add training photos in dim light",
+"Train again on the same photos",
+"Only test it in bright rooms",
+"Use a bigger screen"
+],
+"scr": ""
+},
+"L3-G5-04": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "This line has a missing closing bracket. What kind of error is it?",
+"o": [
+"A syntax error",
+"A logic error",
+"There is no error",
+"A typing speed error"
+],
+"scr": "print(\"Hello\""
+},
+"L3-G5-18": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Binary search only works correctly when the list is...",
+"o": [
+"sorted",
+"short",
+"made of words",
+"empty"
+],
+"scr": ""
+},
+"L3-G6-01": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What does a 3D game have that a 2D game does not?",
+"o": [
+"Depth (a z axis)",
+"More colors",
+"Sound effects",
+"Faster code"
+],
+"scr": ""
+},
+"L3-G6-05": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Obstacles should keep appearing on their own. What do you use?",
+"o": [
+"instantiate() to make copies",
+"Camera2D zoom on the level",
+"A higher score each second",
+"Export the game again"
+],
+"scr": ""
+},
+"L3-G6-10": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What does every good game need?",
+"o": [
+"A goal, rules and player control",
+"Bright, colorful graphics only",
+"A high score table only",
+"Loud background music only"
+],
+"scr": ""
+},
+"L4-G7-01": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What does UX design focus on?",
+"o": [
+"How easy and pleasant it is to use",
+"The exact colors of the app",
+"How fast the code runs",
+"How long the battery lasts"
+],
+"scr": ""
+},
+"L4-G7-12": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Which screen has good visual hierarchy?",
+"o": [
+"The main title is bigger and bolder",
+"All text is the same size and color",
+"The main button is at the very bottom",
+"Every element is bright red"
+],
+"scr": "Four small screen mockups"
+},
+"L4-G7-13": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Students keep forgetting their homework. Which is the best How Might We question?",
+"o": [
+"How might we help students remember homework?",
+"How might we make a red app?",
+"Why are students so lazy?",
+"How might we build an app in a day?"
+],
+"scr": ""
+},
+"L4-G8-04": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Why is JSON commonly used in API responses?",
+"o": [
+"It structures data in a readable way",
+"It makes the internet faster",
+"It designs the app screens",
+"It encrypts every password"
+],
+"scr": ""
+},
+"L4-G8-16": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "In object-oriented programming, what is a class?",
+"o": [
+"A blueprint for making objects",
+"A list of variables",
+"A kind of loop",
+"A color theme for screens"
+],
+"scr": ""
+},
+"L4-G8-18": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Why do apps use async code (async and await) when loading data from the internet?",
+"o": [
+"So the app keeps working while it waits",
+"So the data loads in one second",
+"So data saves without internet",
+"So the screen never redraws"
+],
+"scr": ""
+},
+"L5-G9-10": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What do CSS media queries let you do?",
+"o": [
+"Change styles for different screen sizes",
+"Play videos inside the web page",
+"Store the data of each user",
+"Send emails straight from the page"
+],
+"scr": ""
+},
+"L5-G9-16": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Your website works on your laptop. How can other people open it on the internet?",
+"o": [
+"Deploy it to a server with a domain",
+"Send them a screenshot of it",
+"Save it on your desktop",
+"Email them the HTML file"
+],
+"scr": ""
+},
+"L5-G10-05": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Why should a website never save passwords as plain text?",
+"o": [
+"A leak would expose every password",
+"Plain text is slower to type",
+"Browsers cannot read plain text",
+"It uses too much storage"
+],
+"scr": ""
+},
+"L5-G10-07": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "What does two-factor authentication (2FA) add to logging in?",
+"o": [
+"A second proof, like a phone code",
+"A longer username",
+"A password that changes daily",
+"A second browser window"
+],
+"scr": ""
+},
+"L5-G10-19": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "A tool collects logs from all computers to spot attacks. What is it called?",
+"o": [
+"A SIEM",
+"A web browser",
+"A text editor",
+"A game engine"
+],
+"scr": ""
+},
+"L6-G12-02": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "Data you collect yourself with your own survey is called...",
+"o": [
+"primary data",
+"secondary data",
+"fake data",
+"missing data"
+],
+"scr": ""
+},
+"L6-G12-15": {
+"what": "Smarter wrong options",
+"why": "Old wrong options were too easy to rule out",
+"q": "A color column holds red, green and blue. What do you do before training?",
+"o": [
+"Encode it as numbers (one-hot)",
+"Multiply the column by 100",
+"Delete the color column",
+"Nothing, models read words"
+],
+"scr": ""
 }
 }

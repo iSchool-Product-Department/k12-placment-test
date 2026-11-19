@@ -37,7 +37,8 @@ function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; 
   const label = isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]" dir="ltr">{text}</code> : text ? <span>{text}</span> : null
   if (!pic && !icon) return label
   // Pictures must be big enough to read (PRD 6.6). Icons are simpler and can be smaller.
-  if (tile) return <span className="flex flex-col items-center gap-2 text-center"><Art pic={pic} icon={icon} size={pic ? 120 : 64} />{label}</span>
+  // Pictures fill the tile (up to 220 px wide), so drawings with margins stay readable.
+  if (tile) return <span className="flex w-full flex-col items-center gap-2 text-center">{pic ? <img src={picSrc(pic)} alt="" className="h-auto max-h-[150px] w-full max-w-[220px] object-contain" /> : <Art icon={icon} size={64} />}{label}</span>
   return <span className="flex items-center gap-3"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
 }
 

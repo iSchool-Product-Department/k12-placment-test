@@ -1,7 +1,7 @@
 import {
   Apple, Armchair, Bell, Share2, Smartphone, X, ArrowRight, Car, Cat, CircleCheck, Dices, DoorOpen, EyeOff, Flower2, Hand, Hash, Headphones, Image, Images, Keyboard, Lamp, Laptop,
   Maximize2, Megaphone, MessageCircle, Mouse, MousePointerClick, Music, OctagonX, Package, Palette, Plug, Power, Printer, Save, Scissors, Search, Shirt,
-  Speaker, Trash2, Volume2, type LucideProps,
+  Speaker, Trash2, Volume2, Tv, Radio, Mic, Camera, Undo2, Eye, type LucideProps,
 } from 'lucide-react'
 
 // Lucide has no spoon or teddy bear, so these two are drawn in the same 24px, 2px-stroke line style.
@@ -15,6 +15,7 @@ const Teddy = (p: LucideProps) => (
 
 /** Icons for the emoji the sheet uses as stand-in pictures (see ICON in scripts/sheet-to-bank.mjs). */
 export const ICONS: Record<string, (p: LucideProps) => React.ReactNode> = {
+  tv: Tv, radio: Radio, mic: Mic, camera: Camera, undo: Undo2, eye: Eye,
   laptop: Laptop, apple: Apple, chair: Armchair, mouse: Mouse, spoon: Spoon, teddy: Teddy, keyboard: Keyboard,
   speaker: Speaker, headphones: Headphones, hand: Hand, megaphone: Megaphone, printer: Printer, save: Save,
   trash: Trash2, scissors: Scissors, search: Search, sound: Volume2,

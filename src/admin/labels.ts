@@ -28,6 +28,8 @@ export const FLAG: Record<FlagKey, { text: string; tone: 'warn' | 'info' }> = {
   starterMiss: { text: 'Missed a digital literacy starter. Check digital basics in session 1.', tone: 'warn' },
   fallback: { text: 'A step ran out of questions at the asked difficulty and used another from the same pool.', tone: 'info' },
 }
+/** Tier number, shown after the name: Explorers (Tier 1). */
+export const TIER_NO: Record<Tier, number> = { Explorers: 1, Creators: 2, Innovators: 3 }
 export const TIER_STYLE: Record<Tier, { bg: string; fg: string; dot: string; blurb: string }> = {
   Explorers: { bg: 'bg-[#FFF1E5]', fg: 'text-orange-deep', dot: '#FF7F1C', blurb: 'Slower pace, more guided practice.' },
   Creators: { bg: 'bg-sky', fg: 'text-deep', dot: '#056FEC', blurb: 'Ready for the grade at the normal pace.' },

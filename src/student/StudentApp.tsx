@@ -11,6 +11,7 @@ import { store, useConfig } from '../store'
 import { QuestionView, roomy, stableShuffle } from '../question/QuestionView'
 import { hasSim } from '../question/Visual'
 import { useDragSensors } from '../question/DragAnswers'
+import { GradeIcon } from '../grades'
 
 type Phase = 'welcome' | 'resume' | 'practice' | 'test' | 'result'
 type Tx = typeof T.en
@@ -64,8 +65,10 @@ export default function StudentApp({ lang }: { lang: Lang }) {
           {phase === 'result' && rec && (
             <motion.div key="r" {...fade}>
               <Card className="py-10 text-center">
-                <motion.div initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-blue text-white"><Rocket size={46} strokeWidth={1.75} /></motion.div>
+                {/* The grade's icon from the iSchool roadmap. Only the icon: no track name or topics for students (PRD 6.9). */}
+                <motion.div initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-fit">
+                  <GradeIcon g={rec.placement!.grade} size={104} />
+                </motion.div>
                 <p className="m-0 mt-3 text-2xl font-bold text-orange-deep">{t.youAre[rec.tier!.tier]}</p>
                 <h1 className="m-0 text-4xl text-deep sm:text-5xl">{t.inGrade(rec.placement!.grade)}</h1>
                 <p className="mx-auto mb-0 mt-2 max-w-sm text-lg text-soft">{t.contact}</p>

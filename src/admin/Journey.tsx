@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import type { AnswerRec, TestRecord } from '../engine/types'
 import { BY_ID } from '../data/ladder'
 import { OUTCOME, STEP_LABEL } from './labels'
-import { GRADES, gradeIcon } from './grades'
+import { GRADES, GradeIcon, gradeIcon } from '../grades'
 
 /**
  * The test as a road through the levels: x is time, y is the level.
@@ -130,7 +130,3 @@ export function Journey({ rec, onQuestion }: { rec: TestRecord; onQuestion: (a: 
   )
 }
 
-/** A grade's roadmap icon (white) on a blue circle, as in the iSchool K12 roadmap deck. */
-export function GradeIcon({ g, size }: { g: number; size: number }) {
-  return <span className="grid shrink-0 place-items-center rounded-full bg-blue" style={{ width: size, height: size }}><img src={gradeIcon(g)} alt="" style={{ width: size * 0.62, height: size * 0.62 }} className="object-contain" /></span>
-}

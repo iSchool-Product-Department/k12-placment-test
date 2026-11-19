@@ -1,4 +1,4 @@
-/** iSchool K12 V2.0 roadmap (2026 deck): each grade's track, what it covers, and its icon (public/grades). Admin only: students never see this (PRD 6.9). */
+/** iSchool K12 V2.0 roadmap (2026 deck): each grade's track, what it covers, and its icon (public/grades). Students see only the icon of their grade on the end screen; names and topics are for the team. */
 export const GRADES: { name: string; about: string }[] = [
   { name: 'Technology Around Us', about: 'How technology helps in daily life. First animations and stories in Sprite Lab and PictoBlox Jr.' },
   { name: 'Coding with Minecraft', about: 'Algorithms, sequencing, events, loops and conditionals, by coding in Minecraft.' },
@@ -14,3 +14,8 @@ export const GRADES: { name: string; about: string }[] = [
   { name: 'AI & Data Science', about: 'Data analysis with Google Sheets and Python, then machine-learning models, built and evaluated.' },
 ]
 export const gradeIcon = (g: number) => `${import.meta.env.BASE_URL}grades/g${g}.png`
+
+/** A grade's roadmap icon (white) on a blue circle, as in the iSchool K12 roadmap deck. */
+export function GradeIcon({ g, size }: { g: number; size: number }) {
+  return <span className="grid shrink-0 place-items-center rounded-full bg-blue" style={{ width: size, height: size }}><img src={gradeIcon(g)} alt="" style={{ width: size * 0.62, height: size * 0.62 }} className="object-contain" /></span>
+}

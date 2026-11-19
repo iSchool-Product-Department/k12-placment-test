@@ -47,10 +47,12 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 - Removed. A made-up character did not feel real or close to our students' culture. The name and age screen has only name and age; the admin shows the student's initials where the iSchool admin shows a photo.
 
 ## 6.9 The end
+- The end screen shows the icon of the student's grade from the iSchool roadmap. Only the icon: no track name or topics.
 - Replace the ending with: "You're a Creator in Grade 4! Our team will contact you soon." (Explorer, Creator or Innovator). The student sees only their own tier name, never the other names, an order or a score. Arabic: "أنت من المبدعين في الصف 4!"
 - In the demo only, a small "New student" link lets the next person on the same device start.
 
 ## 7.2 One test (roadmap)
+- The Group box shows the group name, the grade's icon and track ("Grade 4: AI Explorer"), the level and lower or upper grade, and the tier with its number: Explorers (Tier 1), Creators (Tier 2), Innovators (Tier 3). Tier badges everywhere in the admin show the number.
 - Each level row starts with its two grade icons from the iSchool K12 V2.0 roadmap (2026 deck), with the track name on hover. The final milestone shows the placed grade's icon; clicking it shows the track and what the grade covers. Clicking a step shows its level's two grades.
 
 ## 7.1 Test list
@@ -66,6 +68,8 @@ Goal: a first test that feels easy and still places well. Checked on 6,000 simul
 ## 9 Questions and settings sheet
 - v4 content (100 questions): definitions became doing questions, tool names removed (Sprite Lab, Godot, Figma, Unity, pandas and others), every starter at Levels 3 to 6 has 4 options, icons on young students' options.
 - v5 content (7 questions): L3-LG-05 shows both steps in the code box; L3-LG-02 is now "who is the shortest" (the number guessing game was unclear); L6-DL-02 is now phone storage (spreadsheet ##### needs spreadsheet use); L6-LG-02 and L6-LG-03 are harder, they were too easy for a medium at ages 16 to 18; L1-LG-03 has new shape pictures with sharp corners marked; L1-G2-12 has a row of tiles to count and says "will it move". All in ChangeLog.csv.
+- v5 options (72 questions): every wrong option now comes from the same family as the right answer and sounds possible. Starter and Easy: same category, wrong once you think. Medium: neighbor ideas (UI vs UX, authentication vs authorization, DNS vs DHCP). Hard: the usual mistake. Options are close in length so the right one does not stand out. Each question's "why" was rewritten to match. Four Level 1 questions with option pictures (L1-G1-01, -04, -05, -06) keep their wording until new pictures are drawn.
+- Option pictures fill their tile (up to 220 px wide). L1-G1-15 got new block pictures that fill the frame.
 - A picture can be a file drawn in the repo: write "q/name.svg" in the picture column instead of a Drive link.
 - The bank has a test that every question stays within the word limit for its age (Start here tab), and that every stage belongs to a real question.
 

@@ -4,11 +4,12 @@ import { AlertTriangle, ArrowLeft, Check, Download, Info, LayoutGrid, List, Rota
 import clsx from 'clsx'
 import type { AnswerRec, TestRecord, Tier } from '../engine/types'
 import { groupName } from '../engine/engine'
+import { GRADES, GradeIcon } from '../grades'
 import { BY_ID } from '../data/ladder'
 import { store, useTests } from '../store'
 import { QuestionView, KeyLine, answerText } from '../question/QuestionView'
 import { Journey } from './Journey'
-import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when } from './labels'
+import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when, TIER_NO } from './labels'
 
 const TIERS: Tier[] = ['Explorers', 'Creators', 'Innovators']
 /** As the iSchool admin shows a level: "Grade 3 - 4". */
@@ -176,11 +177,23 @@ function SummaryCard({ rec }: { rec: TestRecord }) {
           {field('Language', rec.lang === 'ar' ? 'Arabic' : 'English')}
         </dl>
       </div>
-      <div className={clsx('flex min-w-[200px] flex-col justify-center gap-1 rounded-2xl p-4', s.bg)}>
-        <span className="text-xs font-bold text-soft">Group</span>
-        <span className={clsx('font-[var(--font-head)] text-3xl font-extrabold', s.fg)}><Copy text={groupName(rec)} /></span>
-        <span className="text-sm font-bold">Grade {p.grade} · Level {levelLabel(p.lv)}</span>
-        <span className="text-xs text-soft">{s.blurb}</span>
+      {/* The group: grade (with its roadmap track), level and tier with its number. */}
+      <div className={clsx('flex min-w-[280px] flex-col gap-3 rounded-2xl p-4', s.bg)}>
+        <div>
+          <span className="text-xs font-bold text-soft">Group</span>
+          <div className={clsx('font-[var(--font-head)] text-3xl font-extrabold leading-tight', s.fg)}><Copy text={groupName(rec)} /></div>
+        </div>
+        <div className="flex items-center gap-3">
+          <GradeIcon g={p.grade} size={40} />
+          <div className="min-w-0">
+            <div className="font-extrabold">Grade {p.grade}: {GRADES[p.grade - 1].name}</div>
+            <div className="text-xs text-soft">Level {levelLabel(p.lv)}, the {p.which} grade</div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <TierBadge tier={rec.tier!.tier} big />
+          <span className="text-xs text-soft">{s.blurb}</span>
+        </div>
       </div>
     </section>
   )
@@ -271,7 +284,7 @@ function Confirm({ onYes, ask, className, children }: { onYes: () => void; ask: 
 }
 export function TierBadge({ tier, big, label }: { tier: Tier; big?: boolean; label?: string }) {
   const s = TIER_STYLE[tier]
-  return <span className={clsx('inline-flex items-center gap-1.5 whitespace-nowrap rounded-full font-extrabold', s.bg, s.fg, big ? 'px-3 py-1 text-base' : 'px-2 py-0.5 text-xs')}><i className="h-2 w-2 rounded-full" style={{ background: s.dot }} />{label ?? tier}</span>
+  return <span className={clsx('inline-flex items-center gap-1.5 whitespace-nowrap rounded-full font-extrabold', s.bg, s.fg, big ? 'px-3 py-1 text-base' : 'px-2 py-0.5 text-xs')}><i className="h-2 w-2 rounded-full" style={{ background: s.dot }} />{label ?? tier} <span className="font-bold opacity-75">(Tier {TIER_NO[tier]})</span></span>
 }
 export function Panel({ title, sub, children, className }: { title: string; sub?: string; children: React.ReactNode; className?: string }) {
   return <section className={clsx('rounded-3xl border border-line bg-white p-5 shadow-[var(--shadow-card)]', className)}><h3 className="m-0 text-xl text-deep">{title}</h3>{sub ? <p className="m-0 mb-3 text-sm text-soft">{sub}</p> : <div className="mb-3" />}{children}</section>
