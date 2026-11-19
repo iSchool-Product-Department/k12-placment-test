@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
-import { ArrowDown, BookOpen, Eye, EyeOff, FlaskConical, Layers, Play, Search, Settings2 } from 'lucide-react'
+import { BookOpen, Eye, EyeOff, FlaskConical, GitBranch, Layers, Play, Search, Settings2 } from 'lucide-react'
 import clsx from 'clsx'
 import { DEFAULT_CONFIG, POINTS, simulate } from '../engine/engine'
 import type { AnswerValue, Config, Question, Tier } from '../engine/types'
@@ -10,18 +10,20 @@ import { store, useConfig } from '../store'
 import { QuestionView, KeyLine } from '../question/QuestionView'
 import { Panel, Seg, TierBadge } from '../admin/AdminApp'
 import { TIER_STYLE } from '../admin/labels'
+import { randomBuddy } from '../student/Buddy'
 
-type Tab = 'bank' | 'rules' | 'tiers' | 'sim'
+type Tab = 'bank' | 'settings' | 'flow' | 'tiers' | 'sim'
 export default function ContentApp({ route, go }: { route: string[]; go: (h: string) => void }) {
   const tab = (route[1] as Tab) || 'bank'
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div><p className="m-0 text-sm font-extrabold text-orange-deep">● Content</p><h1 className="m-0 text-3xl text-deep">Questions and rules</h1></div>
-        <Seg value={tab} set={t => go(`content/${t}`)} items={[['bank', <><BookOpen size={15} /> Question bank</>], ['rules', <><Settings2 size={15} /> Rules</>], ['tiers', <><Layers size={15} /> Tiers</>], ['sim', <><FlaskConical size={15} /> Simulator</>]]} />
+        <div><p className="m-0 text-sm font-extrabold text-orange-deep">Content</p><h1 className="m-0 text-3xl text-deep">Questions and rules</h1></div>
+        <Seg value={tab} set={t => go(`content/${t}`)} items={[['bank', <><BookOpen size={15} /> Question bank</>], ['settings', <><Settings2 size={15} /> Settings</>], ['flow', <><GitBranch size={15} /> Flowchart</>], ['tiers', <><Layers size={15} /> Tiers</>], ['sim', <><FlaskConical size={15} /> Simulator</>]]} />
       </div>
       {tab === 'bank' && <Bank />}
-      {tab === 'rules' && <Rules />}
+      {tab === 'settings' && <Settings />}
+      {tab === 'flow' && <Flowchart />}
       {tab === 'tiers' && <Tiers />}
       {tab === 'sim' && <Sim go={go} />}
     </div>
@@ -126,37 +128,30 @@ function Preview({ q }: { q: Question }) {
   )
 }
 
-/* ---------------------------------------------------------------- rules */
-function Rules() {
+/* ---------------------------------------------------------------- settings */
+const range = (a: number, b: number) => (a === b ? `${a}` : `${a} to ${b}`)
+function Settings() {
   const cfg = useConfig()
   const set = (k: keyof Config, v: number) => store.setConfig({ ...cfg, [k]: v })
   const fields: [keyof Config, string, number][] = [
-    ['warmPass', 'Warm-up pass mark (of 3)', 3], ['knowUp', 'Knowledge: go up at (of 4)', 4], ['knowLow', 'Knowledge: lower grade at or below (of 4)', 4],
-    ['gradeUpper', 'Grade check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Creators starts at strength', 100], ['advAt', 'Tier: Innovators starts at strength', 100],
+    ['warmPass', 'Warm-up: pass at (of 3)', 3], ['knowUp', 'Skill check: one level higher at (of 4)', 4], ['knowLow', 'Skill check: lower grade at or below (of 4)', 4],
+    ['gradeUpper', 'Final check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Creators starts at strength', 100], ['advAt', 'Tier: Innovators starts at strength', 100],
     ['fastSec', 'Fast answer: seconds', 10], ['fastCount', 'Fast answers before a flag', 15],
   ]
-  const r = (a: number, b: number) => (a === b ? `${a}` : `${a} to ${b}`)
+  const r = range
   const table: [string, string, string][] = [
-    ['Warm-up (3)', r(cfg.warmPass, 3), 'Pass: knowledge check at this level'],
-    ['Warm-up (3)', r(0, cfg.warmPass - 1), 'Fail: warm-up one level down. At Level 1: Grade 1, Explorers'],
-    ['Warm-up down (3)', r(cfg.warmPass, 3), 'Final level is this level: grade check'],
-    ['Warm-up down (3)', r(0, cfg.warmPass - 1), 'Lower grade of this level, Explorers'],
-    ['Knowledge at S (4)', r(0, cfg.knowLow), 'Lower grade of S'],
-    ['Knowledge at S (4)', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Grade check at S'],
-    ['Knowledge at S (4)', r(cfg.knowUp, 4), 'Knowledge check one level up (Level 6: grade check)'],
-    ['Knowledge at S+1 (4)', r(0, cfg.knowLow), 'Upper grade of S'],
-    ['Knowledge at S+1 (4)', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Lower grade of S+1'],
-    ['Knowledge at S+1 (4)', r(cfg.knowUp, 4), 'Grade check at S+1 (4 of 4 also flags "may belong higher")'],
-    ['Grade check (4)', r(0, cfg.gradeUpper - 1), 'Lower grade of the final level'],
-    ['Grade check (4)', r(cfg.gradeUpper, 4), 'Upper grade of the final level'],
-  ]
-  const flow = [
-    ['Practice', 'Not scored', '1 question for the age'],
-    ['1 · Warm-up at S', '3 questions', 'Starter (digital literacy, very easy) + Logic medium + Logic hard'],
-    ['2 · Knowledge check', '4 questions', 'Lower easy, Lower medium, Upper medium, Upper hard'],
-    ['3 · One level up (if strong)', '4 questions', 'Same mix at level S+1'],
-    ['4 · Grade check', '4 questions', '3 lower-grade (medium or hard) + 1 grade task'],
-    ['5 · Tier', 'No questions', 'Strength from answers at the final level'],
+    ['Warm-up', r(cfg.warmPass, 3), 'Skill check at the age level'],
+    ['Warm-up', r(0, cfg.warmPass - 1), 'Warm-up one level lower. Ages 6 to 7: Grade 1, Explorers'],
+    ['Warm-up one level lower', r(cfg.warmPass, 3), 'Final check at that level'],
+    ['Warm-up one level lower', r(0, cfg.warmPass - 1), 'Lower grade of that level, Explorers'],
+    ['Skill check', r(0, cfg.knowLow), 'Lower grade of the age level'],
+    ['Skill check', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Final check at the age level'],
+    ['Skill check', r(cfg.knowUp, 4), 'Skill check one level higher. Ages 16 to 18: final check'],
+    ['Skill check one level higher', r(0, cfg.knowLow), 'Upper grade of the age level'],
+    ['Skill check one level higher', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Lower grade of the higher level'],
+    ['Skill check one level higher', r(cfg.knowUp, 4), 'Final check at the higher level'],
+    ['Final check', r(0, cfg.gradeUpper - 1), 'Lower grade'],
+    ['Final check', r(cfg.gradeUpper, 4), 'Upper grade'],
   ]
   return (
     <div className="grid gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
@@ -172,39 +167,81 @@ function Rules() {
           </div>
           <button onClick={() => store.setConfig(DEFAULT_CONFIG)} className="mt-3 text-sm font-bold text-blue">Back to starting values</button>
         </Panel>
-        <Panel title="The flow">
-          {flow.map(([a, b, c], i) => (
-            <div key={a}>
-              <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border-s-4 border-blue bg-sky px-3 py-2">
-                <div className="flex justify-between text-sm font-extrabold text-deep"><span>{a}</span><span className="text-soft">{b}</span></div>
-                <div className="text-xs text-soft">{c}</div>
-              </motion.div>
-              {i < flow.length - 1 && <ArrowDown size={16} className="mx-auto my-1 text-soft" />}
-            </div>
-          ))}
-        </Panel>
       </div>
       <div className="flex flex-col gap-4">
         <Panel title="Every possible score" sub="Built from the settings on the left, so it always matches what the test does.">
           <table className="w-full text-sm">
-            <thead><tr className="text-xs text-soft"><th className="py-1 text-start">Step</th><th className="text-start">Correct</th><th className="text-start">Outcome</th></tr></thead>
+            <thead><tr className="text-xs text-soft"><th className="py-1 text-start">Step</th><th className="text-start">Right answers</th><th className="text-start">Outcome</th></tr></thead>
             <tbody>{table.map(([a, b, c], i) => <tr key={i} className={i && table[i - 1][0] !== a ? 'border-t-2 border-line' : ''}><td className="py-1.5 pe-2 font-bold">{a}</td><td className="whitespace-nowrap pe-2">{b}</td><td>{c}</td></tr>)}</tbody>
           </table>
         </Panel>
         <Panel title="Edge cases">
           <ul className="m-0 space-y-1.5 ps-5 text-sm">
-            <li><b>2 of 4, easy right and hard wrong</b>: middle score, grade check at the level. The usual case.</li>
-            <li><b>2 of 4, hard right and easy wrong</b>: same path, plus an "odd pattern" flag for the teacher.</li>
+            <li><b>Only the number of right answers moves the student.</b> Which questions were right only affects the tier.</li>
             <li><b>Missed the starter</b> but got both puzzles: the warm-up still passes. Flag "check digital basics", tier at most Creators.</li>
             <li><b>Level 1 warm-up fails</b>: no level below, so Grade 1, Explorers, flagged. This is the shortest test (3 questions).</li>
-            <li><b>Level 6 and strong</b>: no level above, so straight to the grade check.</li>
+            <li><b>Ages 16 to 18 and strong</b>: no level above, so straight to the final check.</li>
             <li><b>No unseen question at the asked difficulty</b>: any unseen question from the same pool and level. Shown in the team view.</li>
-            <li><b>Closed early</b>: saved as "Not finished", no placement.</li>
+            <li><b>Closed the page</b>: within 24 hours the student continues where they stopped. After that the test expires.</li>
             <li><b>Match, Order, Sort</b>: right only when everything is in place. Typed answers ignore spaces, capitals and Arabic digits.</li>
           </ul>
         </Panel>
       </div>
     </div>
+  )
+}
+
+/* ---------------------------------------------------------------- flowchart (PRD 5.2, 5.3) */
+type Node = 'practice' | 'warm' | 'down' | 'know' | 'up' | 'final' | 'tier'
+type Branch = { score: string; to: Node | null; end?: string }
+function Flowchart() {
+  const cfg = useConfig()
+  const r = range
+  const [sel, setSel] = useState<Node>('warm')
+  const N: Record<Node, { title: string; qs: string; mix: string; out: Branch[] }> = {
+    practice: { title: 'Practice', qs: '1, not scored', mix: 'Teaches the controls and checks reading. Ages 6 to 9 drag, older students tap.', out: [{ score: 'Always', to: 'warm' }] },
+    warm: { title: 'Warm-up', qs: '3 at the age level', mix: '1 starter, 1 medium logic, 1 hard logic', out: [{ score: r(cfg.warmPass, 3), to: 'know' }, { score: r(0, cfg.warmPass - 1), to: 'down', end: 'Ages 6 to 7: Grade 1, Explorers' }] },
+    down: { title: 'Warm-up one level lower', qs: '3', mix: 'Same mix, one level lower', out: [{ score: r(cfg.warmPass, 3), to: 'final' }, { score: r(0, cfg.warmPass - 1), to: null, end: 'Lower grade of that level, Explorers' }] },
+    know: { title: 'Skill check', qs: '4 at the age level', mix: 'Lower grade easy and medium, upper grade medium and hard', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Lower grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: 'final' }, { score: r(cfg.knowUp, 4), to: 'up', end: 'Ages 16 to 18 go to the final check' }] },
+    up: { title: 'Skill check one level higher', qs: '4', mix: 'Same mix, one level higher. Only for strong students.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Upper grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: null, end: 'Lower grade of the higher level' }, { score: r(cfg.knowUp, 4), to: 'final' }] },
+    final: { title: 'Final check', qs: '4', mix: '3 lower-grade questions (medium or hard) and 1 grade task', out: [{ score: r(0, cfg.gradeUpper - 1), to: 'tier', end: 'Lower grade' }, { score: r(cfg.gradeUpper, 4), to: 'tier', end: 'Upper grade' }] },
+    tier: { title: 'Tier', qs: 'No questions', mix: 'Strength from the answers at the placed level', out: [{ score: `below ${cfg.coreAt}`, to: null, end: 'Explorers' }, { score: `${cfg.coreAt} to ${cfg.advAt - 1}`, to: null, end: 'Creators' }, { score: `${cfg.advAt}+`, to: null, end: 'Innovators' }] },
+  }
+  const into = (n: Node) => (Object.keys(N) as Node[]).filter(k => N[k].out.some(b => b.to === n))
+  const lit = (n: Node) => n === sel || into(sel).includes(n) || N[sel].out.some(b => b.to === n)
+  // Main road left to right; the two side roads sit under the step they branch from.
+  const cols: Node[][] = [['practice'], ['warm', 'down'], ['know'], ['up'], ['final'], ['tier']]
+  return (
+    <Panel title="How a student moves through the test" sub="Click a step to see where students come from and where they go. Numbers come from Settings.">
+      <div className="overflow-x-auto pb-2">
+        <div className="grid min-w-[880px] grid-cols-6 gap-3">
+          {cols.map((col, ci) => (
+            <div key={ci} className="flex flex-col gap-3">
+              {col.map(n => (
+                <button key={n} onClick={() => setSel(n)} aria-pressed={sel === n}
+                  className={clsx('rounded-2xl border-2 p-3 text-start transition-colors', sel === n ? 'border-blue bg-sky' : lit(n) ? 'border-bright bg-white' : 'border-line bg-white opacity-60 hover:opacity-100')}>
+                  <div className="text-sm font-extrabold text-deep">{N[n].title}</div>
+                  <div className="text-xs font-bold text-soft">{N[n].qs}</div>
+                  <div className="mt-2 space-y-1">
+                    {N[n].out.map((b, i) => (
+                      <div key={i} className="flex items-start gap-1.5 text-xs">
+                        <span className="shrink-0 rounded bg-mist px-1.5 py-0.5 font-extrabold text-ink">{b.score}</span>
+                        <span>{b.to ? <>to <b>{N[b.to].title}</b>{b.end ? <span className="text-soft"> ({b.end})</span> : null}</> : <b className="text-orange-deep">{b.end}</b>}</span>
+                      </div>
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 rounded-2xl bg-mist p-4 text-sm">
+        <b className="text-deep">{N[sel].title}.</b> {N[sel].mix}.
+        {into(sel).length > 0 && <> Students arrive from {into(sel).map(k => N[k].title).join(' or ')}.</>}
+        <span className="text-soft"> The test never moves a student more than one level from their age.</span>
+      </div>
+    </Panel>
   )
 }
 
@@ -223,16 +260,16 @@ function Tiers() {
         {(['Explorers', 'Creators', 'Innovators'] as Tier[]).map(t => <div key={t} className="mb-2 flex items-center gap-3"><TierBadge tier={t} /><span className="text-sm">{TIER_STYLE[t].blurb}</span></div>)}
       </Panel>
       <Panel title="How strength is worked out" sub="Only answers at the final level count. Harder questions count more.">
-        <div className="mb-3 grid grid-cols-4 gap-2 text-center">
-          {(Object.keys(POINTS) as (keyof typeof POINTS)[]).map(d => <div key={d} className="rounded-2xl bg-sky p-3"><div className="text-2xl font-extrabold text-deep">{POINTS[d]}</div><div className="text-xs font-bold text-soft">{d}{d === 'Hard' ? ' / task' : ''}</div></div>)}
+        <div className="mb-3 grid grid-cols-5 gap-2 text-center">
+          {(Object.keys(POINTS) as (keyof typeof POINTS)[]).map(d => <div key={d} className="rounded-2xl bg-sky p-2.5"><div className="text-2xl font-extrabold text-deep">{POINTS[d]}</div><div className="text-xs font-bold text-soft">{d}</div></div>)}
         </div>
         <p className="m-0 text-sm">Strength = points earned ÷ points possible × 100.</p>
         <h4 className="mb-1 mt-4 text-deep">Caps</h4>
         <ul className="m-0 space-y-1 ps-5 text-sm">
           <li>Failed the warm-up at Level 1, or both warm-ups: <b>Explorers</b>.</li>
-          <li>4 of 4 one level up: <b>Innovators</b>.</li>
+          <li>4 of 4 on the skill check one level higher: <b>Innovators</b>.</li>
           <li>Missed a digital literacy starter: <b>at most Creators</b>.</li>
-          <li>Many very fast answers: <b>at most Creators</b>.</li>
+          <li>4 or more answers in under 3 seconds: <b>at most Creators</b>.</li>
         </ul>
         <h4 className="mb-1 mt-4 text-deep">Confidence</h4>
         <p className="m-0 text-sm">7+ questions at the final level: high. 4 to 6: medium. 3 or fewer: the teacher confirms in session 1.</p>
@@ -256,7 +293,7 @@ function Sim({ go }: { go: (h: string) => void }) {
     }
     setRes({ grades, q: q / N, m: m / N })
   }
-  const one = () => { const r = simulate(ab, age, BANK, cfg, Math.random, 'Simulated student'); r.avatar = '🧪'; store.save(r); go(`admin/${r.id}`) }
+  const one = () => { const r = simulate(ab, age, BANK, cfg, Math.random, 'Simulated student'); r.avatar = randomBuddy(); store.save(r); go(`admin/${r.id}`) }
   const max = res ? Math.max(...Object.values(res.grades).map(g => g.Explorers + g.Creators + g.Innovators)) : 1
   return (
     <div className="grid gap-4 md:grid-cols-[340px_minmax(0,1fr)]">
