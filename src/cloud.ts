@@ -7,7 +7,7 @@ const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 export const cloudOn = !!(URL_ && KEY)
 
 declare const __ADMIN_KEY__: string | null
-/** Admin and content open only where the service key exists: the local dev server. A build is the student test alone. */
+/** A build is the student test plus a password-locked admin. Content and the service key stay on the local dev server. */
 export const adminKey = __ADMIN_KEY__
 export const studentOnly = import.meta.env.PROD
 
@@ -18,8 +18,20 @@ export async function saveTest(rec: TestRecord) {
   if (!r.ok) throw new Error(`save ${r.status}`)
 }
 
-/** All finished tests, read with the service key (local dev only). */
-export async function fetchTests(): Promise<TestRecord[]> {
+const PASS = 'ischool.placement.adminpass'
+export const savedPassword = () => { try { return sessionStorage.getItem(PASS) } catch { return null } }
+
+/** All finished tests. Local dev reads Supabase with the service key; a build asks /api/tests with the team password. */
+export async function fetchTests(password = savedPassword()): Promise<TestRecord[]> {
+  if (studentOnly) {
+    if (!password) throw new Error('password')
+    const r = await fetch('./api/tests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) })
+    const body = await r.json().catch(() => ({ error: `Could not load tests (${r.status}).` }))
+    if (r.status === 401) { try { sessionStorage.removeItem(PASS) } catch { /* */ } throw new Error('password') }
+    if (!r.ok) throw new Error(body.error)
+    try { sessionStorage.setItem(PASS, password) } catch { /* private mode */ }
+    return body
+  }
   if (!adminKey) throw new Error('Add SUPABASE_SERVICE_KEY to .env.local, then restart npm run dev.')
   const r = await fetch(`${URL_}/rest/v1/tests?select=data&status=eq.done&order=updated_at.desc`, { headers: { apikey: adminKey, Authorization: `Bearer ${adminKey}` } })
   if (!r.ok) throw new Error(`load ${r.status}`)

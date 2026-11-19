@@ -32,8 +32,8 @@ export default function App() {
   const [lang, setLang] = useState<Lang>('en')
   useEffect(() => { const f = () => { setRoute(read()); window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
   const go = (h: string) => { location.hash = h.replace(/\//g, '-') }
-  // A deployed build is the test alone: any other hash shows the student view, with no tabs.
-  const view = studentOnly ? 'student' : route[0]
+  // A deployed build: the test, plus #/admin behind the team password. No tabs, no content view.
+  const view = studentOnly && route[0] !== 'admin' ? 'student' : route[0]
   const studentRtl = view === 'student' && lang === 'ar'
   useEffect(() => { document.documentElement.lang = studentRtl ? 'ar' : 'en'; document.documentElement.dir = studentRtl ? 'rtl' : 'ltr' }, [studentRtl])
   const tabs: [string, string, React.ReactNode][] = [['student', 'Student', <GraduationCap size={16} />], ['admin', 'Admin', <LayoutDashboard size={16} />], ['content', 'Content', <Library size={16} />]]
