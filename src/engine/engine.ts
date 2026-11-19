@@ -93,7 +93,8 @@ export const keysOf = (q: Question) => [0, 1, 2, 3].filter(i => q.o[i] !== '' &&
 /** Splits a "left = right" option (Match) or "item = box" option (Sort). */
 export function splitPair(q: Question, i: number, lang: 'en' | 'ar' = 'en') {
   const src = (lang === 'ar' && q.oa[i]) || q.o[i]
-  const at = src.indexOf('=')
+  // The last lone "=" splits, so code like "x = 5 = Valid" or "4 == 4 = True" keeps its own signs.
+  const at = [...src.matchAll(/(?<![=!<>])=(?!=)/g)].pop()?.index ?? -1
   return { left: src.slice(0, at).trim(), right: src.slice(at + 1).trim() }
 }
 
