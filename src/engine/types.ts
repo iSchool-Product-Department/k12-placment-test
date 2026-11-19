@@ -15,9 +15,12 @@ export interface Question {
   q: string
   qa: string
   scr: string
+  /** Option 1 (index 0) is always the right answer. Order: right order. Match "left = right". Sort "item = box". */
   o: string[]
   oa: string[]
-  a: string
+  /** Local picture paths (public/q/), downloaded from the sheet by `npm run bank`. */
+  img?: string
+  oimg?: string[]
   why: string
   src: string
 }
@@ -29,7 +32,7 @@ export interface Draw { qid: string; candidates: number; fallback: boolean; slot
 
 export interface StepState { name: StepName; lv: number; draws: Draw[]; i: number; right: number }
 
-/** Answer value by type: MCQ 'A'..'D'; Order ['B','A',..]; Sort {A:0,B:1}; Match {0:2,1:0}; Type answer string. */
+/** Letters are sheet option columns (A = option 1, the right one). MCQ 'A'..'D'; Order ['B','A',..]; Sort {A:0,B:1} (box index); Match {0:2,1:0} (left index: right index); Type answer string. */
 export type AnswerValue = string | string[] | Record<string, number>
 
 export interface AnswerRec {

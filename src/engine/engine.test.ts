@@ -1,6 +1,8 @@
+/// <reference types="node" />
+import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import bankJson from '../data/bank.json'
-import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate } from './engine'
+import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
 import type { Question, TestRecord } from './types'
 
 const bank = bankJson as Question[]
@@ -27,6 +29,43 @@ const grade = (r: TestRecord) => r.placement!.grade
 describe('answer keys', () => {
   it('every question accepts its own correct answer', () => {
     for (const q of bank) expect(check(q, correctAnswer(q)), q.id).toBe(true)
+  })
+  it('rejects wrong answers (sheet format: option 1 right, order as listed, "=" pairs)', () => {
+    for (const q of bank) {
+      const keys = q.o.map((o, i) => (o ? 'ABCD'[i] : '')).filter(Boolean)
+      if (q.t.endsWith('MCQ')) for (const k of keys.slice(1)) expect(check(q, k), q.id).toBe(false)
+      if (q.t === 'Order') expect(check(q, [...keys].reverse()), q.id).toBe(false)
+      if (q.t === 'Sort') {
+        const v = correctAnswer(q) as Record<string, number>
+        expect(check(q, { ...v, A: 1 - v.A }), q.id).toBe(false)
+        expect(check(q, { A: v.A }), q.id).toBe(false) // not everything placed
+      }
+      if (q.t === 'Match') {
+        expect(check(q, Object.fromEntries(keys.map((_, i) => [i, (i + 1) % keys.length]))), q.id).toBe(false)
+        expect(check(q, { 0: 0 }), q.id).toBe(false)
+      }
+    }
+  })
+  it('sort boxes come from "item = box", two per question, in EN and AR', () => {
+    for (const q of bank.filter(q => q.t === 'Sort')) {
+      expect(sortBoxes(q).length, q.id).toBe(2)
+      expect(sortBoxes(q, 'ar').map(b => b.keys)).toEqual(sortBoxes(q).map(b => b.keys))
+    }
+  })
+  it('typed answers ignore spaces, capitals and Arabic digits', () => {
+    const q = byId.get('L6-T-03')! // "5, 0, -1"
+    for (const a of ['5, 0, -1', '5,0,-1', ' 5 , 0 , -1 ', '٥, ٠, -١']) expect(check(q, a), a).toBe(true)
+    expect(check(q, '5, 0, 1')).toBe(false)
+    expect(check(byId.get('L1-G1-07')!, 'ROBOT')).toBe(true)
+  })
+  it('options and pictures line up, and every picture file exists', () => {
+    for (const q of bank) {
+      const n = q.o.filter(Boolean).length
+      expect(q.oa.filter(Boolean).length, q.id).toBe(n)
+      if (q.oimg) expect(q.oimg.length, q.id).toBe(n)
+      for (const p of [q.img, ...(q.oimg || [])].filter(Boolean)) expect(existsSync(`public/${p}`), p).toBe(true)
+      expect([...q.o, ...q.oa].join(' '), q.id).not.toMatch(/\p{Extended_Pictographic}/u)
+    }
   })
   it('bank has 61 questions per level with the v2 pool sizes', () => {
     for (let lv = 1; lv <= 6; lv++) {

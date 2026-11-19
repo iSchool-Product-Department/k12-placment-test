@@ -20,21 +20,3 @@ export const LEARN: Record<'en' | 'ar', string[][]> = {
 
 /** Avatars are emoji so they stay tiny and need no image files. */
 export const AVATARS = ['🤖', '🦊', '🐼', '🚀', '🦁', '🐙', '🦄', '🐢', '🎮', '⚡', '🧠', '🎧']
-
-/** Arabic labels for the sort boxes (the sheet stores only English box names). */
-export const SORT_AR: Record<string, string> = {
-  'With corners': 'لها زوايا', 'Without corners': 'بلا زوايا', UI: 'UI (الشكل)', UX: 'UX (التجربة)',
-  'Front end': 'الواجهة الأمامية', 'Back end': 'الواجهة الخلفية', Once: 'مرة واحدة', 'Again and again': 'مرارًا وتكرارًا',
-  Research: 'بحث', Design: 'تصميم',
-}
-
-/** Emoji added to short picture options for ages 6 to 9, so options read without big images. */
-export const EMOJI: [RegExp, string][] = [
-  [/tablet/i, '📱'], [/tree/i, '🌳'], [/rock/i, '🪨'], [/the screen/i, '🖥️'], [/the mouse/i, '🖱️'], [/the keyboard/i, '⌨️'],
-  [/folders/i, '📁'], [/trash/i, '🗑️'], [/speaker/i, '🔈'], [/a phone/i, '📱'], [/spoon/i, '🥄'], [/pillow/i, '🛏️'],
-  [/^apple/i, '🍎'], [/^banana/i, '🍌'], [/^car$/i, '🚗'], [/^orange/i, '🍊'], [/^square/i, '🟦'], [/^circle/i, '🔵'],
-  [/^triangle/i, '🔺'], [/^oval/i, '🥚'], [/^a flower/i, '🌸'], [/^a seed/i, '🌰'], [/small plant/i, '🌱'],
-  [/^brush your teeth/i, '🪥'], [/toothpaste/i, '🧴'], [/rinse/i, '💧'], [/pick up the toothbrush/i, '✋'],
-  [/the printer/i, '🖨️'], [/artificial intelligence/i, '🧠'], [/your hand/i, '✋'], [/your voice/i, '🗣️'],
-  [/shut down/i, '⏻'], [/power cable/i, '🔌'], [/close the screen/i, '💻'], [/typewriter/i, '🧾'], [/piano/i, '🎹'],
-]

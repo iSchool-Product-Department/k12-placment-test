@@ -77,19 +77,26 @@ export const currentQuestion = (rec: TestRecord, byId: Map<string, Question>) =>
 const letters = 'ABCD'
 export const keysOf = (q: Question) => [0, 1, 2, 3].filter(i => q.o[i] !== '' && q.o[i] != null)
 
-export function sortBoxes(q: Question): { label: string; keys: string[] }[] {
-  return q.a.split('.').map(s => s.trim()).filter(Boolean).map(part => {
-    const [label, list] = part.split(':')
-    return { label: label.trim(), keys: (list || '').match(/[A-D]/g) || [] }
-  })
+/** Splits a "left = right" option (Match) or "item = box" option (Sort). */
+export function splitPair(q: Question, i: number, lang: 'en' | 'ar' = 'en') {
+  const src = (lang === 'ar' && q.oa[i]) || q.o[i]
+  const at = src.indexOf('=')
+  return { left: src.slice(0, at).trim(), right: src.slice(at + 1).trim() }
 }
 
-export const matchPairs = (q: Question, lang: 'en' | 'ar' = 'en') =>
-  keysOf(q).map(i => {
-    const src = (lang === 'ar' && q.oa[i]) || q.o[i]
-    const at = src.indexOf('=')
-    return { left: src.slice(0, at).trim(), right: src.slice(at + 1).trim() }
-  })
+export const matchPairs = (q: Question, lang: 'en' | 'ar' = 'en') => keysOf(q).map(i => splitPair(q, i, lang))
+
+/** Sort boxes in the order they first appear in the options. Box identity comes from the English text. */
+export function sortBoxes(q: Question, lang: 'en' | 'ar' = 'en'): { label: string; keys: string[] }[] {
+  const boxes: { id: string; label: string; keys: string[] }[] = []
+  for (const i of keysOf(q)) {
+    const id = splitPair(q, i).right
+    let b = boxes.find(x => x.id === id)
+    if (!b) boxes.push(b = { id, label: splitPair(q, i, lang).right, keys: [] })
+    b.keys.push(letters[i])
+  }
+  return boxes
+}
 
 const normType = (s: string) => String(s).split(' (')[0].toLowerCase().replace(/\s+/g, '')
   .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632)).replace(/\.0+$/, '')
@@ -98,7 +105,8 @@ export function check(q: Question, ans: AnswerValue | null | undefined): boolean
   if (ans == null) return false
   switch (q.t) {
     case 'Order': {
-      const exp = (q.a.split('(')[0].match(/[A-D]/g) || []).map(k => q.o[letters.indexOf(k)])
+      // Compare texts, not letters, so two options with the same text can swap places.
+      const exp = keysOf(q).map(i => q.o[i])
       const got = (ans as string[]).map(k => q.o[letters.indexOf(k)])
       return got.length === exp.length && got.every((t, i) => t === exp[i])
     }
@@ -112,9 +120,9 @@ export function check(q: Question, ans: AnswerValue | null | undefined): boolean
       return Object.keys(a).length === n && Object.entries(a).every(([l, r]) => +l === r)
     }
     case 'Type answer':
-      return normType(ans as string) === normType(q.a)
+      return [q.o[0], q.oa[0]].some(a => a && normType(ans as string) === normType(a))
     default:
-      return ans === q.a.trim()[0]
+      return ans === 'A'
   }
 }
 
@@ -243,11 +251,11 @@ export function simulate(ability: number, age: number, bank: Question[], cfg: Co
 
 export function correctAnswer(q: Question): AnswerValue {
   switch (q.t) {
-    case 'Order': return q.a.split('(')[0].match(/[A-D]/g) || []
+    case 'Order': return keysOf(q).map(i => letters[i])
     case 'Sort': { const v: Record<string, number> = {}; sortBoxes(q).forEach((b, i) => b.keys.forEach(k => (v[k] = i))); return v }
     case 'Match': { const v: Record<string, number> = {}; keysOf(q).forEach(i => (v[i] = i)); return v }
-    case 'Type answer': return q.a.split(' (')[0]
-    default: return q.a.trim()[0]
+    case 'Type answer': return q.o[0]
+    default: return 'A'
   }
 }
 function wrongAnswer(q: Question): AnswerValue {
@@ -256,6 +264,6 @@ function wrongAnswer(q: Question): AnswerValue {
     case 'Sort': { const v = correctAnswer(q) as Record<string, number>; const k = Object.keys(v)[0]; return { ...v, [k]: 1 - v[k] } }
     case 'Match': { const n = keysOf(q).length; const v: Record<string, number> = {}; keysOf(q).forEach(i => (v[i] = (i + 1) % n)); return v }
     case 'Type answer': return 'x'
-    default: return letters[(letters.indexOf(q.a.trim()[0]) + 1) % keysOf(q).length]
+    default: return 'B'
   }
 }

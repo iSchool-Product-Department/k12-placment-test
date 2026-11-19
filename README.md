@@ -2,7 +2,7 @@
 
 An adaptive placement test for ages 6 to 18. It finds the **level**, then the **grade** (Grade 1 to 12), then a **tier** (Foundation, Core, Advanced) that the team uses to build group sessions.
 
-Source of truth for questions and rules: the Google Sheet **"iSchool Placement Test v2: Blueprint, Rules, Tiers and Question Bank"**.
+Source of truth: the [PRD](https://docs.google.com/document/d/1Tx9PsSYmmA0DU_IToRnGX8upIXgo-ntrOK6l6h2j--c/edit) for the logic, and the **Questions and Settings** sheet for questions and numbers.
 
 ## Run it
 
@@ -34,7 +34,8 @@ npm run build      # static site in dist/
 ```
 src/engine/engine.ts     The adaptive rules, answer checking, tiers, simulator. Pure functions, no UI.
 src/engine/engine.test.ts One test per row of the "Every possible score" table in the sheet.
-src/data/bank.json       366 questions, generated from the sheet (npm run bank -- file.csv).
+src/data/bank.json       366 questions, generated from the sheet's Questions tab (npm run bank -- Questions.csv).
+public/q/                Question pictures, downloaded from the sheet's picture links by the same script.
 src/data/ladder.ts       Levels, tools, "what you will learn", avatars, emoji for young options.
 src/store.ts             Storage adapter. localStorage for the demo; swap for an API (see below).
 src/question/            One QuestionView used by student, admin and content. Visual.tsx draws stages,
@@ -49,5 +50,5 @@ The demo stores tests **in the browser**. Each device sees its own tests. For re
 1. **Backend**: add Supabase (or Firebase). Two tables: `tests` (one JSON row per `TestRecord`) and `config`. Replace the functions in `src/store.ts`; nothing else changes.
 2. **Sign-in for the team**: protect `#/admin` and `#/content` (Supabase Auth with Google sign-in for @ischooltech.com).
 3. **Student links**: give each student a link with a code instead of typing a name.
-4. **Pictures**: the sheet's Drive images are not used. Visuals are drawn in code. Add new ones in `Visual.tsx`.
+4. **Pictures**: `npm run bank` downloads the sheet's picture links into `public/q/`. Questions without a picture fall back to visuals drawn in `Visual.tsx`.
 5. **Pilot**: run 50 to 100 students, then set the pass marks and tier thresholds (45 and 75) in Content > Rules so each tier holds about a third of students.

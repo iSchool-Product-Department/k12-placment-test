@@ -8,7 +8,7 @@ import { AVATARS, BANK } from './data/ladder'
  * To go live, swap these functions for API calls (for example Supabase tables
  * `tests` and `config`) and keep the same shapes.
  */
-const KEY = 'ischool.placement.v2.tests.2'
+const KEY = 'ischool.placement.v2.tests.3'
 const CFG_KEY = 'ischool.placement.v2.config'
 
 const safeGet = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }

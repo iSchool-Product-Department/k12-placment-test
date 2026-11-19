@@ -3,8 +3,7 @@ import { Reorder, motion } from 'motion/react'
 import { Check, GripVertical, Volume2, X } from 'lucide-react'
 import clsx from 'clsx'
 import type { AnswerValue, Question } from '../engine/types'
-import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes } from '../engine/engine'
-import { EMOJI, SORT_AR } from '../data/ladder'
+import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes, splitPair } from '../engine/engine'
 import { T, type Band, type Lang } from '../i18n'
 import { QuestionVisual } from './Visual'
 
@@ -16,17 +15,16 @@ export const stableShuffle = <T,>(arr: T[], salt: string) => {
   return a
 }
 export const qText = (q: Question, lang: Lang) => (lang === 'ar' && q.qa) || q.q
+/** Option text. For Sort, only the item (the box is the answer). */
 export function optText(q: Question, i: number, lang: Lang) {
-  const t = (lang === 'ar' && q.oa[i]) || q.o[i] || ''
-  if (q.lv > 2 || /^\p{Extended_Pictographic}/u.test(t)) return t
-  const e = EMOJI.find(([re]) => re.test(q.o[i]))
-  return e && q.t !== 'Match' ? `${e[1]} ${t}` : t
+  return q.t === 'Sort' ? splitPair(q, i, lang).left : (lang === 'ar' && q.oa[i]) || q.o[i] || ''
 }
+export const picSrc = (p: string) => import.meta.env.BASE_URL + p
 const isCodey = (s: string) => !/[؀-ۿ]/.test(s) && (/[;{}=<>$#]|^\w[\w.]*\(.*\)$|\(\)/.test(s))
-function OptLabel({ text, big }: { text: string; big?: boolean }) {
-  const m = text.match(/^(\p{Extended_Pictographic}️?)\s*(.*)$/u)
-  if (m) return <span className="flex items-center gap-3"><span className={big ? 'text-4xl' : 'text-2xl'} aria-hidden="true">{m[1]}</span><span>{m[2]}</span></span>
-  return isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]">{text}</code> : <span>{text}</span>
+function OptLabel({ text, pic, big }: { text: string; pic?: string; big?: boolean }) {
+  const label = isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]" dir="ltr">{text}</code> : <span>{text}</span>
+  if (!pic) return label
+  return <span className="flex items-center gap-3"><img src={picSrc(pic)} alt="" className={clsx('shrink-0 object-contain', big ? 'h-16 w-16' : 'h-10 w-10')} />{label}</span>
 }
 
 export function speak(q: Question, lang: Lang) {
@@ -34,7 +32,7 @@ export function speak(q: Question, lang: Lang) {
     const s = window.speechSynthesis; s.cancel()
     const parts = [qText(q, lang)]
     if (q.t === 'Match') matchPairs(q, lang).forEach(p => parts.push(p.left))
-    else keysOf(q).forEach(i => parts.push(optText(q, i, lang).replace(/^\p{Extended_Pictographic}️?\s*/u, '')))
+    else keysOf(q).forEach(i => parts.push(optText(q, i, lang)))
     const u = new SpeechSynthesisUtterance(parts.join('. '))
     u.lang = lang === 'ar' ? 'ar-EG' : 'en-US'; u.rate = 0.92
     s.speak(u)
@@ -45,7 +43,7 @@ export function answerText(q: Question, v: AnswerValue | null | undefined, lang:
   if (v == null) return ''
   if (q.t === 'Type answer') return String(v)
   if (q.t === 'Order') return (v as string[]).map(k => optText(q, L.indexOf(k), lang)).join('  →  ')
-  if (q.t === 'Sort') { const b = sortBoxes(q); return Object.entries(v as Record<string, number>).map(([k, bi]) => `${optText(q, L.indexOf(k), lang)}: ${b[bi]?.label}`).join(' · ') }
+  if (q.t === 'Sort') { const b = sortBoxes(q, lang); return Object.entries(v as Record<string, number>).map(([k, bi]) => `${optText(q, L.indexOf(k), lang)}: ${b[bi]?.label}`).join(' · ') }
   if (q.t === 'Match') { const p = matchPairs(q, lang); return Object.entries(v as Record<string, number>).map(([l, r]) => `${p[+l].left} = ${p[r]?.right}`).join(' · ') }
   const i = L.indexOf(v as string)
   return i >= 0 ? optText(q, i, lang) : String(v)
@@ -77,7 +75,9 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           </button>
         )}
       </div>
-      <QuestionVisual q={q} choice={stageChoice} />
+      {q.img
+        ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[30vh] w-auto max-w-full rounded-2xl object-contain" />
+        : <QuestionVisual q={q} choice={stageChoice} />}
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
       {q.t === 'Order' && <OrderAnswer q={q} lang={lang} value={(value as string[]) || []} set={set} salt={salt} review={review} hint={t.tapOrder} clear={t.clear} />}
       {q.t === 'Sort' && <SortAnswer q={q} lang={lang} value={(value as Record<string, number>) || {}} set={set} review={review} hint={t.sortHint} />}
@@ -85,7 +85,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
         <div className={clsx('grid gap-3', keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
           {stableShuffle(keys, q.id + salt).map((k, n) => {
-            const on = value === L[k], right = review && q.a.trim()[0] === L[k]
+            const on = value === L[k], right = review && L[k] === 'A'
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
                 className={clsx('flex min-h-[60px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-3 text-start font-bold transition-colors',
@@ -94,7 +94,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
                   !on && !right && 'border-line hover:border-bright',
                   review && on && !right && 'border-bad bg-red-50', right && 'border-ok bg-green-50')}>
                 <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-extrabold', on ? 'bg-blue text-white' : 'bg-sky text-deep')}>{L[n]}</span>
-                <OptLabel text={optText(q, k, lang)} big={band === 'kids'} />
+                <OptLabel text={optText(q, k, lang)} pic={q.oimg?.[k]} big={band === 'kids'} />
                 {review && right && <Check className="ms-auto text-ok" size={20} />}
                 {review && on && !right && <X className="ms-auto text-bad" size={20} />}
               </motion.button>
@@ -115,6 +115,7 @@ function OrderAnswer({ q, lang, value, set, salt, review, hint, clear }: { q: Qu
   const keys = keysOf(q).map(i => L[i])
   const pool = useMemo(() => stableShuffle(keys, q.id + salt), [q.id])
   const label = (k: string) => optText(q, L.indexOf(k), lang)
+  const pic = (k: string) => q.oimg?.[L.indexOf(k)]
   return (
     <div className="flex flex-col gap-3">
       <p className="m-0 text-sm text-soft">{hint}</p>
@@ -122,7 +123,7 @@ function OrderAnswer({ q, lang, value, set, salt, review, hint, clear }: { q: Qu
         {value.map((k, n) => (
           <Reorder.Item key={k} value={k} dragListener={!review} className="flex items-center gap-3 rounded-xl border-2 border-blue bg-white px-3 py-2 font-bold shadow-sm">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-blue text-sm text-white">{n + 1}</span>
-            <OptLabel text={label(k)} />
+            <OptLabel text={label(k)} pic={pic(k)} />
             {!review && <><GripVertical className="ms-auto cursor-grab text-soft" size={18} />
               <button onClick={() => set(value.filter(x => x !== k).length ? value.filter(x => x !== k) : null)} className="rounded-full p-1 text-soft hover:bg-sky" aria-label="remove"><X size={16} /></button></>}
           </Reorder.Item>
@@ -131,7 +132,7 @@ function OrderAnswer({ q, lang, value, set, salt, review, hint, clear }: { q: Qu
       {!review && (
         <div className="flex flex-wrap gap-2">
           {pool.filter(k => !value.includes(k)).map(k => (
-            <motion.button layout key={k} whileTap={{ scale: 0.95 }} onClick={() => set([...value, k])} className="rounded-xl border-2 border-line bg-white px-3 py-2 font-bold hover:border-bright"><OptLabel text={label(k)} /></motion.button>
+            <motion.button layout key={k} whileTap={{ scale: 0.95 }} onClick={() => set([...value, k])} className="rounded-xl border-2 border-line bg-white px-3 py-2 font-bold hover:border-bright"><OptLabel text={label(k)} pic={pic(k)} /></motion.button>
           ))}
           {value.length > 0 && <button onClick={() => set(null)} className="rounded-xl px-3 py-2 text-sm font-bold text-soft hover:bg-sky">{clear}</button>}
         </div>
@@ -141,18 +142,18 @@ function OrderAnswer({ q, lang, value, set, salt, review, hint, clear }: { q: Qu
 }
 
 function SortAnswer({ q, lang, value, set, review, hint }: { q: Question; lang: Lang; value: Record<string, number>; set: (v: Record<string, number> | null) => void; review?: boolean; hint: string }) {
-  const boxes = sortBoxes(q)
+  const boxes = sortBoxes(q, lang)
   return (
     <div className="flex flex-col gap-2">
       <p className="m-0 text-sm text-soft">{hint}</p>
       {keysOf(q).map(i => (
         <div key={i} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-line bg-white px-3 py-2">
-          <span className="font-bold"><OptLabel text={optText(q, i, lang)} /></span>
+          <span className="font-bold"><OptLabel text={optText(q, i, lang)} pic={q.oimg?.[i]} /></span>
           <div className="flex gap-1.5">
             {boxes.map((b, bi) => (
               <button key={bi} onClick={() => set({ ...value, [L[i]]: bi })} aria-pressed={value[L[i]] === bi}
                 className={clsx('rounded-full border-2 px-3 py-1.5 text-sm font-bold', value[L[i]] === bi ? 'border-blue bg-blue text-white' : 'border-line bg-white hover:border-bright')}>
-                {lang === 'ar' ? SORT_AR[b.label] || b.label : b.label}
+                {b.label}
               </button>
             ))}
           </div>
