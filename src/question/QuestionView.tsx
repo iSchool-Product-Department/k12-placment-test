@@ -89,6 +89,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   const drag = { q, lang, salt, review, big: band === 'kids', shuffle: stableShuffle, label }
   // Picture tiles, word underneath: ages 6 to 9 for any picture or icon, every age for real pictures.
   const tiles = keys.some(k => q.oimg?.[k]) || (band === 'kids' && keys.some(k => q.oicon?.[k]))
+  const side = (!!q.img || hasSim(q)) && q.t.endsWith('MCQ') && !tiles
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
     <div className="flex flex-col gap-3">
@@ -101,6 +102,8 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           </button>
         )}
       </div>
+      {/* A picture or stage with a plain answer list: side by side on wider screens, so the answers stay in view. */}
+      <div className={clsx('flex flex-col gap-3', side && 'sm:grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:items-center sm:gap-5')}>
       {q.img && !hasSim(q)
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[28vh] w-auto max-w-full rounded-2xl object-contain" />
         : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
@@ -114,13 +117,13 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
       {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.sortHint)} />}
       {q.t === 'Match' && <MatchAnswer {...drag} art={art} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.matchHint)} />}
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
-        <div className={clsx('grid gap-2.5', tiles ? (keys.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
+        <div className={clsx('grid gap-2.5', side ? 'grid-cols-1' : tiles ? (keys.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
           {stableShuffle(keys, q.id + salt).map((k, n) => {
             const on = value === L[k], right = review && L[k] === 'A'
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
                 className={clsx('flex min-h-[52px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-2.5 text-start font-bold transition-colors',
-                  tiles ? 'flex-col justify-center px-2 py-3 text-lg' : band === 'kids' && 'sm:flex-col sm:justify-center sm:text-center',
+                  tiles ? 'flex-col justify-center px-2 py-3 text-lg' : band === 'kids' && !side && 'sm:flex-col sm:justify-center sm:text-center',
                   on && !review && 'border-blue bg-sky shadow-[0_0_0_4px_rgba(5,172,255,.18)]',
                   !on && !right && 'border-line hover:border-bright',
                   review && on && !right && 'border-bad bg-red-50', right && 'border-ok bg-green-50')}>
@@ -133,6 +136,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           })}
         </div>
       )}
+      </div>
       </div>
     </div>
   )
