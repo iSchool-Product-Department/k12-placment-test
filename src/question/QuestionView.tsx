@@ -7,7 +7,7 @@ import { BlockOrderAnswer, CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer
 import { blockText, isBlockOrder, isCodeOrder } from './codeLines'
 import { ICONS } from './icons'
 import { T, type Band, type Lang } from '../i18n'
-import { QuestionVisual, hasSim } from './Visual'
+import { QuestionVisual, hasSim, hasVisual, looksLikeCode } from './Visual'
 
 const L = 'ABCD'
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
@@ -89,12 +89,14 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   const drag = { q, lang, salt, review, big: band === 'kids', shuffle: stableShuffle, label }
   // Picture tiles, word underneath: ages 6 to 9 for any picture or icon, every age for real pictures.
   const tiles = keys.some(k => q.oimg?.[k]) || (band === 'kids' && keys.some(k => q.oicon?.[k]))
-  const side = (!!q.img || hasSim(q)) && q.t.endsWith('MCQ') && !tiles
+  // Any picture, stage, code or blocks with a plain answer list: side by side on wider screens, so nothing scrolls.
+  const side = (!!q.img || hasVisual(q)) && (q.t.endsWith('MCQ') || q.t === 'Type answer') && !tiles
+  const wide = side && !hasSim(q) && !q.img && looksLikeCode(q)
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
-        <h2 className={clsx('m-0 flex-1 text-ink', band === 'kids' ? 'text-[26px] font-bold' : band === 'teen' ? 'text-2xl font-bold' : 'text-[22px] font-semibold')}>{qText(q, lang)}</h2>
+        <h2 className={clsx('m-0 max-w-3xl flex-1 text-ink', band === 'kids' ? 'text-[26px] font-bold' : band === 'teen' ? 'text-2xl font-bold' : 'text-[22px] font-semibold')}>{qText(q, lang)}</h2>
         {showListen && (
           <button onClick={() => speak(q, lang)} aria-label={t.listen}
             className={clsx('flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-sm font-extrabold', listenHot ? 'border-orange bg-orange text-white' : 'border-line bg-white text-deep hover:border-blue')}>
@@ -102,8 +104,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
           </button>
         )}
       </div>
-      {/* A picture or stage with a plain answer list: side by side on wider screens, so the answers stay in view. */}
-      <div className={clsx('flex flex-col gap-3', side && 'sm:grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:items-center sm:gap-5')}>
+      <div className={clsx('flex flex-col gap-3', side && 'md:grid md:items-center md:gap-5', side && (wide ? 'md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : 'md:grid-cols-2'))}>
       {q.img && !hasSim(q)
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[28vh] w-auto max-w-full rounded-2xl object-contain" />
         : <QuestionVisual q={q} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
@@ -117,7 +118,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
       {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.sortHint)} />}
       {q.t === 'Match' && <MatchAnswer {...drag} art={art} value={(value as Record<string, number>) || {}} set={set} hint={hint(t.matchHint)} />}
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
-        <div className={clsx('grid gap-2.5', side ? 'grid-cols-1' : tiles ? (keys.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
+        <div className={clsx('grid gap-2.5', side ? 'grid-cols-1' : tiles ? (keys.length === 4 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 70) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
           {stableShuffle(keys, q.id + salt).map((k, n) => {
             const on = value === L[k], right = review && L[k] === 'A'
             return (

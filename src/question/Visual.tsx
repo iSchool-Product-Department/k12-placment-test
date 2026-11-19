@@ -235,6 +235,9 @@ export function Code({ src }: { src: string }) {
 }
 export const looksLikeCode = (q: Question) => q.t === 'Code MCQ' || /\n|[=;{}<>]|\w\(|\/\/|\[\d/.test(q.scr) && !/^(A |An |Three|Four|Two|Grid|Six|Pictures)/.test(q.scr)
 
+/** True when QuestionVisual draws something (keep in step with it). */
+export const hasVisual = (q: Question) => hasSim(q) || !!parsePattern(q) || (!!q.scr && (looksLikeBlocks(q) || looksLikeCode(q) || (/[:\d]/.test(q.scr) && q.scr.length < 160)))
+
 /** Picks the right compact visual for a question, or nothing when the on-screen note was only for designers. */
 export function QuestionVisual({ q, choice, play, onDone }: { q: Question; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
   if (hasSim(q)) return <Stage q={q} choice={choice} play={play} onDone={onDone} />

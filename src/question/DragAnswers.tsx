@@ -88,8 +88,9 @@ export function OrderAnswer(p: OrderProps) {
   const { slots, tray, active, put, ctx, right } = useOrder(p)
   return (
     <DndContext {...ctx}>
-      <div className="flex flex-col gap-3">
-        <p className="m-0 text-sm text-soft">{hint}</p>
+      {/* Wider screens: the slots and the cards to place sit side by side, so the question fits without scrolling. */}
+      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-5">
+        <p className="m-0 text-sm text-soft sm:col-span-2">{hint}</p>
         <ol className="m-0 flex list-none flex-col gap-2 p-0">
           {slots.map((k, i) => (
             <li key={i} className="flex items-center gap-3">
@@ -106,7 +107,7 @@ export function OrderAnswer(p: OrderProps) {
           ))}
         </ol>
         {!review && (
-          <Zone id="tray" className="flex min-h-[60px] flex-wrap gap-2 rounded-2xl border-2 border-transparent p-1">
+          <Zone id="tray" className="flex min-h-[60px] flex-wrap gap-2 rounded-2xl border-2 border-transparent p-1 sm:flex-col sm:flex-nowrap">
             {tray.map(k => (
               <Card key={k} id={k} onTap={() => put(k, slots.indexOf(''))} className={clsx(cardCls(big), 'w-auto border-line hover:border-bright')}>{label(k)}<Grip /></Card>
             ))}
@@ -262,8 +263,9 @@ export function BlockOrderAnswer({ q, lang, value, set, salt, review, hint, big,
 
   return (
     <DndContext sensors={sensors} collisionDetection={collideBlocks} onDragStart={e => setActive(String(e.active.id))} onDragEnd={end} onDragCancel={() => setActive(null)}>
-      <div className="flex flex-col gap-3">
-        <p className="m-0 text-sm text-soft">{hint}</p>
+      {/* Wider screens: the palette sits beside the script, like the Scratch editor. */}
+      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] sm:items-start sm:gap-x-5">
+        <p className="m-0 text-sm text-soft sm:col-span-2">{hint}</p>
         <SortableContext items={script} strategy={verticalListSortingStrategy}>
           <ScriptArea>
             {!hasHat && <div className="mb-px flex w-fit items-center gap-2 rounded-t-2xl rounded-b-md bg-orange px-4 pb-2 pt-3 text-sm font-extrabold text-white"><Play size={16} className="fill-white" />{lang === 'ar' ? 'عند التشغيل' : 'when Run it'}</div>}
@@ -272,7 +274,7 @@ export function BlockOrderAnswer({ q, lang, value, set, salt, review, hint, big,
           </ScriptArea>
         </SortableContext>
         {!review && (
-          <Zone id="palette" className="flex min-h-[56px] flex-wrap items-start gap-2 rounded-2xl border-2 border-transparent p-1">
+          <Zone id="palette" className="flex min-h-[56px] flex-wrap items-start gap-2 rounded-2xl border-2 border-transparent p-1 sm:flex-col sm:flex-nowrap">
             {palette.map(k => (
               <Card key={k} id={k} onTap={() => save([...script, k])}
                 className={clsx('relative rounded-md px-3 font-extrabold', big ? 'py-3 text-base' : 'py-2 text-sm', color(k), hat(k) && 'rounded-t-2xl pt-3')}>

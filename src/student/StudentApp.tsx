@@ -39,7 +39,7 @@ export default function StudentApp({ lang }: { lang: Lang }) {
   return (
     <div className="relative min-h-[calc(100dvh-64px)] overflow-hidden">
       <Backdrop band={band} />
-      <div className="relative mx-auto max-w-3xl px-4 pb-10 pt-4 sm:pt-6">
+      <div className={clsx('relative mx-auto px-4 pb-10 pt-4 sm:pt-6', phase === 'test' ? 'max-w-5xl' : 'max-w-3xl')}>
         <AnimatePresence mode="wait">
           {phase === 'welcome' && <motion.div key="w" {...fade}><Welcome {...{ t, band, name, setName, age, setAge, buddy, setBuddy }} onStart={() => setPhase('practice')} /></motion.div>}
           {phase === 'resume' && rec && (
@@ -253,7 +253,8 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
           <Card>
             <QuestionView q={q} lang={lang} band={band} value={value} onChange={setValue} salt={rec.id} locked={locked} onPlayed={() => setPlayedId(q.id)}
               listenHot={rec.practice?.readHelp} tapMode={rec.practice?.tapMode} />
-            <div className="mt-4 flex justify-end">
+            {/* Next stays on screen even when a question is taller than the window. */}
+            <div className="sticky bottom-0 -mx-4 mt-4 flex justify-end rounded-b-3xl bg-white/95 px-4 py-3 sm:-mx-6 sm:px-6">
               <Btn disabled={!ready || locked} onClick={submit}>{t.next} <ArrowRight size={18} className="rtl:rotate-180" /></Btn>
             </div>
           </Card>

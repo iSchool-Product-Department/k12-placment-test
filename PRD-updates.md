@@ -15,7 +15,8 @@ Newest decisions go at the bottom of each section.
 
 ## 6.3 The question screen
 - Replace "Read-aloud plays on its own for ages 6 to 7" with: "Read-aloud plays only when the student taps Listen."
-- Pictures and stages sit beside the answers on wider screens, so the student does not scroll to reach the answers.
+- A question should fit on one screen. On wider screens: a picture, stage, code or block program sits beside the answers; order cards sit beside their numbered slots; the block palette sits beside the script; four short options go in two columns.
+- Next stays pinned to the bottom of the screen, so it is never scrolled away.
 
 ## 6.4 Question types
 - Stage questions (robot, bee, number line). The stage stays still while the student answers. Next locks the answer, the stage plays it, then the test moves to the next question by itself. There is no separate Run button, and no trying again.
