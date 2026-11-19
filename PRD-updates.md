@@ -7,15 +7,15 @@ Newest decisions go at the bottom of each section.
 - Retakes stay out. Once a student presses Next, that answer is final: no going back, no changing it.
 
 ## 5 Placement logic
-Goal: a first test that feels easy and still places well. Checked on 6,000 simulated new students (ages 6 to 18): about 8 questions instead of 9, 2.4 wrong instead of 4.4, three wrong in a row for 12% of students instead of 57%, right grade 59% instead of 51%, within one grade 90% instead of 82%.
-- Warm-up: 1 starter, then 2 medium logic questions (was 1 medium and 1 hard). The starter is for confidence and does not count toward the warm-up, so one slip on it changes nothing. Pass: both logic questions right (Settings "warm-up pass" stays 2, now of 2).
+Goal: a first test that feels easy and still places well. Checked on 6,000 simulated new students (ages 6 to 18): about 8.5 questions instead of 9, 3.2 wrong instead of 4.4, three wrong in a row for 19% of students instead of 57%, right grade 53% instead of 51%, within one grade 84% instead of 82%.
+- Warm-up: 1 starter, then up to 3 medium logic questions (was 1 medium and 1 hard). The starter is for confidence and does not count toward the warm-up. Pass at 2 of 3, so one slip never moves a student down a level: 2 right in a row and the third is not asked. Settings "warm-up pass" stays 2.
 - Skill check, and skill check one level higher: lower grade easy, lower grade medium, upper grade medium (the upper grade hard is gone). One level higher at 3 of 3; lower grade at 0 or 1.
 - Why no hard question in those steps: it was always last, and a student could only earn it by getting everything before it right, by which point the step is already decided.
 - Final check: 3 lower grade questions and 1 grade task, upper grade at 3 of 4 as before. A hard question only comes when every earlier question in the step was right; otherwise a medium is drawn instead.
 - Every step stops once the questions left cannot change where the student goes. The grade task is always shown, even when the final check is already decided.
-- A test is now 2 to 15 questions (was 3 to 15). The shortest is a Level 1 student who misses the first logic question: Grade 1 whatever comes next.
+- A test is still 3 to 15 questions.
 - "Perfect one level higher" (Innovators) is now 3 of 3.
-- Tier cut-offs stay 45 and 75. In the simulation the tier mix moves from about 52/35/12 to 26/50/24 (Explorers/Creators/Innovators), but the tier was close to chance before and after, so the cut-offs should be set from pilot data, not the simulation.
+- Tier cut-offs stay 45 and 75. In the simulation the tier mix moves from about 52/35/12 to 20/61/18 (Explorers/Creators/Innovators), but the tier was close to chance before and after, so the cut-offs should be set from pilot data, not the simulation.
 - The sheet's Adaptive Rules tab needs the same changes.
 
 ## 6.1 Getting in

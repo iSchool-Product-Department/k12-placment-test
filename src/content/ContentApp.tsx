@@ -134,15 +134,15 @@ function Settings() {
   const cfg = useConfig()
   const set = (k: keyof Config, v: number) => store.setConfig({ ...cfg, [k]: v })
   const fields: [keyof Config, string, number][] = [
-    ['warmPass', 'Warm-up: pass at (of 2 logic)', 2], ['knowUp', 'Skill check: one level higher at (of 3)', 3], ['knowLow', 'Skill check: lower grade at or below (of 3)', 3],
+    ['warmPass', 'Warm-up: pass at (of 3 logic)', 3], ['knowUp', 'Skill check: one level higher at (of 3)', 3], ['knowLow', 'Skill check: lower grade at or below (of 3)', 3],
     ['gradeUpper', 'Final check: upper grade at (of 4)', 4], ['coreAt', 'Tier: Creators starts at strength', 100], ['advAt', 'Tier: Innovators starts at strength', 100],
     ['fastSec', 'Fast answer: seconds', 10], ['fastCount', 'Fast answers before a flag', 15],
   ]
   const r = range
   const table: [string, string, string][] = [
-    ['Warm-up', r(cfg.warmPass, 2), 'Skill check at the age level'],
+    ['Warm-up', r(cfg.warmPass, 3), 'Skill check at the age level'],
     ['Warm-up', r(0, cfg.warmPass - 1), 'Warm-up one level lower. Ages 6 to 7: Grade 1, Explorers'],
-    ['Warm-up one level lower', r(cfg.warmPass, 2), 'Final check at that level'],
+    ['Warm-up one level lower', r(cfg.warmPass, 3), 'Final check at that level'],
     ['Warm-up one level lower', r(0, cfg.warmPass - 1), 'Lower grade of that level, Explorers'],
     ['Skill check', r(0, cfg.knowLow), 'Lower grade of the age level'],
     ['Skill check', r(cfg.knowLow + 1, cfg.knowUp - 1), 'Final check at the age level'],
@@ -200,8 +200,8 @@ function Flowchart() {
   const [sel, setSel] = useState<Node>('warm')
   const N: Record<Node, { title: string; qs: string; mix: string; out: Branch[] }> = {
     practice: { title: 'Practice', qs: '1, not scored', mix: 'Teaches the controls and checks reading. Ages 6 to 9 drag, older students tap.', out: [{ score: 'Always', to: 'warm' }] },
-    warm: { title: 'Warm-up', qs: 'Up to 3 at the age level', mix: '1 starter (not scored), then 2 medium logic. Stops once decided.', out: [{ score: r(cfg.warmPass, 2), to: 'know' }, { score: r(0, cfg.warmPass - 1), to: 'down', end: 'Ages 6 to 7: Grade 1, Explorers' }] },
-    down: { title: 'Warm-up one level lower', qs: 'Up to 3', mix: 'Same mix, one level lower', out: [{ score: r(cfg.warmPass, 2), to: 'final' }, { score: r(0, cfg.warmPass - 1), to: null, end: 'Lower grade of that level, Explorers' }] },
+    warm: { title: 'Warm-up', qs: 'Up to 4 at the age level', mix: '1 starter (not scored), then up to 3 medium logic. The third only comes after a miss.', out: [{ score: r(cfg.warmPass, 3), to: 'know' }, { score: r(0, cfg.warmPass - 1), to: 'down', end: 'Ages 6 to 7: Grade 1, Explorers' }] },
+    down: { title: 'Warm-up one level lower', qs: 'Up to 4', mix: 'Same mix, one level lower', out: [{ score: r(cfg.warmPass, 3), to: 'final' }, { score: r(0, cfg.warmPass - 1), to: null, end: 'Lower grade of that level, Explorers' }] },
     know: { title: 'Skill check', qs: 'Up to 3 at the age level', mix: 'Lower grade easy and medium, upper grade medium. No hard. Stops once decided.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Lower grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: 'final' }, { score: r(cfg.knowUp, 3), to: 'up', end: 'Ages 16 to 18 go to the final check' }] },
     up: { title: 'Skill check one level higher', qs: 'Up to 3', mix: 'Same mix, one level higher. Only for strong students.', out: [{ score: r(0, cfg.knowLow), to: null, end: 'Upper grade of the age level' }, { score: r(cfg.knowLow + 1, cfg.knowUp - 1), to: null, end: 'Lower grade of the higher level' }, { score: r(cfg.knowUp, 3), to: 'final' }] },
     final: { title: 'Final check', qs: 'Up to 4', mix: '3 lower-grade questions and 1 grade task. A hard one only after all right so far. Stops once decided, the grade task is always shown.', out: [{ score: r(0, cfg.gradeUpper - 1), to: 'tier', end: 'Lower grade' }, { score: r(cfg.gradeUpper, 4), to: 'tier', end: 'Upper grade' }] },

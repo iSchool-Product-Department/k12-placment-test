@@ -20,11 +20,13 @@ export const isExpired = (rec: TestRecord, now = Date.now()) => rec.status === '
 /**
  * Which questions each step draws, in order. No hard question in the warm-up or skill check:
  * a student could only earn it by getting everything before it right, and by then the step is decided.
- * The starter is for confidence and does not count toward the warm-up, so one slip on it changes nothing.
+ * The starter is for confidence and does not count toward the warm-up. Then up to 3 medium logic, pass at 2,
+ * so one slip never moves a student down a level.
  */
 export const STEP_SLOTS: Record<'warmup' | 'know' | 'grade', Slot[]> = {
   warmup: [
     { pool: 'Starter', diffs: ['Starter'] },
+    { pool: 'Logic', diffs: ['Medium'] },
     { pool: 'Logic', diffs: ['Medium'] },
     { pool: 'Logic', diffs: ['Medium'] },
   ],

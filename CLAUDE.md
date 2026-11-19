@@ -11,7 +11,7 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 ## Rules that must match the PRD
 - Placement logic is PRD section 5. `src/engine/engine.ts` implements it, and every row of the "Every possible score" table (5.3) has a test in `src/engine/engine.test.ts`. Change the PRD, the engine and the test together, then run `npm test`.
 - Numbers (pass marks, tier cut-offs 45 and 75) come from the sheet's Settings tab. Questions come from its Questions tab: export as CSV, run `npm run bank -- file.csv`, then `npm test`.
-- 2 to 15 questions. The first is always a Starter, and it does not count toward the warm-up. No hard question before the final check; there, a hard one only after all right so far. A step stops once it is decided; the grade task is always shown.
+- 3 to 15 questions. The first is always a Starter, and it does not count toward the warm-up. Warm-up passes at 2 of 3 logic, so one slip is forgiven. No hard question before the final check; there, a hard one only after all right so far. A step stops once it is decided; the grade task is always shown.
 - Tiers: Explorers, Creators, Innovators. Group name is tier plus grade, like "Creators G4".
 - Students see only their grade and their tier as a name: "You're a Creator in Grade 4!". Never the other tier names, an order, the score, strength or right and wrong.
 - Read-aloud plays only when the student taps Listen. Never on its own.

@@ -128,21 +128,24 @@ describe('every possible score (Adaptive Rules tab)', () => {
   // Plans list the answers in the order they are shown. A step stops once the rest cannot change the result.
   it('first question is always a Starter, and it does not count toward the warm-up', () => {
     for (let age = 6; age <= 18; age++) expect(byId.get(play(age, []).answers[0].qid)!.pool).toBe('Starter')
-    const r = play(10, [[0, 1, 1]]); expect(r.steps[0].outcome).toBe('warmPass'); expect(r.steps[0].total).toBe(2)
+    const r = play(10, [[0, 1, 1]]); expect(r.steps[0].outcome).toBe('warmPass'); expect(r.steps[0].total).toBe(2) // 2 right: the third is not needed
   })
-  it('warm-up 0 or 1 of 2 logic at Level 1 places Grade 1, Explorers, flagged', () => {
-    for (const w of [[1, 0], [1, 1, 0], [0, 0]]) {
+  it('one slip in the warm-up is forgiven: a third logic question, pass at 2 of 3', () => {
+    const r = play(10, [[1, 0, 1, 1]]); expect(r.steps[0].outcome).toBe('warmPass'); expect(r.steps[0].total).toBe(3)
+  })
+  it('warm-up 0 or 1 of 3 logic at Level 1 places Grade 1, Explorers, flagged', () => {
+    for (const w of [[1, 0, 0], [1, 1, 0, 0], [0, 0, 0]]) {
       const r = play(6, [w]); expect(grade(r)).toBe(1); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failL1')
-      expect(r.answers.length).toBe(w.length) // [1, 0]: the second logic question cannot help, so it is not asked
+      expect(r.answers.length).toBe(w.length) // [1, 0, 0]: the third logic question cannot help, so it is not asked
     }
   })
   it('warm-up fail above Level 1 goes one level down', () => {
-    const r = play(10, [[1, 0], [1, 1, 1], [1, 1, 1, 1]]) // L3 fail, L2 pass, final check 3 right then the grade task
+    const r = play(10, [[1, 0, 0], [1, 1, 1], [1, 1, 1, 1]]) // L3 fail, L2 pass, final check 3 right then the grade task
     expect(r.steps.map(s => s.name)).toEqual(['warmup', 'warmupDown', 'grade'])
-    expect(grade(r)).toBe(4); expect(r.answers.length).toBe(9)
+    expect(grade(r)).toBe(4); expect(r.answers.length).toBe(10)
   })
-  it('fails both warm-ups: lower grade of S-1, Explorers, in 4 questions', () => {
-    const r = play(10, [[1, 0], [1, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth'); expect(r.answers.length).toBe(4)
+  it('fails both warm-ups: lower grade of S-1, Explorers, in 6 questions', () => {
+    const r = play(10, [[1, 0, 0], [1, 0, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth'); expect(r.answers.length).toBe(6)
   })
   it('skill check 0 or 1 of 3 places the lower grade of S', () => {
     expect(grade(play(12, [[1, 1, 1], [0, 0]]))).toBe(7)
@@ -186,11 +189,11 @@ describe('every possible score (Adaptive Rules tab)', () => {
   it('sheet example: smart beginner is Creators, not Explorers', () => {
     const r = play(10, [[1, 1, 1], [1, 0, 0]]); expect(grade(r)).toBe(5); expect(r.tier!.strength).toBe(60); expect(r.tier!.tier).toBe('Creators')
   })
-  it('test length is 2 to 15; no hard question before the final check; every final check ends on the grade task', () => {
+  it('test length is 3 to 15; no hard question before the final check; every final check ends on the grade task', () => {
     const rng = seeded(3)
     for (let i = 0; i < 400; i++) {
       const r = simulate(1 + rng() * 6, 6 + Math.floor(rng() * 13), bank, DEFAULT_CONFIG, rng)
-      expect(r.answers.length).toBeGreaterThanOrEqual(2); expect(r.answers.length).toBeLessThanOrEqual(15)
+      expect(r.answers.length).toBeGreaterThanOrEqual(3); expect(r.answers.length).toBeLessThanOrEqual(15)
       expect(new Set(r.answers.map(a => a.qid)).size).toBe(r.answers.length)
       expect(r.answers.filter(a => a.step !== 'grade' && !a.fallback).some(a => byId.get(a.qid)!.d === 'Hard')).toBe(false)
       if (r.steps.some(s => s.name === 'grade')) expect(byId.get(r.answers.at(-1)!.qid)!.pool).toBe('Grade task')
