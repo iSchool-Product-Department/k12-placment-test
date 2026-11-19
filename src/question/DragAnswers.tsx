@@ -4,6 +4,7 @@
  * - Or tap: tap a card, then where it goes. In Order, tapping a card puts it in the next empty slot.
  * - Drop on a taken place and the two cards swap (Match: the old link is replaced).
  * - Drag a placed card back out, or drop it on nothing, to take it back.
+ * Code order is the one exception: the lines already sit in the editor, so you move them up and down.
  */
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
@@ -11,7 +12,9 @@ import {
   type CollisionDetection, type DragEndEvent, type DragStartEvent,
 } from '@dnd-kit/core'
 import clsx from 'clsx'
-import { GripVertical } from 'lucide-react'
+import { ChevronDown, ChevronUp, GripVertical } from 'lucide-react'
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { Question } from '../engine/types'
 import { correctAnswer, keysOf, matchPairs, sortBoxes } from '../engine/engine'
 import { codeFile, codeIndents } from './codeLines'
@@ -56,7 +59,7 @@ function Zone({ id, disabled, onTap, className, children }: { id: string; disabl
 // ---------------------------------------------------------------- Order
 type OrderProps = Common & { value: string[]; set: (v: string[] | null) => void; clear: string }
 
-/** Shared by the card and code editor versions: slots, tray, swap on drop, tap to place. */
+/** Slots, tray, swap on drop, tap to place. */
 function useOrder({ q, value, set, salt, shuffle }: OrderProps) {
   const keys = keysOf(q).map(i => L[i])
   const slots = keys.map((_, i) => value[i] || '')
@@ -117,69 +120,84 @@ export function OrderAnswer(p: OrderProps) {
 }
 
 /**
- * "Put the lines in order" for levels 3 to 6 (PRD 6.5): a light editor with a file tab, line numbers
- * and a caret on the next empty line. Each line carries its real indent, so the program reads right
- * only when the order is right.
+ * "Put the lines in order" for levels 3 to 6 (PRD 6.5). Like moving lines in a real editor:
+ * the program starts scrambled inside the editor, and the student drags lines up or down
+ * (or taps a line, then where it goes, or uses the arrows). Each line keeps its real indent,
+ * so the program only reads right when the order is right.
  */
-export function CodeOrderAnswer(p: OrderProps) {
-  const { q, review, hint, clear, set } = p
-  const { slots, tray, active, put, ctx, right } = useOrder(p)
-  const lines = keysOf(q).map(i => q.o[i])
-  const { lang, file, unit } = codeFile(lines)
+export function CodeOrderAnswer({ q, lang, value, set, salt, review, hint, shuffle }: OrderProps) {
+  const keys = keysOf(q).map(i => L[i])
+  // Never starts already right. The answer only counts once a line has been moved.
+  const start = useMemo(() => { let s = shuffle(keys, q.id + salt); if (s.every((k, i) => k === keys[i])) s = [...s.slice(1), s[0]]; return s }, [q.id])
+  const order = value.length === keys.length && value.every(Boolean) ? value : start
+  const [sel, setSel] = useState<string | null>(null)
+  const [active, setActive] = useState<string | null>(null)
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
+  const lines = keys.map(k => q.o[L.indexOf(k)])
+  const { lang: language, file, unit } = codeFile(lines)
   const indents = codeIndents(lines)
   const text = (k: string) => q.o[L.indexOf(k)]
-  const indentOf = (k: string) => indents[L.indexOf(k)] * unit
-  const next = slots.indexOf('')
-  const chip = 'mono flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-[13px] leading-snug text-ink sm:text-[14px]'
+  const indent = (k: string) => indents[L.indexOf(k)] * unit
+  const move = (from: number, to: number) => { if (to >= 0 && to < order.length && from !== to) set(arrayMove(order, from, to)); setSel(null) }
+  const tap = (k: string) => (sel && sel !== k ? move(order.indexOf(sel), order.indexOf(k)) : setSel(sel === k ? null : k))
+  const code = 'mono whitespace-pre-wrap break-words text-[13px] leading-relaxed text-ink sm:text-[14px]'
 
   return (
-    <DndContext {...ctx}>
+    <DndContext sensors={sensors} collisionDetection={closestCenter}
+      onDragStart={e => { setSel(null); setActive(String(e.active.id)) }} onDragCancel={() => setActive(null)}
+      onDragEnd={({ active: a, over }) => { setActive(null); if (over) move(order.indexOf(String(a.id)), order.indexOf(String(over.id))) }}>
       <div className="flex flex-col gap-3">
         <p className="m-0 text-sm text-soft">{hint}</p>
         <div dir="ltr" className="overflow-hidden rounded-2xl border border-line bg-white">
           <div className="flex items-end justify-between border-b border-line bg-mist px-2 pt-2">
             <span className="mono rounded-t-lg border border-b-0 border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-ink">{file}</span>
-            <span className="pb-1.5 pe-2 text-xs font-bold text-soft">{lang}</span>
+            <span className="pb-1.5 pe-2 text-xs font-bold text-soft">{language}</span>
           </div>
-          <ol className="m-0 list-none py-2 ps-0">
-            {slots.map((k, i) => (
-              <li key={i}>
-                <Zone id={'s' + i} disabled={review} className="flex min-h-[44px] items-stretch border-2 border-transparent">
-                  <span className={clsx('mono w-10 shrink-0 select-none pe-3 pt-[11px] text-end text-[13px]', !review && i === next ? 'font-semibold text-blue' : 'text-soft/70')}>{i + 1}</span>
-                  <div className="flex min-w-0 flex-1 items-center pe-2">
-                    {k ? (
-                      <Card id={k} disabled={review} onTap={() => put(k, 'tray')}
-                        className={clsx('group flex w-full items-center rounded-md px-2 py-1.5 text-start', review ? (right(i) ? 'bg-green-50' : 'bg-red-50') : 'hover:bg-sky')}>
-                        <code className="mono min-w-0 flex-1 whitespace-pre-wrap break-words text-[13px] leading-relaxed text-ink sm:text-[14px]"
-                          style={{ paddingInlineStart: `${indentOf(k)}ch`, backgroundImage: indentOf(k) ? `repeating-linear-gradient(to right, var(--color-line) 0 1px, transparent 1px ${unit}ch)` : undefined, backgroundSize: `${indentOf(k)}ch 100%`, backgroundRepeat: 'no-repeat' }}>
-                          <CodeText src={text(k)} />
-                        </code>
-                        {!review && <GripVertical size={16} className="shrink-0 text-soft opacity-40 group-hover:opacity-100" aria-hidden="true" />}
-                      </Card>
-                    ) : (
-                      <span className={clsx('flex h-8 w-full items-center rounded-md border border-dashed px-2', i === next && !review ? 'border-bright bg-sky/50' : 'border-line')}>
-                        {i === next && !review && <span className="h-5 w-0.5 bg-blue motion-safe:animate-pulse" aria-hidden="true" />}
-                      </span>
-                    )}
-                  </div>
-                </Zone>
-              </li>
-            ))}
-          </ol>
+          <SortableContext items={order} strategy={verticalListSortingStrategy}>
+            <ol className="m-0 list-none py-2 ps-0">
+              {order.map((k, i) => (
+                <CodeLine key={k} id={k} n={i + 1} disabled={review} selected={sel === k}
+                  status={review ? (q.o[L.indexOf(k)] === q.o[i] ? 'ok' : 'bad') : undefined}
+                  onTap={() => tap(k)} onMove={d => move(i, i + d)} first={i === 0} last={i === order.length - 1} lang={lang}>
+                  <code className={code} style={{ paddingInlineStart: `${indent(k)}ch` }}><CodeText src={text(k)} /></code>
+                </CodeLine>
+              ))}
+            </ol>
+          </SortableContext>
         </div>
-        {!review && (
-          <Zone id="tray" className="flex min-h-[52px] flex-wrap gap-2 rounded-2xl border-2 border-transparent p-1" >
-            {tray.map(k => (
-              <Card key={k} id={k} onTap={() => next >= 0 && put(k, next)} className={clsx(chip, 'border-line hover:border-bright')}>
-                <code className="mono whitespace-pre-wrap text-start"><CodeText src={text(k)} /></code><Grip />
-              </Card>
-            ))}
-            {slots.some(Boolean) && <button type="button" onClick={() => set(null)} className="rounded-xl px-3 py-2 text-sm font-bold text-soft hover:bg-sky">{clear}</button>}
-          </Zone>
-        )}
       </div>
-      <DragOverlay dropAnimation={null}>{active && <div dir="ltr" className={clsx(chip, 'border-blue shadow-[var(--shadow-pop)]')}><code className="mono"><CodeText src={text(active)} /></code></div>}</DragOverlay>
+      <DragOverlay dropAnimation={null}>
+        {active && (
+          <div dir="ltr" className="flex items-center rounded-md border border-blue bg-white px-2 py-1.5 shadow-[var(--shadow-pop)]">
+            <code className={code} style={{ paddingInlineStart: `${indent(active)}ch` }}><CodeText src={text(active)} /></code>
+          </div>
+        )}
+      </DragOverlay>
     </DndContext>
+  )
+}
+
+function CodeLine({ id, n, disabled, selected, status, onTap, onMove, first, last, lang, children }: {
+  id: string; n: number; disabled?: boolean; selected: boolean; status?: 'ok' | 'bad'; onTap: () => void; onMove: (d: number) => void
+  first: boolean; last: boolean; lang: Lang; children: ReactNode
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
+  const arrow = 'grid h-8 w-8 place-items-center rounded-md text-deep hover:bg-sky disabled:opacity-30'
+  return (
+    <li ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform), transition }} className={clsx('flex items-center', isDragging && 'opacity-30')}>
+      <span className="mono w-10 shrink-0 select-none pe-3 text-end text-[13px] text-soft/70">{n}</span>
+      <button type="button" {...attributes} {...listeners} onClick={() => !disabled && onTap()}
+        className={clsx('group flex min-h-[40px] min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-1.5 text-start',
+          status === 'ok' ? 'bg-green-50' : status === 'bad' ? 'bg-red-50' : selected ? 'bg-sky ring-2 ring-bright/60' : 'hover:bg-sky',
+          !disabled && 'cursor-grab touch-none active:cursor-grabbing')}>
+        <span className="min-w-0 flex-1">{children}</span>
+        {!disabled && <GripVertical size={16} className="shrink-0 text-soft opacity-40 group-hover:opacity-100" aria-hidden="true" />}
+      </button>
+      <span className={clsx('flex shrink-0 pe-1', !selected && 'invisible')}>
+        <button type="button" className={arrow} disabled={first} onClick={() => onMove(-1)} aria-label={lang === 'ar' ? 'انقل السطر لأعلى' : 'Move line up'}><ChevronUp size={18} /></button>
+        <button type="button" className={arrow} disabled={last} onClick={() => onMove(1)} aria-label={lang === 'ar' ? 'انقل السطر لأسفل' : 'Move line down'}><ChevronDown size={18} /></button>
+      </span>
+    </li>
   )
 }
 
@@ -252,7 +270,7 @@ function MatchCard({ id, disabled, onTap, children, className, style, cardRef }:
   return <Card id={id} disabled={disabled} onTap={onTap} extraRef={n => { setNodeRef(n); cardRef(n) }} style={style} className={clsx(className, isOver && 'border-bright! bg-sky')}>{children}</Card>
 }
 
-export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuffle }: Omit<Common, 'label'> & { value: Record<string, number>; set: (v: Record<string, number> | null) => void }) {
+export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuffle, art }: Omit<Common, 'label'> & { value: Record<string, number>; set: (v: Record<string, number> | null) => void; art: (i: number) => ReactNode }) {
   const pairs = matchPairs(q, lang)
   const rights = useMemo(() => { let s = shuffle(pairs.map((_, i) => i), q.id + salt); if (s.every((v, i) => v === i)) s = [...s.slice(1), s[0]]; return s }, [q.id])
   const box = useRef<HTMLDivElement>(null)
@@ -360,7 +378,8 @@ export function MatchAnswer({ q, lang, value, set, salt, review, hint, big, shuf
                 <MatchCard key={id} id={id} disabled={review} onTap={() => tap(id)} cardRef={n => { cards.current[id] = n }}
                   className={cls(id, linked, 'L')} style={linked ? { borderColor: colorOf(l) } : undefined}>
                   {linked && badge(l)}
-                  <span>{p.left}</span>
+                  {art(l)}
+                  {p.left && <span>{p.left}</span>}
                   {handle('L', linked ? colorOf(l) : undefined, showHint && l === 0)}
                 </MatchCard>
               )

@@ -32,9 +32,22 @@ const C = {
   why: col('Why the wrong options are wrong'), src: col('Curriculum source'), old: col('Old ID'),
 }
 const optCol = (k, lang) => col(k === 1 ? `Option 1: RIGHT ANSWER (${lang})` : `Option ${k} (${lang})`)
-// PRD 10: no emoji as icons. The sheet still has a few, so drop them here.
-const noEmoji = s => s.replace(/\p{Extended_Pictographic}️?\s*/gu, '').trim()
+// PRD 10: no emoji as icons. The sheet uses emoji as stand-in pictures, so each one becomes
+// a drawn icon (src/question/icons.tsx). A new emoji in the sheet needs a line here and an icon there.
+const ICON = {
+  '💻': 'laptop', '🍎': 'apple', '🪑': 'chair', '🖱': 'mouse', '🥄': 'spoon', '🧸': 'teddy', '⌨': 'keyboard',
+  '🔈': 'speaker', '🎧': 'headphones', '🙋': 'hand', '📢': 'megaphone', '🖨': 'printer', '💾': 'save',
+  '🗑': 'trash', '✂': 'scissors', '🔍': 'search', '🔊': 'sound',
+}
+const EMOJI = /(\p{Extended_Pictographic})️?\s*/u
+function iconOf(s, id) {
+  const e = s.match(EMOJI)?.[1]
+  if (e && !ICON[e]) throw new Error(`${id}: no icon for ${e}. Add it to ICON in this script and to src/question/icons.tsx.`)
+  return e ? ICON[e] : ''
+}
+const noEmoji = s => s.replace(new RegExp(EMOJI, 'gu'), '').trim()
 const opts = (r, lang) => [1, 2, 3, 4].map(k => noEmoji(r[optCol(k, lang)] || ''))
+const icons = r => [1, 2, 3, 4].map(k => iconOf(r[optCol(k, 'EN')] || '', r[C.id]))
 
 // ---------------------------------------------------------------- pictures
 const DIR = new URL('../public/q/', import.meta.url)
@@ -57,12 +70,14 @@ async function picture(url) {
 const bank = []
 for (const r of rows.filter(r => r[C.id])) {
   const oimg = await Promise.all(r[C.oimg].split('\n').filter(s => s.trim()).map(picture))
+  const oicon = icons(r)
   bank.push({
     id: r[C.id], old: r[C.old], lv: +r[C.lv], grade: r[C.grade], pool: r[C.pool], strand: r[C.strand], d: r[C.d], t: r[C.t],
     q: r[C.q], qa: r[C.qa], scr: r[C.scr], why: r[C.why], src: r[C.src],
     o: opts(r, 'EN'), oa: opts(r, 'AR'),
     ...(r[C.img].trim() && { img: await picture(r[C.img]) }),
     ...(oimg.length && { oimg }),
+    ...(oicon.some(Boolean) && { oicon }),
   })
 }
 writeFileSync(new URL('../src/data/bank.json', import.meta.url), JSON.stringify(bank))

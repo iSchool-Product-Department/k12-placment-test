@@ -21,6 +21,8 @@ export interface Question {
   /** Local picture paths (public/q/), downloaded from the sheet by `npm run bank`. */
   img?: string
   oimg?: string[]
+  /** Drawn icon per option (src/question/icons.tsx), from the emoji the sheet uses as stand-in pictures. */
+  oicon?: string[]
   why: string
   src: string
 }

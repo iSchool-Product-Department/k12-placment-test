@@ -5,6 +5,7 @@ import bankJson from '../data/bank.json'
 import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
 import type { Question, TestRecord } from './types'
 import { codeIndents, isCodeOrder } from '../question/codeLines'
+import { ICONS } from '../question/icons'
 
 const bank = bankJson as Question[]
 const byId = new Map(bank.map(q => [q.id, q]))
@@ -77,6 +78,14 @@ describe('answer keys', () => {
     expect(ind('L6-T-01')).toEqual([0, 1, 1, 0])
     expect(ind('L6-T-05')).toEqual([0, 1, 2, 0]) // "} }" closes two
     expect(bank.filter(isCodeOrder).map(q => q.id)).toEqual(['L3-T-01', 'L3-T-04', 'L3-T-06', 'L5-T-01', 'L5-T-05', 'L6-T-01', 'L6-T-05'])
+  })
+  it('every option has words or a picture, and every icon exists (L2-DL-04 is icons only)', () => {
+    for (const q of bank) for (const i of q.o.map((o, i) => (o ? i : -1)).filter(i => i >= 0)) {
+      const words = q.t === 'Match' || q.t === 'Sort' ? q.o[i].split('=')[0].trim() : q.o[i]
+      expect(words || q.oimg?.[i] || q.oicon?.[i], `${q.id} option ${i + 1}`).toBeTruthy()
+      if (q.oicon?.[i]) expect(ICONS[q.oicon[i]], q.oicon[i]).toBeDefined()
+    }
+    expect(byId.get('L2-DL-04')!.oicon).toEqual(['search', 'sound', 'trash', ''])
   })
   it('bank has 61 questions per level with the v2 pool sizes', () => {
     for (let lv = 1; lv <= 6; lv++) {

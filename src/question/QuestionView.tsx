@@ -5,6 +5,7 @@ import type { AnswerValue, Question } from '../engine/types'
 import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes, splitPair } from '../engine/engine'
 import { CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer } from './DragAnswers'
 import { isCodeOrder } from './codeLines'
+import { ICONS } from './icons'
 import { T, type Band, type Lang } from '../i18n'
 import { QuestionVisual } from './Visual'
 
@@ -22,10 +23,17 @@ export function optText(q: Question, i: number, lang: Lang) {
 }
 export const picSrc = (p: string) => import.meta.env.BASE_URL + p
 const isCodey = (s: string) => !/[؀-ۿ]/.test(s) && (/[;{}=<>$#]|^\w[\w.]*\(.*\)$|\(\)/.test(s))
-function OptLabel({ text, pic, big }: { text: string; pic?: string; big?: boolean }) {
-  const label = isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]" dir="ltr">{text}</code> : <span>{text}</span>
-  if (!pic) return label
-  return <span className="flex items-center gap-3"><img src={picSrc(pic)} alt="" className={clsx('shrink-0 object-contain', big ? 'h-16 w-16' : 'h-10 w-10')} />{label}</span>
+/** An option's picture: a sheet picture, or a drawn icon for the emoji the sheet used. */
+export function Art({ pic, icon, size }: { pic?: string; icon?: string; size: number }) {
+  if (pic) return <img src={picSrc(pic)} alt="" style={{ width: size, height: size }} className="shrink-0 object-contain" />
+  const I = icon && ICONS[icon]
+  return I ? <span className="grid shrink-0 place-items-center text-blue" style={{ width: size, height: size }}><I size={size * 0.7} strokeWidth={1.75} /></span> : null
+}
+function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; icon?: string; big?: boolean; tile?: boolean }) {
+  const label = isCodey(text) ? <code className="whitespace-pre-wrap text-[14px]" dir="ltr">{text}</code> : text ? <span>{text}</span> : null
+  if (!pic && !icon) return label
+  if (tile) return <span className="flex flex-col items-center gap-2 text-center"><Art pic={pic} icon={icon} size={80} />{label}</span>
+  return <span className="flex items-center gap-3"><Art pic={pic} icon={icon} size={big ? 56 : 40} />{label}</span>
 }
 
 export function speak(q: Question, lang: Lang) {
@@ -65,8 +73,11 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   const t = T[lang]
   const set = (v: AnswerValue | null) => !review && onChange?.(v)
   const keys = keysOf(q)
-  const label = (k: string) => <OptLabel text={optText(q, L.indexOf(k), lang)} pic={q.oimg?.[L.indexOf(k)]} big={band === 'kids'} />
+  const label = (k: string) => <OptLabel text={optText(q, L.indexOf(k), lang)} pic={q.oimg?.[L.indexOf(k)]} icon={q.oicon?.[L.indexOf(k)]} big={band === 'kids'} />
+  const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={band === 'kids' ? 48 : 36} />
   const drag = { q, lang, salt, review, big: band === 'kids', shuffle: stableShuffle, label }
+  // Ages 6 to 9: when options have pictures, show them as big picture tiles, word underneath.
+  const tiles = band === 'kids' && keys.some(k => q.oimg?.[k] || q.oicon?.[k])
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
     <div className="flex flex-col gap-4">
@@ -86,22 +97,22 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
         ? <CodeOrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.codeOrder} clear={t.clear} />
         : <OrderAnswer {...drag} value={(value as string[]) || []} set={set} hint={t.tapOrder} clear={t.clear} />)}
       {q.t === 'Sort' && <SortAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.sortHint} />}
-      {q.t === 'Match' && <MatchAnswer {...drag} value={(value as Record<string, number>) || {}} set={set} hint={t.matchHint} />}
+      {q.t === 'Match' && <MatchAnswer {...drag} art={art} value={(value as Record<string, number>) || {}} set={set} hint={t.matchHint} />}
       {['Text MCQ', 'Code MCQ', 'Picture MCQ'].includes(q.t) && (
-        <div className={clsx('grid gap-3', keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
+        <div className={clsx('grid gap-3', tiles ? (keys.length === 4 ? 'grid-cols-2' : 'grid-cols-3') : keys.some(k => (q.o[k] || '').length > 26) ? 'grid-cols-1' : keys.length === 4 ? 'sm:grid-cols-2' : band === 'kids' ? 'sm:grid-cols-3' : 'sm:grid-cols-1')}>
           {stableShuffle(keys, q.id + salt).map((k, n) => {
             const on = value === L[k], right = review && L[k] === 'A'
             return (
               <motion.button key={k} whileTap={{ scale: 0.97 }} onClick={() => set(L[k])} aria-pressed={on}
                 className={clsx('flex min-h-[60px] items-center gap-3 rounded-2xl border-2 bg-white px-4 py-3 text-start font-bold transition-colors',
-                  band === 'kids' && 'sm:flex-col sm:justify-center sm:text-center',
+                  tiles ? 'min-h-[150px] flex-col justify-center px-2 py-4 text-lg' : band === 'kids' && 'sm:flex-col sm:justify-center sm:text-center',
                   on && !review && 'border-blue bg-sky shadow-[0_0_0_4px_rgba(5,172,255,.18)]',
                   !on && !right && 'border-line hover:border-bright',
                   review && on && !right && 'border-bad bg-red-50', right && 'border-ok bg-green-50')}>
-                <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-extrabold', on ? 'bg-blue text-white' : 'bg-sky text-deep')}>{L[n]}</span>
-                <OptLabel text={optText(q, k, lang)} pic={q.oimg?.[k]} big={band === 'kids'} />
-                {review && right && <Check className="ms-auto text-ok" size={20} />}
-                {review && on && !right && <X className="ms-auto text-bad" size={20} />}
+                {!tiles && <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-extrabold', on ? 'bg-blue text-white' : 'bg-sky text-deep')}>{L[n]}</span>}
+                <OptLabel text={optText(q, k, lang)} pic={q.oimg?.[k]} icon={q.oicon?.[k]} big={band === 'kids'} tile={tiles} />
+                {review && right && <Check className={tiles ? 'text-ok' : 'ms-auto text-ok'} size={20} />}
+                {review && on && !right && <X className={tiles ? 'text-bad' : 'ms-auto text-bad'} size={20} />}
               </motion.button>
             )
           })}
