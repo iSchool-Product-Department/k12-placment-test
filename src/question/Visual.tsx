@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { Question } from '../engine/types'
 
 /* ------------------------------------------------------------------ live stages (grid and number line)
-   Ported from the v1 demo. Keyed by the v1 question ID so they keep working after the v2 renumbering. */
+   Keyed by question ID. Check the stage again whenever its question changes in the sheet. */
 const NOROT = new Set(['rabbit', 'cat', 'frog'])
 const C = 80
 const DIRS: Record<string, [number, number]> = { u: [0, -1], r: [1, 0], d: [0, 1], l: [-1, 0] }
@@ -28,23 +28,25 @@ type Sim = {
   mark?: (o: string) => [number, number]; run?: (o: any) => string[]
 }
 const SIM: Record<string, Sim> = {
-  'L1-LG-03': { g: [3, 3], a: 'rabbit', s: [0, 2], f: 'u', goal: ['carrot', [2, 0]], run: (o: string) => arrows(o) },
-  'L1-LG-05': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['star', [2, 0]], rocks: [[1, 1]], run: (o: string) => arrows(o) },
-  'L1-GT-01': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['battery', [2, 1]], run: (seq: string[]) => seq.map(x => (/left/.test(x) ? 'L' : 'F')) },
-  'L1-GT-06': { g: [4, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (seq: string[]) => { const out: string[] = []; for (let i = 0; i < seq.length; i++) { const x = seq[i]; if (/repeat/.test(x)) { const nx = seq[i + 1]; if (nx) { out.push(...rep(3, /nectar/.test(nx) ? ['N'] : ['F'])); i++ } } else out.push(/nectar/.test(x) ? 'N' : 'F') } return out } },
-  'L1-GB-02': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [4, 0], run: (o: string) => { const m = o.match(/repeat (\d+)/); return rep(m ? +m[1] : 1, ['F']) } },
-  'L1-GB-05': { g: [5, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (o: string) => rep(+o || 0, ['F']) },
-  'L1-GB-14': { g: [3, 1], a: 'bee', s: [1, 0], f: 'r', walls: [[2, 0]], run: (o: string) => (/forward/i.test(o) ? ['F'] : /left/i.test(o) ? ['L'] : ['W']) },
-  'L1-GT-02': { g: [4, 4], a: 'robot', s: [0, 3], f: 'u', count: 'F', run: () => rep(3, ['F', 'F', 'R']) },
-  'L1-GB-17': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', count: 'F', run: () => rep(4, ['F']) },
-  'L1-LG-12': { g: [4, 4], a: 'cat', s: [0, 3], f: 'r', count: 'M', run: () => ['r', 'r', 'u', 'u'] },
-  'L1-GB-20': { g: [4, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [3, 0], run: () => ['F', 'F'] },
-  'L2-LG-05': { g: [5, 5], a: 'robot', s: [1, 4], f: 'u', run: () => rep(3, ['F', 'F', 'R']) },
-  'L2-LG-11': { g: [5, 4], a: 'robot', s: [1, 3], f: 'r', mark: o => { const n = (s: string) => +((o.match(new RegExp('(\\d+) squares? ' + s)) || [0, 0])[1]); return [1 + n('right'), 3 - n('up') + n('down')] }, run: () => ['F', 'F', 'L', 'F'] },
-  'L1-LG-06': { line: [1, 10], a: 'frog', s: 1, hops: () => [2, 2, 2] },
-  'L3-LG-06': { line: [0, 16], a: 'robot', s: 0, hops: () => rep(4, [3, -1]) },
+  'L1-G2-01': { g: [3, 2], a: 'robot', s: [0, 1], f: 'r', goal: ['star', [2, 0]], run: (o: string) => o.split(',').map(x => (/left/.test(x) ? 'L' : /right/.test(x) ? 'R' : 'F')) },
+  'L1-LG-06': { g: [3, 3], a: 'rabbit', s: [0, 2], f: 'u', goal: ['carrot', [2, 0]], run: (o: string) => arrows(o) },
+  'L1-LG-07': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['star', [2, 0]], rocks: [[1, 1]], run: (o: string) => arrows(o) },
+  'L1-T-01': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['battery', [2, 1]], run: (seq: string[]) => seq.map(x => (/left/.test(x) ? 'L' : 'F')) },
+  'L1-T-06': { g: [4, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (seq: string[]) => { const out: string[] = []; for (let i = 0; i < seq.length; i++) { const x = seq[i]; if (/repeat/.test(x)) { const nx = seq[i + 1]; if (nx) { out.push(...rep(3, /nectar/.test(nx) ? ['N'] : ['F'])); i++ } } else out.push(/nectar/.test(x) ? 'N' : 'F') } return out } },
+  'L1-G2-02': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [4, 0], run: (o: string) => { const m = o.match(/repeat (\d+)/); return rep(m ? +m[1] : 1, ['F']) } },
+  'L1-G2-15': { g: [5, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (o: string) => rep(+o || 0, ['F']) },
+  'L1-G2-19': { g: [3, 1], a: 'bee', s: [1, 0], f: 'r', walls: [[2, 0]], run: (o: string) => (/forward/i.test(o) ? ['F'] : /left/i.test(o) ? ['L'] : ['W']) },
+  'L1-T-02': { g: [4, 4], a: 'robot', s: [0, 3], f: 'u', count: 'F', run: () => rep(3, ['F', 'F', 'R']) },
+  'L1-G2-12': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', count: 'F', run: () => rep(4, ['F']) },
+  'L1-LG-09': { g: [4, 4], a: 'cat', s: [0, 3], f: 'r', count: 'M', run: () => ['r', 'r', 'u', 'u'] },
+  'L1-G2-14': { g: [4, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [3, 0], run: () => ['F', 'F'] },
+  'L2-LG-06': { g: [5, 5], a: 'robot', s: [1, 4], f: 'u', run: () => rep(3, ['F', 'F', 'R']) },
+  'L2-LG-08': { g: [5, 4], a: 'robot', s: [1, 3], f: 'r', mark: o => { const n = (s: string) => +((o.match(new RegExp('(\\d+) squares? ' + s)) || [0, 0])[1]); return [1 + n('right'), 3 - n('up') + n('down')] }, run: () => ['F', 'F', 'L', 'F'] },
+  'L1-LG-08': { line: [1, 10], a: 'frog', s: 1, hops: () => [2, 2, 2] },
+  'L3-LG-08': { line: [0, 16], a: 'robot', s: 0, hops: () => rep(4, [3, -1]) },
 }
-export const hasSim = (q: Question) => !!SIM[q.old || q.id]
+export const SIM_IDS = Object.keys(SIM)
+export const hasSim = (q: Question) => !!SIM[q.id]
 
 function stageSvg(sp: Sim) {
   if (sp.line) {
@@ -124,7 +126,7 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null,
  */
 export function Stage({ q, choice, play = false, onDone }: { q: Question; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
   const box = useRef<HTMLDivElement>(null)
-  const sp = SIM[q.old || q.id]
+  const sp = SIM[q.id]
   useEffect(() => { if (box.current && sp) box.current.innerHTML = stageSvg(sp) }, [q.id])
   useEffect(() => {
     const svg = box.current?.querySelector('svg')
@@ -194,7 +196,7 @@ function parseBlocks(scr: string): Blk[] {
   }
   return out
 }
-export const looksLikeBlocks = (q: Question) => q.lv <= 2 && /\b(repeat|move forward|set (score|lives|count)|change (score|count|lives)|turn (left|right)|say ")/i.test(q.scr) && !/[;{}]|var |\+\+/.test(q.scr)
+export const looksLikeBlocks = (q: Question) => q.lv <= 2 && /\b(define|repeat|move forward|set (score|lives|count)|change (score|count|lives)|turn (left|right)|say ")/i.test(q.scr) && !/[;{}]|var |\+\+/.test(q.scr)
 function BlockList({ items }: { items: Blk[] }) {
   return (
     <div className="flex flex-col gap-1.5">

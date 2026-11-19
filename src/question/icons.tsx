@@ -1,4 +1,8 @@
-import { Apple, Armchair, Hand, Headphones, Keyboard, Laptop, Megaphone, Mouse, Printer, Save, Scissors, Search, Speaker, Trash2, Volume2, type LucideProps } from 'lucide-react'
+import {
+  Apple, Armchair, ArrowRight, Car, Cat, CircleCheck, Dices, DoorOpen, EyeOff, Flower2, Hand, Hash, Headphones, Image, Images, Keyboard, Lamp, Laptop,
+  Maximize2, Megaphone, MessageCircle, Mouse, MousePointerClick, Music, OctagonX, Package, Palette, Plug, Power, Printer, Save, Scissors, Search, Shirt,
+  Speaker, Trash2, Volume2, type LucideProps,
+} from 'lucide-react'
 
 // Lucide has no spoon or teddy bear, so these two are drawn in the same 24px, 2px-stroke line style.
 const Line = ({ size = 24, strokeWidth = 2, className, children }: LucideProps) => (
@@ -14,4 +18,7 @@ export const ICONS: Record<string, (p: LucideProps) => React.ReactNode> = {
   laptop: Laptop, apple: Apple, chair: Armchair, mouse: Mouse, spoon: Spoon, teddy: Teddy, keyboard: Keyboard,
   speaker: Speaker, headphones: Headphones, hand: Hand, megaphone: Megaphone, printer: Printer, save: Save,
   trash: Trash2, scissors: Scissors, search: Search, sound: Volume2,
+  power: Power, plug: Plug, cat: Cat, image: Image, music: Music, box: Package, shirt: Shirt, hide: EyeOff, bigger: Maximize2,
+  click: MousePointerClick, palette: Palette, number: Hash, yesno: CircleCheck, door: DoorOpen, clap: Hand, talk: MessageCircle,
+  forward: ArrowRight, flower: Flower2, stop: OctagonX, pictures: Images, guess: Dices, lamp: Lamp, car: Car,
 }

@@ -6,6 +6,7 @@ import { answer, check, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest,
 import type { Question, TestRecord } from './types'
 import { blockIndents, codeIndents, isBlockOrder, isCodeOrder } from '../question/codeLines'
 import { ICONS } from '../question/icons'
+import { SIM_IDS } from '../question/Visual'
 
 const bank = bankJson as Question[]
 const byId = new Map(bank.map(q => [q.id, q]))
@@ -94,6 +95,11 @@ describe('answer keys', () => {
     expect(ind('L1-T-01')).toEqual([0, 0, 0, 0])
     expect(ind('L2-T-01')).toEqual([0, 0, 1, 1]) // when clicked: two blocks inside
     expect(ind('L2-T-05')).toEqual([0, 1, 1, 2])
+  })
+  it('every stage belongs to a real question, and questions keep the age word limits (sheet Settings)', () => {
+    for (const id of SIM_IDS) expect(byId.has(id), id).toBe(true)
+    const limit: Record<number, number> = { 1: 10, 2: 14, 3: 18, 4: 20, 5: 22, 6: 22 }
+    for (const q of bank) expect(q.q.split(/\s+/).filter(Boolean).length, q.id).toBeLessThanOrEqual(limit[q.lv])
   })
   it('bank has 61 questions per level with the v2 pool sizes', () => {
     for (let lv = 1; lv <= 6; lv++) {
