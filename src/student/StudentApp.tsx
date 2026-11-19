@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import confetti from 'canvas-confetti'
-import { ArrowRight, Clock, Minus, Play, Plus, RotateCcw, Sparkles, Trophy, Zap } from 'lucide-react'
+import { ArrowRight, Clock, Minus, Plus, RotateCcw, Sparkles, Trophy, Zap } from 'lucide-react'
 import clsx from 'clsx'
 import { answer, currentQuestion, newTest, progress, startLevel } from '../engine/engine'
 import type { AnswerValue, StepName, TestRecord } from '../engine/types'
@@ -139,7 +139,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   const value = q && ans.id === q.id ? ans.v : null
   const setValue = (v: AnswerValue | null) => setAns({ id: q.id, v })
   const [toast, setToast] = useState<string | null>(null)
-  // Questions with a stage: "Run it" locks the answer and plays it, then Next moves on. No changes after Run.
+  // Questions with a stage: Next locks the answer, the stage plays it, then the test moves on by itself. No changes after Next.
   const [locked, setLocked] = useState(false)
   const [played, setPlayed] = useState(false)
   const sec = useRef(0)
@@ -147,14 +147,18 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
   useEffect(() => {
     setLocked(false); setPlayed(false); t0.current = Date.now()
   }, [q?.id])
+  useEffect(() => { if (played) { const id = setTimeout(finish, 700); return () => clearTimeout(id) } }, [played])
   if (!q) return null
   const n = rec.answers.length
   const ready = value != null && (q.t !== 'Order' || (value as string[]).filter(Boolean).length === q.o.filter(Boolean).length)
     && (q.t !== 'Sort' && q.t !== 'Match' || Object.keys(value as object).length === q.o.filter(Boolean).length)
   const stage = !!q && hasSim(q)
   const submit = () => {
-    if (!ready) return
-    if (stage && !locked) { sec.current = (Date.now() - t0.current) / 1000; setLocked(true); return }
+    if (!ready || locked) return
+    if (stage) { sec.current = (Date.now() - t0.current) / 1000; setLocked(true); return }
+    finish()
+  }
+  function finish() {
     try { speechSynthesis.cancel() } catch { /* */ }
     setToast(t.saved[n % t.saved.length]); setTimeout(() => setToast(null), 900)
     onAnswer(value!, stage ? sec.current : (Date.now() - t0.current) / 1000)
@@ -173,9 +177,7 @@ function TestRun({ rec, lang, band, onAnswer }: { rec: TestRecord; lang: Lang; b
             <QuestionView q={q} lang={lang} band={band} value={value} onChange={setValue} salt={rec.id} locked={locked} onPlayed={() => setPlayed(true)} />
             <div className="mt-6 flex items-center justify-end gap-3">
               <AnimatePresence>{toast && <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="font-extrabold text-ok">{toast} +10 XP</motion.span>}</AnimatePresence>
-              {stage && !locked
-                ? <Btn disabled={!ready} onClick={submit}><Play size={18} /> {t.run}</Btn>
-                : <Btn disabled={!ready || (locked && !played)} onClick={submit}>{t.next} <ArrowRight size={18} className="rtl:rotate-180" /></Btn>}
+              <Btn disabled={!ready || locked} onClick={submit}>{t.next} <ArrowRight size={18} className="rtl:rotate-180" /></Btn>
             </div>
           </Card>
         </motion.div>

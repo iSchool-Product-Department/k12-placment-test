@@ -131,7 +131,7 @@ export function Stage({ q, choice, play = false, onDone }: { q: Question; choice
   useEffect(() => {
     const svg = box.current?.querySelector('svg')
     let alive = true
-    if (svg && sp) runStage(svg as SVGSVGElement, sp, choice, play).then(() => alive && play && onDone?.())
+    if (svg && sp) runStage(svg as SVGSVGElement, sp, choice, play).catch(console.error).then(() => alive && play && onDone?.()) // always finish, or the test waits forever
     return () => { alive = false }
   }, [q.id, JSON.stringify(choice), play])
   return <div ref={box} className="mx-auto w-full max-w-[360px] [&_svg]:block [&_svg]:max-h-[220px] [&_svg]:w-full [&_svg]:rounded-2xl [&_svg]:border [&_svg]:border-line [&_svg]:bg-white" aria-hidden="true" />
