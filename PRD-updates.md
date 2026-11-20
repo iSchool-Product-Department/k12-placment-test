@@ -22,6 +22,10 @@ Everything up to 19 November 2026 is in the PRD.
 - 600-question audit (iSchool_Placement_600_Question_Audit_FOR_REVIEW.csv): 36 flagged questions rewritten and 5 fixed for ".0". Each row's Reviewer decision and note say what changed. Rewrites keep the ID, pool, difficulty and (except L6-LG-10, now Text MCQ) the type. New ones get a visual where it helps: robot stages (L1-LG-12, L1-G2-21, L1-G2-28, L6-LG-06), a number line (L6-LG-10), drawn balls (L1-LG-16), icons, and scenes (L2-G4-21, L3-LG-05, L6-LG-09, L6-DL-07).
 - Whole numbers never show as "2.0". A test fails if one does, unless the code really makes a float.
 
+- Second audit (iSchool_Placement_All_600_Difficulty_Audit.csv): 54 drafted replacements written in full (options, Arabic, why), mostly plainer Lower-grade and warm-up questions for levels 5 and 6. Difficulty changes: L5-LG-10, L5-G10-17 and L6-LG-16 Hard to Medium, L1-G2-28 Medium to Easy. Each row's decision is in the audit file.
+- Game screens for ages 6 to 9 (GameScene.tsx): game-making questions show a small game picture (the cat mid-jump, a coin to collect, a wall). After Next it acts out the student's answer. An Order rebuilds the game in their order, and "Test" only works if what it needs came first; a wrong order just does not work, with no right or wrong shown. Used on L1-G1-22, 24, 29, 30, 31, L1-T-07, L2-G3-11, 14, 16, 29. Still pictures on L1-G1-07 and L2-LG-05; robot stage with a gate on L1-G2-18.
+- Pictures for young ages stay drawings of things in the question (a cat, a coin, a robot), not a character with a name or personality, so the no-mascot rule holds.
+
 ## 5 Placement steps
 - "Skill check" is now called "Grade check" in the admin and content views: it decides the lower or upper grade of the age's level. "Grade check one level higher" for the step above.
 

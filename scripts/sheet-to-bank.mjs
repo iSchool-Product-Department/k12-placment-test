@@ -81,7 +81,7 @@ const THING = {
   keyboard: 'keyboard', mouse: 'mouse', screen: 'monitor', monitor: 'monitor', headphones: 'headphones', microphone: 'mic', mic: 'mic',
   camera: 'camera', printer: 'printer', speaker: 'speaker', photo: 'image', picture: 'image', image: 'image', background: 'image',
   voice: 'voice', speech: 'voice', sound: 'sound', volume: 'sound', video: 'video', calculator: 'calculator', phone: 'phone',
-  light: 'lamp', doorbell: 'bell', png: 'image', mp3: 'music', txt: 'file', mp4: 'video', folder: 'folder', files: 'folder',
+  music: 'music', light: 'lamp', doorbell: 'bell', png: 'image', mp3: 'music', txt: 'file', mp4: 'video', folder: 'folder', files: 'folder',
   bin: 'trash', downloads: 'download', menu: 'menu', browser: 'globe', coin: 'coin', star: 'star', point: 'star', spike: 'spike',
   lava: 'flame', obstacle: 'obstacle', door: 'door', pause: 'pause', score: 'trophy', cat: 'cat', apple: 'apple', fish: 'fish',
   dark: 'moon', hungry: 'food', raining: 'rain', cold: 'snow', clap: 'clap', jump: 'jump', step: 'steps',

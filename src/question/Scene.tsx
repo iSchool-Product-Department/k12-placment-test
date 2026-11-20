@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import type { Question } from '../engine/types'
 import type { Lang } from '../i18n'
 import { ICONS } from './icons'
+import { GameScene, type GameDef } from './GameScene'
 
 /* Small drawn scenes for questions that were words only (ages 6 to 9), keyed by question ID like the stages.
    Like a stage, a scene stays still while the student answers (it may mark their pick), and once Next locks
@@ -22,11 +23,25 @@ type SceneDef =
   | { chat: { me?: boolean; t: W }[]; reply?: W } // plays: the bot types its reply
   | { screens: Part[][]; play?: 'tap' | 'score' | 'front' | 'go' | 'build' }
   | { xy: [number, number] } // plays: the car drives the way the student picked
+  | { game: GameDef } // a tiny game screen that acts out the answer (GameScene.tsx)
 
 const kid = (en: string, ar: string, tone?: Tone): Tile => ({ i: 'user', t: [en, ar], tone })
 const who: Tile = { i: 'user', t: '?', tone: 'soft' }
 
 const SCENE: Record<string, SceneDef> = {
+  // Game making: a still picture before Next, then the student's answer acted out
+  'L1-G1-29': { game: { init: { cast: false }, still: { y: -60 }, steps: [[/character/i, ['cast']], [/click/i, ['flag:click']], [/jump/i, ['flag:jump']], [/test/i, ['test-jump']]] } },
+  'L1-G1-30': { game: { still: { bg: 1, tap: true }, steps: [[/^Choose/, ['flag:pick']], [/click event/, ['flag:click']], [/switch/, ['flag:switch']], [/test/, ['test-bg']]] } },
+  'L1-G1-31': { game: { init: { cast: false }, still: { cast: true, bg: 1, x: 0.5 }, steps: [[/background/i, ['bg']], [/character/i, ['cast']], [/start/i, ['flag:start']], [/run/i, ['run']]] } },
+  'L1-T-07': { game: { still: { coin: 'on', score: 0 }, steps: [[/add the coin/i, ['coin', 'place']], [/zero/i, ['score0']], [/touched/i, ['flag:touch', 'flag:score']], [/show/i, ['collect']]] } },
+  'L2-G3-29': { game: { init: { coin: 'on', score: 3 }, steps: [[/detect/i, ['arrive']], [/increase/i, ['+1']], [/hide/i, ['take']], [/show/i, ['glow']]] } },
+  'L1-G1-24': { game: { init: { wall: true }, pick: [[/^Stop/, ['stop-wall']], [/^Pass/, ['pass-wall']], [/^Delete/, ['fade']]] } },
+  'L1-G1-22': { game: { pick: [[/^Tap/, ['tap', 'walk']], [/^Stop/, ['tap', 'shake']], [/^Background/, ['tap', 'bg']]] } },
+  'L2-G3-14': { game: { init: { key: false }, pick: [[/key/, ['key', 'walk']], [/starts/, ['walk']], [/clicked/, ['tap', 'walk']], [/second/, ['walk', 'walk']]] } },
+  'L2-G3-11': { game: { pick: [[/again/, ['jump3']], [/once/, ['jump']], [/clicked/, ['tap', 'jump']], [/stops/, ['fade']]] } },
+  'L2-G3-16': { game: { init: { score: 10 }, run: ['+5', '+5'] } },
+  'L1-G1-07': { still: [{ i: 'robot', t: 'robot' }], ltr: true },
+  'L2-LG-05': { still: ['2', '4', '7', '8'].map(t => ({ t })), ltr: true },
   // Counting and logic
   'L1-G1-23': { add: ['star', 4, 2] },
   'L2-LG-04': { week: 3 },
@@ -66,7 +81,7 @@ export const hasScene = (q: Question) => !!SCENE[q.id]
 /** True when the scene plays after Next, so the test waits for it like a stage. */
 export const scenePlays = (q: Question) => {
   const s = SCENE[q.id]
-  return !!s && ('row' in s || 'add' in s || 'week' in s || 'xy' in s || ('chat' in s && !!s.reply) || ('screens' in s && !!s.play))
+  return !!s && ('game' in s || 'row' in s || 'add' in s || 'week' in s || 'xy' in s || ('chat' in s && !!s.reply) || ('screens' in s && !!s.play))
 }
 
 const say = (t: W | string | undefined, lang: Lang) => (Array.isArray(t) ? t[lang === 'ar' ? 1 : 0] : t)
@@ -215,6 +230,7 @@ export function Scene({ q, lang, choice, play, onDone }: Props) {
   const s = SCENE[q.id]
   const p = { lang, play, onDone }
   if (!s) return null
+  if ('game' in s) return <GameScene g={s.game} choice={choice} {...p} />
   if ('row' in s) return <Row items={s.row} ltr={s.ltr} {...p} />
   if ('still' in s) return <Row items={s.still} ltr={s.ltr} lang={lang} />
   if ('add' in s) return <Add s={s.add} {...p} />
