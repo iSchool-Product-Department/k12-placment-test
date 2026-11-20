@@ -9,7 +9,7 @@ const NOROT = new Set(['rabbit', 'cat', 'frog'])
 const C = 80
 const DIRS: Record<string, [number, number]> = { u: [0, -1], r: [1, 0], d: [0, 1], l: [-1, 0] }
 const ANG: Record<string, number> = { u: 0, r: 90, d: 180, l: 270 }
-const SPR: Record<string, string> = {
+export const SPR: Record<string, string> = {
   robot: `<rect x="-20" y="-18" width="40" height="36" rx="9" fill="#056FEC"/><rect x="-13" y="-10" width="26" height="13" rx="4" fill="#ECF8FF"/><circle cx="-6" cy="-3.5" r="3" fill="#0E2A4D"/><circle cx="6" cy="-3.5" r="3" fill="#0E2A4D"/><path d="M0 -18 v-8" stroke="#5B7599" stroke-width="3"/><circle cx="0" cy="-28" r="4" fill="#FF7F1C"/><path d="M-8 -34 l8 -10 l8 10z" fill="#FFD700"/>`,
   bee: `<ellipse cx="0" cy="2" rx="22" ry="16" fill="#FFD700"/><rect x="-8" y="-13" width="6" height="30" fill="#0E2A4D"/><rect x="4" y="-13" width="6" height="30" fill="#0E2A4D"/><ellipse cx="-4" cy="-16" rx="10" ry="7" fill="#ECF8FF" opacity=".9"/><path d="M-6 -36 l6 -8 l6 8z" fill="#FF7F1C"/>`,
   rabbit: `<ellipse cx="-8" cy="-22" rx="5" ry="14" fill="#fff" stroke="#CFD8DC" stroke-width="2"/><ellipse cx="8" cy="-22" rx="5" ry="14" fill="#fff" stroke="#CFD8DC" stroke-width="2"/><circle cx="0" cy="4" r="18" fill="#fff" stroke="#CFD8DC" stroke-width="2"/><circle cx="-6" cy="1" r="2.5" fill="#0E2A4D"/><circle cx="6" cy="1" r="2.5" fill="#0E2A4D"/><circle cx="0" cy="8" r="2.5" fill="#E91E63"/>`,
@@ -44,6 +44,7 @@ const SIM: Record<string, Sim> = {
   'L1-G2-28': { g: [3, 2], a: 'robot', s: [0, 1], f: 'r', goal: ['star', [2, 0]], run: (seq: string[]) => seq.flatMap(x => (/left/.test(x) ? ['L'] : rep(+(x.match(/\d+/)?.[0] || 1), ['F']))) },
   'L6-LG-06': { g: [3, 3], a: 'robot', s: [1, 1], f: 'u', run: () => ['R', 'R', 'R', 'L'] },
   'L6-LG-10': { line: [0, 10], a: 'robot', s: 1, hops: () => [3, 3] },
+  'L1-G2-18': { g: [3, 1], a: 'robot', s: [0, 0], f: 'r', walls: [[1, 0]], goal: ['star', [2, 0]], run: (o: string) => o.split(',').flatMap(x => (/open/i.test(x) ? ['O'] : rep(+(x.match(/\d+/)?.[0] || 1), ['F']))) },
   'L1-G2-15': { g: [5, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (o: string) => rep(+o || 0, ['F']) },
   'L1-G2-19': { g: [3, 1], a: 'bee', s: [1, 0], f: 'r', walls: [[2, 0]], run: (o: string) => (/forward/i.test(o) ? ['F'] : /left/i.test(o) ? ['L'] : ['W']) },
   'L1-T-02': { g: [4, 4], a: 'robot', s: [0, 3], f: 'u', count: 'F', run: () => rep(3, ['F', 'F', 'R']) },
@@ -68,7 +69,7 @@ function stageSvg(sp: Sim) {
   for (let r = 0; r < ch; r++) for (let c = 0; c < cw; c++) s += `<rect x="${P + c * C}" y="${P + r * C}" width="${C}" height="${C}" rx="6" fill="${(r + c) % 2 ? '#F1F8E9' : '#E8F5E9'}" stroke="#C5E1A5"/>`;
   (sp.rocks || []).forEach(([c, r]) => (s += `<g style="transform:${cell(c, r)}">${SPR.rock}</g>`));
   (sp.items || []).forEach(([k, [c, r]]) => (s += `<g style="transform:${cell(c, r)} scale(.8)">${SPR[k]}</g>`));
-  (sp.walls || []).forEach(([c, r]) => (s += `<g style="transform:translate(${P + c * C + 14}px,${P + r * C + C / 2}px)">${SPR.wall}</g>`))
+  (sp.walls || []).forEach(([c, r]) => (s += `<g class="wall" style="transition:opacity .4s;transform:translate(${P + c * C + 14}px,${P + r * C + C / 2}px)">${SPR.wall}</g>`))
   if (sp.ghost) s += `<rect x="${P + sp.ghost[0] * C + 6}" y="${P + sp.ghost[1] * C + 6}" width="${C - 12}" height="${C - 12}" rx="10" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="8 6"/>`
   if (sp.goal) s += `<g id="goal" style="transform:${cell(...sp.goal[1])}"><g class="spr">${SPR[sp.goal[0]]}</g></g>`
   const st = sp.s as [number, number]
@@ -108,12 +109,16 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null,
   if (sp.mark && typeof choice === 'string') { const [mc, mr] = sp.mark(choice); mk.innerHTML = `<rect x="${P + mc * C + 6}" y="${P + mr * C + 6}" width="${C - 12}" height="${C - 12}" rx="10" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="8 6"/>` }
   if (!play) return Promise.resolve()
   const acts = sp.run!(Array.isArray(choice) ? choice : String(choice || ''))
-  const blocked = (nc: number, nr: number) => (sp.rocks || []).some(([x, y]) => x === nc && y === nr) || (sp.walls || []).some(([x, y]) => x === nc && y === nr)
+  // 'O' opens the gates: walls fade and stop blocking.
+  let open = false
+  svg.querySelectorAll<SVGGElement>('.wall').forEach(w => (w.style.opacity = '1'))
+  const blocked = (nc: number, nr: number) => (sp.rocks || []).some(([x, y]) => x === nc && y === nr) || (!open && (sp.walls || []).some(([x, y]) => x === nc && y === nr))
   return (async () => {
     await wait(80); ag.style.transition = 'transform .42s ease, opacity .3s'
     for (const act of acts) {
       if (tok !== simTok) return
       if (act === 'L' || act === 'R') { a += act === 'L' ? -90 : 90; ag.style.transform = tr(c, r, a) }
+      else if (act === 'O') { open = true; svg.querySelectorAll<SVGGElement>('.wall').forEach(w => (w.style.opacity = '.15')) }
       else if (act === 'W') { sk.classList.add('shake'); await wait(500); sk.classList.remove('shake') }
       else if (act === 'N') { const g = sp.goal?.[1]; if (g && g[0] === c && g[1] === r) svg.querySelector('#goal .spr')!.classList.add('won'); else { sk.classList.add('shake'); await wait(400); sk.classList.remove('shake') } }
       else {
