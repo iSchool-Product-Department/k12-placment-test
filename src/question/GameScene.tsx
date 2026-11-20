@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import clsx from 'clsx'
 import type { Lang } from '../i18n'
 import { ICONS } from './icons'
 import { SPR } from './Visual'
@@ -9,18 +8,19 @@ import { SPR } from './Visual'
    After Next it acts out the student's answer:
    - Order: rebuilds the game in the student's order, one card at a time. "Test" only works if what it needs came first.
    - MCQ: does what the picked option says.
-   It never says right or wrong. A wrong order simply does not work, like a real game. */
+   It never says right or wrong: a step that cannot work just does nothing (no shake, no failure motion).
+   Playback is capped at about 2.5 seconds; a tap on the stage skips it (QuestionView). */
 type S = {
   cast: boolean; x: number; y: number; coin: 'off' | 'loose' | 'on' | 'gone'; score: number | null; bg: 0 | 1
-  wall: boolean; tap: boolean; key: boolean; faded: boolean; shake: boolean; glow: boolean; flags: string[]
+  wall: boolean; tap: boolean; key: boolean; faded: boolean; glow: boolean; flags: string[]
 }
 /** Effects, in the order they play:
  *  cast, coin (loose in a corner), place (coin moves into the level), score0, bg, wall,
- *  flag:<click|jump|touch|start|score> (the part is added; a small chip shows it),
+ *  flag:<click|jump|touch|start|score|pick|switch> (the part is added; nothing shows, it only changes what a test does),
  *  test-jump (tap; jumps only with click and jump added), test-bg (tap; the background changes only with pick, click and switch added), run (walks only with start added),
  *  collect (walks to the coin; takes it with touch added, and scores with score added too),
  *  arrive (walks to the coin), take (coin goes), +1, +5, glow (score pulses),
- *  jump, jump3, walk, tap, key, stop-wall, pass-wall, fade, shake. */
+ *  jump, jump3, walk, tap, key, stop-wall, pass-wall, fade. */
 export type GameDef = {
   init?: Partial<S>
   still?: Partial<S> // the picture before Next
@@ -29,14 +29,14 @@ export type GameDef = {
   run?: string[] // after Next, whatever was picked
 }
 
-export const BASE: S = { cast: true, x: 0.15, y: 0, coin: 'off', score: null, bg: 0, wall: false, tap: false, key: false, faded: false, shake: false, glow: false, flags: [] }
+export const BASE: S = { cast: true, x: 0.15, y: 0, coin: 'off', score: null, bg: 0, wall: false, tap: false, key: false, faded: false, glow: false, flags: [] }
 const COIN_X = 0.68, WALL_X = 0.55
 
 /** Turns effects into frames, each a full state. Effects that depend on parts read the state at that moment. */
 export function frames(start: S, effects: string[]): S[] {
   let s = { ...start }
   const out: S[] = []
-  const push = (p: Partial<S>) => { s = { ...s, shake: false, ...p }; out.push(s) }
+  const push = (p: Partial<S>) => { s = { ...s, ...p }; out.push(s) }
   const has = (f: string) => s.flags.includes(f)
   for (const e of effects) {
     if (e === 'cast') push({ cast: true })
@@ -48,13 +48,13 @@ export function frames(start: S, effects: string[]): S[] {
     else if (e.startsWith('flag:')) push({ flags: [...s.flags, e.slice(5)] })
     else if (e === 'test-jump') {
       push({ tap: true })
-      if (s.cast && has('click') && has('jump')) { push({ y: -60 }); push({ y: 0, tap: false }) } else push({ shake: true, tap: false })
+      if (s.cast && has('click') && has('jump')) { push({ y: -60 }); push({ y: 0, tap: false }) } else push({ tap: false })
     } else if (e === 'test-bg') {
       push({ tap: true })
-      push(has('pick') && has('click') && has('switch') ? { bg: 1, tap: false } : { shake: true, tap: false })
-    } else if (e === 'run') push(s.cast && has('start') ? { x: 0.8 } : { shake: true })
+      push(has('pick') && has('click') && has('switch') ? { bg: 1, tap: false } : { tap: false })
+    } else if (e === 'run') { if (s.cast && has('start')) push({ x: 0.8 }) }
     else if (e === 'collect') {
-      if (!s.cast || s.coin === 'off') { push({ shake: true }); continue }
+      if (!s.cast || s.coin === 'off') continue
       push({ x: COIN_X - 0.06 })
       if (s.coin === 'on' && has('touch')) push({ coin: 'gone', score: has('score') && s.score != null ? s.score + 1 : s.score })
       else push({ x: 0.88 })
@@ -67,15 +67,12 @@ export function frames(start: S, effects: string[]): S[] {
     else if (e === 'walk') push({ x: Math.min(s.x + 0.45, 0.85) })
     else if (e === 'tap') { push({ tap: true }); push({ tap: false }) }
     else if (e === 'key') push({ key: true })
-    else if (e === 'stop-wall') { push({ x: WALL_X - 0.12 }); push({ shake: true }) }
+    else if (e === 'stop-wall') push({ x: WALL_X - 0.12 })
     else if (e === 'pass-wall') { push({ x: WALL_X - 0.12 }); push({ x: 0.85 }) }
     else if (e === 'fade') push({ faded: true })
-    else if (e === 'shake') push({ shake: true })
   }
   return out
 }
-
-const CHIP: Record<string, string> = { click: 'click', jump: 'jump', touch: 'hand', start: 'play', score: 'trophy', pick: 'image', switch: 'palette' }
 
 export function GameScene({ g, lang, choice, play, onDone }: { g: GameDef; lang: Lang; choice: string | string[] | null; play?: boolean; onDone?: () => void }) {
   const start = { ...BASE, ...g.init }
@@ -93,11 +90,12 @@ export function GameScene({ g, lang, choice, play, onDone }: { g: GameDef; lang:
     ]
     const fs = frames(start, effects)
     const fast = matchMedia('(prefers-reduced-motion: reduce)').matches
+    const gap = Math.max(300, Math.min(650, 2500 / Math.max(fs.length, 1)))
     let k = 0, id = 0
     setS(start)
     const tick = () => {
       if (fast) { setS(fs[fs.length - 1] || start); k = fs.length } else setS(fs[k++] || start)
-      id = window.setTimeout(k < fs.length ? tick : () => done.current?.(), fast ? 0 : 650)
+      id = window.setTimeout(k < fs.length ? tick : () => done.current?.(), fast ? 0 : gap)
     }
     id = window.setTimeout(tick, fast ? 0 : 400)
     return () => clearTimeout(id)
@@ -119,8 +117,8 @@ export function GameScene({ g, lang, choice, play, onDone }: { g: GameDef; lang:
             </g>
           )}
           {s.cast && (
-            <g style={{ transform: `translate(${X(s.x)}px, ${G - 22 + s.y}px)`, transition: 'transform .55s cubic-bezier(.22,1,.36,1)' }}>
-              <g className={clsx(s.shake && 'shake')} dangerouslySetInnerHTML={{ __html: SPR.cat }} />
+            <g style={{ transform: `translate(${X(s.x)}px, ${G - 22 + s.y}px)`, transition: 'transform .4s cubic-bezier(.22,1,.36,1)' }}>
+              <g dangerouslySetInnerHTML={{ __html: SPR.cat }} />
               {s.y < 0 && <path d="M-14 34 v10 M0 36 v12 M14 34 v10" stroke="#5B7599" strokeWidth="2.5" strokeLinecap="round" />}
               {s.tap && <Hand x={6} y={4} size={30} color="#0E2A4D" strokeWidth={2} />}
             </g>
@@ -136,12 +134,6 @@ export function GameScene({ g, lang, choice, play, onDone }: { g: GameDef; lang:
               <text x="17" y="20" textAnchor="middle" fontSize="16" fontWeight="800" fill={s.key ? '#fff' : '#0E2A4D'}>→</text>
             </g>
           )}
-        </g>
-        <g transform="translate(10, 10)">
-          {s.flags.filter(f => CHIP[f]).map((f, i) => {
-            const I = ICONS[CHIP[f]]
-            return <g key={f} transform={`translate(${i * 34}, 0)`}><rect width="30" height="30" rx="8" fill="#fff" stroke="#056FEC" strokeWidth="2" /><I x={5} y={5} size={20} color="#056FEC" strokeWidth={2} /></g>
-          })}
         </g>
       </svg>
     </div>

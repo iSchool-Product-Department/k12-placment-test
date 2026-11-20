@@ -36,7 +36,7 @@ const SCENE: Record<string, SceneDef> = {
   'L1-T-07': { game: { still: { coin: 'on', score: 0 }, steps: [[/add the coin/i, ['coin', 'place']], [/zero/i, ['score0']], [/touched/i, ['flag:touch', 'flag:score']], [/show/i, ['collect']]] } },
   'L2-G3-29': { game: { init: { coin: 'on', score: 3 }, steps: [[/detect/i, ['arrive']], [/increase/i, ['+1']], [/hide/i, ['take']], [/show/i, ['glow']]] } },
   'L1-G1-24': { game: { init: { wall: true }, pick: [[/^Stop/, ['stop-wall']], [/^Pass/, ['pass-wall']], [/^Delete/, ['fade']]] } },
-  'L1-G1-22': { game: { pick: [[/^Tap/, ['tap', 'walk']], [/^Stop/, ['tap', 'shake']], [/^Background/, ['tap', 'bg']]] } },
+  'L1-G1-22': { game: { pick: [[/^Tap/, ['tap', 'walk']], [/^Stop/, ['tap']], [/^Background/, ['tap', 'bg']]] } },
   'L2-G3-14': { game: { init: { key: false }, pick: [[/key/, ['key', 'walk']], [/starts/, ['walk']], [/clicked/, ['tap', 'walk']], [/second/, ['walk', 'walk']]] } },
   'L2-G3-11': { game: { pick: [[/again/, ['jump3']], [/once/, ['jump']], [/clicked/, ['tap', 'jump']], [/stops/, ['fade']]] } },
   'L2-G3-16': { game: { init: { score: 10 }, run: ['+5', '+5'] } },
@@ -99,7 +99,7 @@ function useSteps(play: boolean | undefined, n: number, ms: number, onDone?: () 
     if (!play) { setStep(0); return }
     const fast = matchMedia('(prefers-reduced-motion: reduce)').matches
     let k = 0, id = 0
-    const tick = () => { k = fast ? n : k + 1; setStep(k); id = window.setTimeout(k < n ? tick : () => done.current?.(), fast ? 0 : ms) }
+    const tick = () => { k = fast ? n : k + 1; setStep(k); id = window.setTimeout(k < n ? tick : () => done.current?.(), fast ? 0 : Math.min(ms, 2500 / Math.max(n, 1))) }
     id = window.setTimeout(tick, fast ? 0 : 300)
     return () => clearTimeout(id)
   }, [play, n, ms])

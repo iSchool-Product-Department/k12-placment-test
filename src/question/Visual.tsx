@@ -83,8 +83,7 @@ let simTok = 0
 function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null, play: boolean): Promise<void> {
   const tok = ++simTok, ag = svg.querySelector<SVGGElement>('#ag')!, mk = svg.querySelector('#mk')!
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, wait = (ms: number) => new Promise(r => setTimeout(r, reduce ? 0 : ms))
-  const sk = ag.querySelector('.spr')!
-  ag.style.transition = 'none'; ag.style.opacity = '1'; sk.classList.remove('shake'); void ag.getBoundingClientRect()
+  ag.style.transition = 'none'; ag.style.opacity = '1'; void ag.getBoundingClientRect()
   if (sp.line) {
     const [a] = sp.line, step = +(svg.dataset.w || 1), X = (v: number) => 30 + (v - a) * step, arcs = svg.querySelector('#arcs')!
     arcs.innerHTML = ''
@@ -93,18 +92,19 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null,
     ag.style.transform = `translate(${X(sp.s as number)}px,92px)`
     if (!play) return Promise.resolve()
     return (async () => {
-      await wait(60); ag.style.transition = 'transform .45s ease'; let v = sp.s as number
-      for (const h of sp.hops!()) {
+      const hops = sp.hops!(), per = Math.max(300, Math.min(600, 2500 / hops.length))
+      await wait(60); ag.style.transition = `transform ${Math.min(450, per - 50)}ms ease`; let v = sp.s as number
+      for (const h of hops) {
         if (tok !== simTok) return
         const nv = v + h
         arcs.innerHTML += `<path d="M${X(v)} 104 Q${(X(v) + X(nv)) / 2} ${h > 0 ? 40 : 60} ${X(nv)} 104" fill="none" stroke="#056FEC" stroke-width="3" stroke-dasharray="6 6"/>`
-        v = nv; ag.style.transform = `translate(${X(v)}px,92px)`; await wait(600)
+        v = nv; ag.style.transform = `translate(${X(v)}px,92px)`; await wait(per)
       }
     })()
   }
   const [cw, ch] = sp.g!, P = 10, tr = (c: number, r: number, a: number) => `translate(${P + c * C + C / 2}px,${P + r * C + C / 2}px) rotate(${NOROT.has(sp.a) ? 0 : a}deg)`
   let [c, r] = sp.s as [number, number]; let a = ANG[sp.f!], n = 0
-  ag.style.transform = tr(c, r, a); svg.querySelector('#goal .spr')?.classList.remove('won')
+  ag.style.transform = tr(c, r, a)
   const cnt = svg.querySelector('#cnt'); if (cnt) cnt.textContent = ''; mk.innerHTML = ''
   if (sp.mark && typeof choice === 'string') { const [mc, mr] = sp.mark(choice); mk.innerHTML = `<rect x="${P + mc * C + 6}" y="${P + mr * C + 6}" width="${C - 12}" height="${C - 12}" rx="10" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="8 6"/>` }
   if (!play) return Promise.resolve()
@@ -113,26 +113,27 @@ function runStage(svg: SVGSVGElement, sp: Sim, choice: string | string[] | null,
   let open = false
   svg.querySelectorAll<SVGGElement>('.wall').forEach(w => (w.style.opacity = '1'))
   const blocked = (nc: number, nr: number) => (sp.rocks || []).some(([x, y]) => x === nc && y === nr) || (!open && (sp.walls || []).some(([x, y]) => x === nc && y === nr))
+  // Never hints right or wrong: no shake, no pop at the goal. Capped at about 2.5 seconds; a tap skips it (QuestionView).
+  const per = Math.max(280, Math.min(520, 2500 / Math.max(acts.length, 1)))
   return (async () => {
-    await wait(80); ag.style.transition = 'transform .42s ease, opacity .3s'
+    await wait(80); ag.style.transition = `transform ${Math.min(420, per - 40)}ms ease, opacity .3s`
     for (const act of acts) {
       if (tok !== simTok) return
       if (act === 'L' || act === 'R') { a += act === 'L' ? -90 : 90; ag.style.transform = tr(c, r, a) }
       else if (act === 'O') { open = true; svg.querySelectorAll<SVGGElement>('.wall').forEach(w => (w.style.opacity = '.15')) }
-      else if (act === 'W') { sk.classList.add('shake'); await wait(500); sk.classList.remove('shake') }
-      else if (act === 'N') { const g = sp.goal?.[1]; if (g && g[0] === c && g[1] === r) svg.querySelector('#goal .spr')!.classList.add('won'); else { sk.classList.add('shake'); await wait(400); sk.classList.remove('shake') } }
+      else if (act === 'W') await wait(per)
+      else if (act === 'N') { /* collect: nothing to show either way */ }
       else {
         let d: [number, number]
         if (act === 'F') { const k = (((a % 360) + 360) % 360) / 90; d = ([[0, -1], [1, 0], [0, 1], [-1, 0]] as [number, number][])[k] } else { d = DIRS[act]; a = ANG[act] }
         const nc = c + d[0], nr = r + d[1]; n++
         if (cnt) cnt.textContent = (sp.count === 'F' ? 'move forward: ' : 'steps: ') + n
-        if (blocked(nc, nr)) { ag.style.transform = `translate(${P + (c + d[0] * 0.35) * C + C / 2}px,${P + (r + d[1] * 0.35) * C + C / 2}px) rotate(${NOROT.has(sp.a) ? 0 : a}deg)`; await wait(380); ag.style.transform = tr(c, r, a); sk.classList.add('shake'); await wait(450); return }
+        if (blocked(nc, nr)) { ag.style.transform = `translate(${P + (c + d[0] * 0.35) * C + C / 2}px,${P + (r + d[1] * 0.35) * C + C / 2}px) rotate(${NOROT.has(sp.a) ? 0 : a}deg)`; await wait(380); ag.style.transform = tr(c, r, a); await wait(300); return }
         c = nc; r = nr; ag.style.transform = tr(c, r, a)
         if (c < 0 || r < 0 || c >= cw || r >= ch) { await wait(380); ag.style.opacity = '.25'; return }
       }
-      await wait(520)
+      await wait(per)
     }
-    const g = sp.goal?.[1]; if (g && g[0] === c && g[1] === r && !acts.includes('N')) svg.querySelector('#goal .spr')?.classList.add('won')
   })()
 }
 

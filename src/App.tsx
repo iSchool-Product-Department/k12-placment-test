@@ -5,10 +5,10 @@ import StudentApp from './student/StudentApp'
 import AdminApp from './admin/AdminApp'
 import ContentApp from './content/ContentApp'
 import type { Lang } from './i18n'
-import { studentOnly } from './cloud'
 
-// Plain #name hashes (student, admin, admin-<id>, content-rules) so links work everywhere, including inside artifacts.
-const read = () => (location.hash.replace(/^#\/?/, '') || 'student').split(/[-/]/)
+// Real paths: / is the student test, /admin, /admin/<id>, /content/<tab>. Old #/admin links still land in the right place.
+if (location.hash.startsWith('#/')) history.replaceState(null, '', '/' + location.hash.slice(2).replace(/^student$/, ''))
+const read = () => (location.pathname.replace(/^\/+|\/+$/g, '') || 'student').split('/')
 
 // Last line of defence: a render error shows this instead of a blank white page. Changing view resets it.
 class Safe extends Component<{ children: ReactNode }, { err: Error | null }> {
@@ -30,10 +30,10 @@ class Safe extends Component<{ children: ReactNode }, { err: Error | null }> {
 export default function App() {
   const [route, setRoute] = useState(read)
   const [lang, setLang] = useState<Lang>('en')
-  useEffect(() => { const f = () => { setRoute(read()); window.scrollTo(0, 0) }; addEventListener('hashchange', f); return () => removeEventListener('hashchange', f) }, [])
-  const go = (h: string) => { location.hash = h.replace(/\//g, '-') }
-  // A deployed build: the test, plus #/admin behind the team password. No tabs, no content view.
-  const view = studentOnly && route[0] !== 'admin' ? 'student' : route[0]
+  useEffect(() => { const f = () => { setRoute(read()); window.scrollTo(0, 0) }; addEventListener('popstate', f); return () => removeEventListener('popstate', f) }, [])
+  const go = (h: string) => { history.pushState(null, '', h === 'student' ? '/' : '/' + h); setRoute(read()); window.scrollTo(0, 0) }
+  // Demo: admin and content are open (no password). Students only see the test at /, with no tabs.
+  const view = ['admin', 'content'].includes(route[0]) ? route[0] : 'student'
   const studentRtl = view === 'student' && lang === 'ar'
   useEffect(() => { document.documentElement.lang = studentRtl ? 'ar' : 'en'; document.documentElement.dir = studentRtl ? 'rtl' : 'ltr' }, [studentRtl])
   const tabs: [string, string, React.ReactNode][] = [['student', 'Student', <GraduationCap size={16} />], ['admin', 'Admin', <LayoutDashboard size={16} />], ['content', 'Content', <Library size={16} />]]
@@ -41,15 +41,15 @@ export default function App() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 bg-blue text-white shadow-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4" dir="ltr">
-          <img src="./ischool-logo-white.png" alt="iSchool" className="h-7 w-auto sm:h-8" />
+          <img src="/ischool-logo-white.png" alt="iSchool" className="h-7 w-auto sm:h-8" />
           <span className="hidden font-[var(--font-head)] text-lg font-bold sm:inline">Placement Test</span>
-          {!studentOnly && <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
+          {view !== 'student' && <nav className="ms-auto flex rounded-full bg-deep/50 p-1">
             {tabs.map(([k, l, i]) => (
               <button key={k} onClick={() => go(k)} aria-pressed={view === k} className={clsx('flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-extrabold', view === k ? 'bg-white text-deep' : 'text-white/90 hover:text-white')}>{i}<span className="hidden sm:inline">{l}</span></button>
             ))}
           </nav>}
           {view === 'student' && (
-            <div className={clsx("flex rounded-full bg-deep/50 p-1", studentOnly && "ms-auto")}>
+            <div className="ms-auto flex rounded-full bg-deep/50 p-1">
               {(['en', 'ar'] as Lang[]).map(l => <button key={l} onClick={() => setLang(l)} aria-pressed={lang === l} className={clsx('rounded-full px-2.5 py-1.5 text-sm font-extrabold', lang === l ? 'bg-white text-deep' : 'text-white/90')}>{l === 'en' ? 'EN' : 'عربي'}</button>)}
             </div>
           )}

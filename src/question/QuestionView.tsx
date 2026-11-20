@@ -8,7 +8,8 @@ import { BlockOrderAnswer, CodeOrderAnswer, MatchAnswer, OrderAnswer, SortAnswer
 import { blockText, isBlockOrder, isCodeOrder } from './codeLines'
 import { ICONS } from './icons'
 import { T, type Band, type Lang } from '../i18n'
-import { QuestionVisual, hasSim, hasVisual, looksLikeCode } from './Visual'
+import { QuestionVisual, hasSim, hasVisual, looksLikeCode, parsePattern } from './Visual'
+import { hasScene } from './Scene'
 
 const L = 'ABCD'
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
@@ -29,9 +30,11 @@ export const roomy = (q: Question) => !!q.img || hasVisual(q) || ['Order', 'Sort
 export const picSrc = (p: string) => import.meta.env.BASE_URL + p
 const isCodey = (s: string) => !/[؀-ۿ]/.test(s) && (/[;{}=<>$#]|^\w[\w.]*\(.*\)$|\(\)/.test(s))
 /** An option's picture: a sheet picture, or a drawn icon for the emoji the sheet used. */
-export function Art({ pic, icon, size }: { pic?: string; icon?: string; size: number }) {
+/** `soft` (ages 6 to 9): a filled shape on a soft tile, to match the drawn stages. Older students get the plain line icon. */
+export function Art({ pic, icon, size, soft }: { pic?: string; icon?: string; size: number; soft?: boolean }) {
   if (pic) return <img src={picSrc(pic)} alt="" style={{ width: size, height: size }} className="shrink-0 object-contain" />
   const I = icon && ICONS[icon]
+  if (I && soft) return <span className="grid shrink-0 place-items-center rounded-2xl bg-sky text-blue" style={{ width: size, height: size }}><I size={size * 0.62} strokeWidth={2} fill="white" /></span>
   return I ? <span className="grid shrink-0 place-items-center text-blue" style={{ width: size, height: size }}><I size={size * 0.7} strokeWidth={1.75} /></span> : null
 }
 function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; icon?: string; big?: boolean; tile?: boolean }) {
@@ -39,8 +42,8 @@ function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; 
   if (!pic && !icon) return label
   // Pictures must be big enough to read (PRD 6.6). Icons are simpler and can be smaller.
   // Pictures fill the tile (up to 220 px wide), so drawings with margins stay readable.
-  if (tile) return <span className="flex w-full flex-col items-center gap-2 text-center">{pic ? <img src={picSrc(pic)} alt="" className="h-auto max-h-[150px] w-full max-w-[220px] object-contain" /> : <Art icon={icon} size={64} />}{label}</span>
-  return <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [overflow-wrap:anywhere]"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
+  if (tile) return <span className="flex w-full flex-col items-center gap-2 text-center">{pic ? <img src={picSrc(pic)} alt="" className="h-auto max-h-[150px] w-full max-w-[220px] object-contain" /> : <Art icon={icon} size={72} soft />}{label}</span>
+  return <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [overflow-wrap:anywhere]"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 56 : 40} soft={big} />{label}</span>
 }
 
 /** Reads the question and its answers out loud. Returns the utterance, or null when the device has no speech. */
@@ -117,7 +120,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   const set = (v: AnswerValue | null) => !review && !locked && onChange?.(v)
   const keys = keysOf(q)
   const label = (k: string) => <OptLabel text={optText(q, L.indexOf(k), lang)} pic={q.oimg?.[L.indexOf(k)]} icon={q.oicon?.[L.indexOf(k)]} big={band === 'kids'} />
-  const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={q.oimg?.[i] ? 72 : band === 'kids' ? 48 : 36} />
+  const art = (i: number) => <Art pic={q.oimg?.[i]} icon={q.oicon?.[i]} size={q.oimg?.[i] ? 72 : band === 'kids' ? 52 : 36} soft={band === 'kids'} />
   const hint = (h: string) => (tapMode ? t.tapHint : h)
   const drag = { q, lang, salt, review, big: band === 'kids', shuffle: stableShuffle, label }
   // Picture tiles, word underneath: ages 6 to 9 for any picture or icon, every age for real pictures.
@@ -125,6 +128,10 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
   // Any picture, stage, code or blocks with a plain answer list: side by side on wider screens, so nothing scrolls.
   const side = (!!q.img || hasVisual(q)) && (q.t.endsWith('MCQ') || q.t === 'Type answer') && !tiles
   const wide = side && !hasSim(q) && !q.img && looksLikeCode(q)
+  // Drawn stages and scenes are hidden from screen readers; the wrapper reads the sheet's picture note instead.
+  // A tap on a playing stage skips to the next question.
+  const drawn = hasSim(q) || hasScene(q) || !!parsePattern(q)
+  const about = /^(Arrange|Connect|Drag|Sort|Tap)\b/.test(q.scr) ? '' : q.scr
   const plain = !roomy(q) && !keys.some(k => q.oimg?.[k] || q.oicon?.[k])
   const stageChoice = q.t === 'Order' ? ((value as string[] | null) || []).filter(Boolean).map(k => q.o[L.indexOf(k)]) : typeof value === 'string' && L.includes(value) ? q.o[L.indexOf(value)] : null
   return (
@@ -136,7 +143,10 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
       <div className={clsx('flex flex-col gap-3', side && 'md:grid md:items-center md:gap-5', side && (wide ? 'md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : 'md:grid-cols-2'))}>
       {q.img && !hasSim(q)
         ? <img src={picSrc(q.img)} alt={q.scr} className="mx-auto max-h-[28vh] w-auto max-w-full rounded-2xl object-contain" />
-        : <QuestionVisual q={q} lang={lang} choice={stageChoice} play={locked || review} onDone={onPlayed} />}
+        : <div className={clsx('min-w-0', locked && !review && 'cursor-pointer')} onClick={locked && !review ? onPlayed : undefined}
+            {...(drawn && about ? { role: 'img', 'aria-label': about } : {})}>
+            <QuestionVisual q={q} lang={lang} choice={stageChoice} play={locked || review} onDone={onPlayed} />
+          </div>}
       <div className="contents" {...(locked ? { inert: '' } : {})}>
       {q.t === 'Type answer' && <TypeAnswer value={value as string | null} set={set} placeholder={t.typeHere} review={review} />}
       {q.t === 'Order' && (isBlockOrder(q)

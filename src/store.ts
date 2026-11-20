@@ -53,7 +53,7 @@ const view = () => {
 export const store = {
   subscribe(f: () => void) { subs.add(f); return () => subs.delete(f) },
   tests: () => (cloudOn ? view() : tests),
-  async loadRemote(password?: string) { remote = await fetchTests(password); emit() },
+  async loadRemote() { remote = await fetchTests(); emit() },
   config: () => config,
   save(rec: TestRecord) {
     const i = tests.findIndex(t => t.id === rec.id)

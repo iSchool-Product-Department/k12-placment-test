@@ -25,9 +25,9 @@ npm run build      # static site in dist/
 
 | View | URL | What it is |
 |---|---|---|
-| Student | `#/student` | Name, age, avatar, practice round, the adaptive test, grade reveal. English and Arabic (RTL). Audio on every question, auto-play for ages 6 to 7. |
-| Admin | `#/admin` | Every test taken, KPIs, filters, **session groups** (grade x tier board). `#/admin/<id>` opens one test: journey roadmap, tier gauge, flags, every answer with a drawer. |
-| Content | `#/content/bank`, `rules`, `tiers`, `sim` | Bank browser with live student preview (EN/AR, answer key), editable rules with the every-score table, tier rules, simulator. |
+| Student | `/` | Name, age, avatar, practice round, the adaptive test, grade reveal. English and Arabic (RTL). Audio on every question, auto-play for ages 6 to 7. |
+| Admin | `/admin` | Every test taken, KPIs, filters, **session groups** (grade x tier board). `/admin/<id>` opens one test: journey roadmap, tier gauge, flags, every answer with a drawer. |
+| Content | `/content/bank`, `rules`, `tiers`, `sim` | Bank browser with live student preview (EN/AR, answer key), editable rules with the every-score table, tier rules, simulator. |
 
 ## How the code is laid out
 
@@ -48,7 +48,7 @@ src/student/ admin/ content/   The three views.
 The demo stores tests **in the browser**. Each device sees its own tests. For real use:
 
 1. **Backend**: add Supabase (or Firebase). Two tables: `tests` (one JSON row per `TestRecord`) and `config`. Replace the functions in `src/store.ts`; nothing else changes.
-2. **Sign-in for the team**: protect `#/admin` and `#/content` (Supabase Auth with Google sign-in for @ischooltech.com).
+2. **Sign-in for the team**: protect `/admin` and `/content` (Supabase Auth with Google sign-in for @ischooltech.com).
 3. **Student links**: give each student a link with a code instead of typing a name.
 4. **Pictures**: `npm run bank` downloads the sheet's picture links into `public/q/`. Questions without a picture fall back to visuals drawn in `Visual.tsx`.
 5. **Pilot**: run 50 to 100 students, then set the pass marks and tier thresholds (45 and 75) in Content > Rules so each tier holds about a third of students.
