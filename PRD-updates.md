@@ -19,3 +19,11 @@ Everything up to 19 November 2026 is in the PRD.
 - Ages 6 to 9 (levels 1 and 2): cards with no picture get a drawn icon from their words (a coin, a keyboard, a moon). A question gets icons only when every card gets a different one, so a Sort never hints with matching icons. Long text answers (over 3 words) stay text.
 - New stages: L1-G2-21 (robot repeats forward twice), L1-G2-22 (closed door: wait or bump), L1-G2-23 (robot turns right four times).
 - Scenes (ages 6 to 9): small drawings for word-only questions, never showing the answer before Next. Like stages, they stay still while the student answers (marking the pick where it fits), then play after Next and the test moves on: the stars join, a dot hops along the week, the car drives the picked way, app screens tap Start, count the score, bring the sprite forward, change screen or build in the student's order, AI steps light up in turn, and the chatbot types its reply. Counting stars (L1-G1-23), a week strip (L2-LG-04), children in a line (L2-LG-07, L2-LG-01), app screens for App Lab questions (L2-G3-01, 09, 12, 19, 21, 23, 25, 28), chat bubbles and picture rows for AI questions (L1-G2-24, L2-G4-02, 03, 06, 08, 09, 10, 15, 16, 18, 20, 21, 22, 24).
+- 600-question audit (iSchool_Placement_600_Question_Audit_FOR_REVIEW.csv): 36 flagged questions rewritten and 5 fixed for ".0". Each row's Reviewer decision and note say what changed. Rewrites keep the ID, pool, difficulty and (except L6-LG-10, now Text MCQ) the type. New ones get a visual where it helps: robot stages (L1-LG-12, L1-G2-21, L1-G2-28, L6-LG-06), a number line (L6-LG-10), drawn balls (L1-LG-16), icons, and scenes (L2-G4-21, L3-LG-05, L6-LG-09, L6-DL-07).
+- Whole numbers never show as "2.0". A test fails if one does, unless the code really makes a float.
+
+## 5 Placement steps
+- "Skill check" is now called "Grade check" in the admin and content views: it decides the lower or upper grade of the age's level. "Grade check one level higher" for the step above.
+
+## 6.3 Read-aloud
+- Listen still only plays when tapped. While it reads, the student can Pause or Start again; while paused, Resume or Start again.

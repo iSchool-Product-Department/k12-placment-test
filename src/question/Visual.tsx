@@ -26,7 +26,7 @@ const arrows = (o: string) => [...o].map(c => ({ '↑': 'u', '→': 'r', '↓': 
 const rep = <T,>(n: number, a: T[]) => Array.from({ length: n }, () => a).flat()
 type Sim = {
   g?: [number, number]; a: string; s: number | [number, number]; f?: string; goal?: [string, [number, number]]; rocks?: [number, number][]
-  walls?: [number, number][]; ghost?: [number, number]; count?: string; line?: [number, number]; hops?: () => number[]
+  walls?: [number, number][]; items?: [string, [number, number]][]; ghost?: [number, number]; count?: string; line?: [number, number]; hops?: () => number[]
   mark?: (o: string) => [number, number]; run?: (o: any) => string[]
 }
 const SIM: Record<string, Sim> = {
@@ -36,9 +36,14 @@ const SIM: Record<string, Sim> = {
   'L1-T-01': { g: [3, 3], a: 'robot', s: [0, 2], f: 'r', goal: ['battery', [2, 1]], run: (seq: string[]) => seq.map(x => (/left/.test(x) ? 'L' : 'F')) },
   'L1-T-06': { g: [4, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (seq: string[]) => { const out: string[] = []; for (let i = 0; i < seq.length; i++) { const x = seq[i]; if (/repeat/.test(x)) { const nx = seq[i + 1]; if (nx) { out.push(...rep(3, /nectar/.test(nx) ? ['N'] : ['F'])); i++ } } else out.push(/nectar/.test(x) ? 'N' : 'F') } return out } },
   'L1-G2-02': { g: [6, 1], a: 'robot', s: [0, 0], f: 'r', ghost: [4, 0], run: (o: string) => { const m = o.match(/repeat (\d+)/); return rep(m ? +m[1] : 1, ['F']) } },
-  'L1-G2-21': { g: [5, 1], a: 'robot', s: [0, 0], f: 'r', count: 'F', run: () => rep(2, ['F']) },
+  'L1-G2-21': { g: [5, 1], a: 'robot', s: [0, 0], f: 'r', count: 'F', run: () => rep(3, ['F']) },
   'L1-G2-22': { g: [3, 1], a: 'robot', s: [0, 0], f: 'r', walls: [[1, 0]], run: (o: string) => (/wait/i.test(o) ? ['W'] : ['F']) },
   'L1-G2-23': { g: [3, 3], a: 'robot', s: [1, 1], f: 'u', run: () => rep(4, ['R']) },
+  // Each path starts from the robot; the stage shows the grid, then traces the first path after Next.
+  'L1-LG-12': { g: [3, 3], a: 'robot', s: [1, 2], f: 'u', items: [['star', [1, 0]], ['carrot', [2, 1]], ['flower', [0, 1]], ['battery', [2, 0]]], run: () => ['u', 'u'] },
+  'L1-G2-28': { g: [3, 2], a: 'robot', s: [0, 1], f: 'r', goal: ['star', [2, 0]], run: (seq: string[]) => seq.flatMap(x => (/left/.test(x) ? ['L'] : rep(+(x.match(/\d+/)?.[0] || 1), ['F']))) },
+  'L6-LG-06': { g: [3, 3], a: 'robot', s: [1, 1], f: 'u', run: () => ['R', 'R', 'R', 'L'] },
+  'L6-LG-10': { line: [0, 10], a: 'robot', s: 1, hops: () => [3, 3] },
   'L1-G2-15': { g: [5, 1], a: 'bee', s: [0, 0], f: 'r', goal: ['flower', [3, 0]], run: (o: string) => rep(+o || 0, ['F']) },
   'L1-G2-19': { g: [3, 1], a: 'bee', s: [1, 0], f: 'r', walls: [[2, 0]], run: (o: string) => (/forward/i.test(o) ? ['F'] : /left/i.test(o) ? ['L'] : ['W']) },
   'L1-T-02': { g: [4, 4], a: 'robot', s: [0, 3], f: 'u', count: 'F', run: () => rep(3, ['F', 'F', 'R']) },
@@ -62,6 +67,7 @@ function stageSvg(sp: Sim) {
   let s = `<svg class="stage" viewBox="0 0 ${cw * C + P * 2} ${ch * C + P * 2 + (sp.count ? 30 : 0)}">`
   for (let r = 0; r < ch; r++) for (let c = 0; c < cw; c++) s += `<rect x="${P + c * C}" y="${P + r * C}" width="${C}" height="${C}" rx="6" fill="${(r + c) % 2 ? '#F1F8E9' : '#E8F5E9'}" stroke="#C5E1A5"/>`;
   (sp.rocks || []).forEach(([c, r]) => (s += `<g style="transform:${cell(c, r)}">${SPR.rock}</g>`));
+  (sp.items || []).forEach(([k, [c, r]]) => (s += `<g style="transform:${cell(c, r)} scale(.8)">${SPR[k]}</g>`));
   (sp.walls || []).forEach(([c, r]) => (s += `<g style="transform:translate(${P + c * C + 14}px,${P + r * C + C / 2}px)">${SPR.wall}</g>`))
   if (sp.ghost) s += `<rect x="${P + sp.ghost[0] * C + 6}" y="${P + sp.ghost[1] * C + 6}" width="${C - 12}" height="${C - 12}" rx="10" fill="none" stroke="#FF7F1C" stroke-width="3" stroke-dasharray="8 6"/>`
   if (sp.goal) s += `<g id="goal" style="transform:${cell(...sp.goal[1])}"><g class="spr">${SPR[sp.goal[0]]}</g></g>`

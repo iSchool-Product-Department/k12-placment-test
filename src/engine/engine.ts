@@ -18,7 +18,7 @@ export const RESUME_MS = 24 * 3600e3
 export const isExpired = (rec: TestRecord, now = Date.now()) => rec.status === 'in_progress' && now - rec.createdAt > RESUME_MS
 
 /**
- * Which questions each step draws, in order. No hard question in the warm-up or skill check:
+ * Which questions each step draws, in order. No hard question in the warm-up or grade check:
  * a student could only earn it by getting everything before it right, and by then the step is decided.
  * The starter is for confidence and does not count toward the warm-up. Then up to 3 medium logic, pass at 2,
  * so one slip never moves a student down a level.

@@ -7,5 +7,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ command, mode }) => ({
   base: './',
   plugins: [react(), tailwindcss()],
+  server: { allowedHosts: ['.trycloudflare.com'] }, // quick tunnels to the dev server
   define: { __ADMIN_KEY__: JSON.stringify(command === 'serve' ? loadEnv(mode, process.cwd(), '').SUPABASE_SERVICE_KEY || null : null) },
 }))

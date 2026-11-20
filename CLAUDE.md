@@ -14,7 +14,7 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 - 3 to 15 questions. The first is always a Starter, and it does not count toward the warm-up. Warm-up passes at 2 of 3 logic, so one slip is forgiven. No hard question before the final check; there, a hard one only after all right so far. A step stops once it is decided; the grade task is always shown.
 - Tiers: Explorers, Creators, Innovators. Group name is tier plus grade, like "Creators G4".
 - Students see only their grade and their tier as a name: "You're a Creator in Grade 4!". Never the other tier names, an order, the score, strength or right and wrong.
-- Read-aloud plays only when the student taps Listen. Never on its own.
+- Read-aloud plays only when the student taps Listen. Never on its own. Pause, Resume and Start again while it reads.
 - Option pictures stay big enough to read. Students should not scroll to reach the answers.
 - Stages (robot, bee, number line) stay still while the student answers. Next locks the answer, plays it, then moves on by itself. Never let a student change an answer after Next.
 - No XP, no points, no streaks for students.

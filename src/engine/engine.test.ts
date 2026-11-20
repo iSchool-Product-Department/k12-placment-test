@@ -2,7 +2,7 @@
 import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import bankJson from '../data/bank.json'
-import { answer, check, groupName, isExpired, pointsOf, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes } from './engine'
+import { answer, check, groupName, isExpired, pointsOf, correctAnswer, currentQuestion, DEFAULT_CONFIG, newTest, seeded, simulate, sortBoxes, splitPair } from './engine'
 import type { Question, TestRecord } from './types'
 import { blockIndents, codeIndents, isBlockOrder, isCodeOrder } from '../question/codeLines'
 import { ICONS } from '../question/icons'
@@ -83,17 +83,19 @@ describe('answer keys', () => {
   })
   it('every option has words or a picture, and every icon exists (L2-DL-04 is icons only)', () => {
     for (const q of bank) for (const i of q.o.map((o, i) => (o ? i : -1)).filter(i => i >= 0)) {
-      const words = q.t === 'Match' || q.t === 'Sort' ? q.o[i].split('=')[0].trim() : q.o[i]
+      const words = q.t === 'Match' || q.t === 'Sort' ? splitPair(q, i).left : q.o[i]
       expect(words || q.oimg?.[i] || q.oicon?.[i], `${q.id} option ${i + 1}`).toBeTruthy()
       if (q.oicon?.[i]) expect(ICONS[q.oicon[i]], q.oicon[i]).toBeDefined()
     }
     expect(byId.get('L2-DL-04')!.oicon).toEqual(['search', 'sound', 'trash', ''])
+    // Whole numbers never show as "2.0" (the sheet export adds it). Allowed only when the code really makes a float.
+    for (const q of bank) if (!/\/|float|double/i.test(q.scr)) for (const o of [...q.o, ...q.oa]) expect(o, q.id).not.toMatch(/^-?\d+\.0$/)
     // Icons drawn from card words (ages 6 to 9) are all different, so a Sort never hints with two matching icons.
     expect(byId.get('L1-G1-34')!.oicon).toEqual(['coin', 'star', 'spike', 'flame'])
     for (const q of bank.filter(q => q.oicon && q.t === 'Sort')) expect(new Set(q.oicon!.filter(Boolean)).size, q.id).toBe(q.o.filter(Boolean).length)
   })
   it('block programs nest with the ">" sheet rule or code colons', () => {
-    expect(bank.filter(isBlockOrder).map(q => q.id)).toEqual(['L1-T-01', 'L1-T-06', 'L2-T-01', 'L2-T-03', 'L2-T-05'])
+    expect(bank.filter(isBlockOrder).map(q => q.id)).toEqual(['L1-T-01', 'L1-T-06', 'L2-T-01', 'L2-T-03', 'L2-T-05', 'L1-G2-28'])
     const ind = (id: string) => blockIndents(byId.get(id)!.o.filter(Boolean))
     expect(ind('L1-T-06')).toEqual([0, 1, 0]) // repeat [ move ] then get nectar
     expect(ind('L1-T-01')).toEqual([0, 0, 0, 0])
@@ -152,15 +154,15 @@ describe('every possible score (Adaptive Rules tab)', () => {
   it('fails both warm-ups: lower grade of S-1, Explorers, in 6 questions', () => {
     const r = play(10, [[1, 0, 0], [1, 0, 0]]); expect(grade(r)).toBe(3); expect(r.tier!.tier).toBe('Explorers'); expect(r.flags).toContain('failBoth'); expect(r.answers.length).toBe(6)
   })
-  it('skill check 0 or 1 of 3 places the lower grade of S', () => {
+  it('grade check 0 or 1 of 3 places the lower grade of S', () => {
     expect(grade(play(12, [[1, 1, 1], [0, 0]]))).toBe(7)
     expect(grade(play(12, [[1, 1, 1], [1, 0, 0]]))).toBe(7)
   })
-  it('skill check 2 of 3 goes to the final check at S', () => {
+  it('grade check 2 of 3 goes to the final check at S', () => {
     const r = play(12, [[1, 1, 1], [1, 1, 0], [1, 1, 1, 0]])
     expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(8)
   })
-  it('skill check 3 of 3 goes up; up-check 0-1 => upper grade of S, 2 => lower of S+1, 3 => final check', () => {
+  it('grade check 3 of 3 goes up; up-check 0-1 => upper grade of S, 2 => lower of S+1, 3 => final check', () => {
     expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 0, 0]]))).toBe(4)
     expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 0]]))).toBe(5)
     expect(grade(play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1, 0]]))).toBe(6)
@@ -169,7 +171,7 @@ describe('every possible score (Adaptive Rules tab)', () => {
     const r = play(8, [[1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0]])
     expect(r.flags).toContain('perfectUp'); expect(r.tier!.tier).toBe('Innovators'); expect(grade(r)).toBe(5)
   })
-  it('Level 6 with a high skill check goes straight to the final check', () => {
+  it('Level 6 with a high grade check goes straight to the final check', () => {
     const r = play(17, [[1, 1, 1], [1, 1, 1], [1, 1, 1, 1]]); expect(r.steps.map(s => s.name)).toEqual(['warmup', 'know', 'grade']); expect(grade(r)).toBe(12)
   })
   it('final check: a hard question (other than the grade task) only after every earlier one was right; the grade task is always shown', () => {

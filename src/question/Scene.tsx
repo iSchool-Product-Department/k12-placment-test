@@ -15,8 +15,8 @@ type Tile = { i?: string; n?: number; t?: W | string; tone?: Tone; faint?: boole
 type Item = Tile | '→'
 type Part = { k: 'title' | 'label' | 'button' | 'input' | 'image' | 'sprite'; t?: W | string; hidden?: boolean }
 type SceneDef =
-  | { row: Item[] } // plays: each tile lights up in turn
-  | { still: Item[] } // never plays
+  | { row: Item[]; ltr?: boolean } // plays: each tile lights up in turn
+  | { still: Item[]; ltr?: boolean } // never plays (ltr: left and right matter, so Arabic keeps the order)
   | { add: [string, number, number] } // plays: the two groups join
   | { week: number } // marks the picked day; plays: a dot hops this many days from Monday
   | { chat: { me?: boolean; t: W }[]; reply?: W } // plays: the bot types its reply
@@ -42,6 +42,7 @@ const SCENE: Record<string, SceneDef> = {
   'L2-G3-25': { screens: [[{ k: 'label', t: ['Score: 0', 'النقاط: 0'] }, { k: 'image' }, { k: 'input', t: ['Your name', 'اسمك'] }, { k: 'button', t: ['Submit', 'إرسال'] }]] },
   'L2-G3-28': { screens: [[{ k: 'title', t: ['Welcome!', 'أهلًا بك!'] }, { k: 'button', t: ['Start', 'ابدأ'] }]], play: 'build' },
   'L2-G3-19': { xy: [100, 200] },
+  'L6-DL-07': { screens: [[{ k: 'title', t: ['Calculator', 'الآلة الحاسبة'] }, { k: 'label', t: ['Allow camera?', 'السماح بالكاميرا؟'] }, { k: 'button', t: ['Allow', 'سماح'] }, { k: 'button', t: ['Deny', 'رفض'] }]] },
   // AI
   'L2-G4-02': { row: [{ i: 'book', t: ['Story', 'قصة'] }, '→', { i: 'phone' }, '→', { i: 'sound', tone: 'orange' }] },
   'L2-G4-03': { row: [{ i: 'bottle', n: 3, t: ['Bottle photos', 'صور زجاجات'] }, '→', { i: 'brain' }] },
@@ -54,7 +55,9 @@ const SCENE: Record<string, SceneDef> = {
   'L2-G4-22': { chat: [{ me: true, t: ['A good book about space?', 'كتاب جيد عن الفضاء؟'] }, { t: ['Read "Moon Cats" by Sam Lee.', 'اقرأ «قطط القمر» لسام لي.'] }] },
   'L2-G4-18': { still: [{ i: 'image', t: ['Pizza Plase', 'بيتزا بلاس'], tone: 'orange' }] },
   'L2-G4-20': { row: [{ i: 'sun', tone: 'gold', t: ['Works', 'ينجح'] }, { i: 'moon', tone: 'soft', t: ['Fails', 'يفشل'] }] },
-  'L2-G4-21': { row: [{ i: 'file', t: ['Recipe', 'وصفة'] }, '→', { i: 'phone' }, '→', { i: 'sound', tone: 'orange' }] },
+  'L2-G4-21': { row: [{ i: 'flower', t: ['Plant photo', 'صورة نبتة'] }, '→', { i: 'phone' }, '→', { t: ['Rose', 'وردة'], tone: 'orange' }] },
+  'L3-LG-05': { row: [{ t: '4' }, '→', { t: '× 2' }, '→', { t: '+ 1' }, '→', { t: '?', tone: 'orange' }], ltr: true },
+  'L6-LG-09': { still: [1, 2, 3, 4].map(n => ({ i: 'chair', t: String(n), tone: 'soft' as Tone })), ltr: true },
   'L2-G4-24': { row: [{ i: 'voice', tone: 'soft', faint: true, t: ['Quiet voice', 'صوت هادئ'] }, '→', { i: 'mic' }, '→', { t: '?', tone: 'orange' }] },
 }
 
@@ -98,15 +101,15 @@ function TileView({ tile, lang, on }: { tile: Tile; lang: Lang; on?: boolean }) 
     </div>
   )
 }
-const Arrow = () => <ArrowRight size={22} className="shrink-0 text-soft rtl:-scale-x-100" aria-hidden="true" />
+const Arrow = ({ fixed }: { fixed?: boolean }) => <ArrowRight size={22} className={clsx('shrink-0 text-soft', !fixed && 'rtl:-scale-x-100')} aria-hidden="true" />
 
 type Props = { q: Question; lang: Lang; choice: string | string[] | null; play?: boolean; onDone?: () => void }
 
-function Row({ items, lang, play, onDone }: { items: Item[]; lang: Lang; play?: boolean; onDone?: () => void }) {
+function Row({ items, lang, play, onDone, ltr }: { items: Item[]; lang: Lang; play?: boolean; onDone?: () => void; ltr?: boolean }) {
   const tiles = items.filter(x => x !== '→').length
   const step = useSteps(play, tiles, 650, onDone)
   let k = 0
-  return <div className={box} aria-hidden="true">{items.map((x, i) => x === '→' ? <Arrow key={i} /> : <TileView key={i} tile={x} lang={lang} on={++k <= step} />)}</div>
+  return <div className={box} dir={ltr ? 'ltr' : undefined} aria-hidden="true">{items.map((x, i) => x === '→' ? <Arrow key={i} fixed={ltr} /> : <TileView key={i} tile={x} lang={lang} on={++k <= step} />)}</div>
 }
 
 function Add({ s: [icon, a, b], lang, play, onDone }: { s: [string, number, number]; lang: Lang; play?: boolean; onDone?: () => void }) {
@@ -212,8 +215,8 @@ export function Scene({ q, lang, choice, play, onDone }: Props) {
   const s = SCENE[q.id]
   const p = { lang, play, onDone }
   if (!s) return null
-  if ('row' in s) return <Row items={s.row} {...p} />
-  if ('still' in s) return <Row items={s.still} lang={lang} />
+  if ('row' in s) return <Row items={s.row} ltr={s.ltr} {...p} />
+  if ('still' in s) return <Row items={s.still} ltr={s.ltr} lang={lang} />
   if ('add' in s) return <Add s={s.add} {...p} />
   if ('week' in s) return <Week hops={s.week} choice={choice} {...p} />
   if ('chat' in s) return <Chat s={s} {...p} />
