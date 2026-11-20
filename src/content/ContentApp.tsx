@@ -1,26 +1,29 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'motion/react'
-import { BookOpen, Eye, EyeOff, FlaskConical, GitBranch, Layers, Play, Search, Settings2 } from 'lucide-react'
+import { Activity, BookOpen, Eye, EyeOff, FlaskConical, GitBranch, Layers, Play, Search, Settings2 } from 'lucide-react'
 import clsx from 'clsx'
 import { DEFAULT_CONFIG, POINTS, simulate } from '../engine/engine'
 import type { AnswerValue, Config, Question, Tier } from '../engine/types'
 import { BANK, LEVELS } from '../data/ladder'
 import changesJson from '../data/changes.json'
-import { store, useConfig } from '../store'
+import { store, useConfig, useTests } from '../store'
+import { cloudOn } from '../cloud'
+import { MIN_ANSWERS, questionHealth } from './health'
 import { QuestionView, KeyLine } from '../question/QuestionView'
 import { Panel, Seg, TierBadge } from '../admin/AdminApp'
 import { TIER_STYLE } from '../admin/labels'
 
-type Tab = 'bank' | 'settings' | 'flow' | 'tiers' | 'sim'
+type Tab = 'bank' | 'health' | 'settings' | 'flow' | 'tiers' | 'sim'
 export default function ContentApp({ route, go }: { route: string[]; go: (h: string) => void }) {
   const tab = (route[1] as Tab) || 'bank'
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div><p className="m-0 text-sm font-extrabold text-orange-deep">Content</p><h1 className="m-0 text-3xl text-deep">Questions and rules</h1></div>
-        <Seg value={tab} set={t => go(`content/${t}`)} items={[['bank', <><BookOpen size={15} /> Question bank</>], ['settings', <><Settings2 size={15} /> Settings</>], ['flow', <><GitBranch size={15} /> Flowchart</>], ['tiers', <><Layers size={15} /> Tiers</>], ['sim', <><FlaskConical size={15} /> Simulator</>]]} />
+        <Seg value={tab} set={t => go(`content/${t}`)} items={[['bank', <><BookOpen size={15} /> Question bank</>], ['health', <><Activity size={15} /> Question health</>], ['settings', <><Settings2 size={15} /> Settings</>], ['flow', <><GitBranch size={15} /> Flowchart</>], ['tiers', <><Layers size={15} /> Tiers</>], ['sim', <><FlaskConical size={15} /> Simulator</>]]} />
       </div>
-      {tab === 'bank' && <Bank />}
+      {tab === 'bank' && <Bank pick={route[2]} />}
+      {tab === 'health' && <Health go={go} />}
       {tab === 'settings' && <Settings />}
       {tab === 'flow' && <Flowchart />}
       {tab === 'tiers' && <Tiers />}
@@ -29,14 +32,73 @@ export default function ContentApp({ route, go }: { route: string[]; go: (h: str
   )
 }
 
+/* ---------------------------------------------------------------- question health */
+const FLAG_STYLE: Record<string, string> = {
+  'Too hard': 'bg-[#FDECEC] text-bad', 'Harder than its label': 'bg-[#FFF1E5] text-orange-deep',
+  'Too easy': 'bg-sky text-deep', 'Easier than its label': 'bg-sky text-deep', Slow: 'bg-[#FFF8CC] text-[#8A6A00]',
+}
+const FLAG_WHY: Record<string, string> = {
+  'Too hard': 'Under 25% right. Check the wording, the answer key and the picture.',
+  'Harder than its label': 'Starter or Easy, but under half right. Maybe Medium.',
+  'Too easy': '95% or more right. It tells us little.',
+  'Easier than its label': 'Hard, but over 85% right. Maybe Medium.',
+  Slow: 'Twice the usual time for its level. Often too much reading.',
+}
+function Health({ go }: { go: (h: string) => void }) {
+  const all = useTests()
+  const [state, setState] = useState(cloudOn ? 'loading' : 'ready')
+  useEffect(() => { if (state === 'loading') store.loadRemote().then(() => setState('ready'), (e: Error) => setState(e.message)) }, [state])
+  const [only, setOnly] = useState<'flagged' | 'all'>('flagged')
+  const done = all.filter(t => t.status === 'done')
+  const real = done.filter(t => !t.simulated)
+  const tests = real.length ? real : done
+  const rows = useMemo(() => questionHealth(BANK, tests), [tests.length, all])
+  const shown = only === 'flagged' ? rows.filter(r => r.flags.length) : rows
+  if (state === 'loading') return <p className="py-16 text-center font-bold text-soft">Loading tests...</p>
+  if (state !== 'ready') return <p className="mx-auto max-w-md py-16 text-center font-bold text-bad">{state}</p>
+  return (
+    <Panel title="Question health" sub={`From ${tests.length} finished ${real.length ? 'tests' : 'simulated tests (no real tests yet, so treat this as a demo)'}. A question needs ${MIN_ANSWERS} answers before it can be flagged. ${rows.length} of ${BANK.length} questions have been answered.`}>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <Seg small value={only} set={setOnly} items={[['flagged', `Needs a look (${rows.filter(r => r.flags.length).length})`], ['all', `All answered (${rows.length})`]]} />
+        <div className="flex flex-wrap gap-1.5">{Object.keys(FLAG_STYLE).map(k => <span key={k} title={FLAG_WHY[k]} className={clsx('rounded-full px-2 py-0.5 text-xs font-bold', FLAG_STYLE[k])}>{k}</span>)}</div>
+      </div>
+      {shown.length === 0
+        ? <p className="m-0 py-8 text-center text-sm font-bold text-soft">{rows.length ? 'Nothing needs a look right now.' : 'No answers yet. Results show here once students finish tests.'}</p>
+        : <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="text-xs text-soft">{['Question', 'Level', 'Difficulty', 'Answers', 'Right', 'Avg time', 'Why'].map((h, i) => <th key={h} className={clsx('px-2 py-1', i >= 3 && i <= 5 ? 'text-end' : 'text-start')}>{h}</th>)}</tr></thead>
+            <tbody>{shown.map(r => (
+              <tr key={r.q.id} className="hover:bg-mist">
+                <td className="max-w-[340px] border-t border-line px-2 py-2">
+                  <button onClick={() => go(`content/bank/${r.q.id}`)} className="text-start"><b className="text-xs text-deep underline decoration-line underline-offset-2">{r.q.id}</b><span className="block truncate">{r.q.q}</span></button>
+                </td>
+                <td className="border-t border-line px-2">{r.q.lv}</td>
+                <td className="border-t border-line px-2">{r.q.d}</td>
+                <td className="border-t border-line px-2 text-end tabular-nums">{r.n}</td>
+                <td className="border-t border-line px-2 text-end font-bold tabular-nums">{Math.round(r.right * 100)}%</td>
+                <td className="border-t border-line px-2 text-end tabular-nums">{Math.round(r.sec)} s</td>
+                <td className="border-t border-line px-2">
+                  {r.n < MIN_ANSWERS ? <span className="text-xs text-soft">Too few answers</span>
+                    : <div className="flex flex-wrap gap-1">{r.flags.map(k => <span key={k} title={FLAG_WHY[k]} className={clsx('rounded-full px-2 py-0.5 text-xs font-bold', FLAG_STYLE[k])}>{k}</span>)}</div>}
+                </td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>}
+    </Panel>
+  )
+}
+
 /* ---------------------------------------------------------------- bank */
 // v4 content edits, built from the sheet's Change log rows (ChangeLog.csv) with each question's wording before.
 type Change = { what: string; why: string; q: string; o: string[]; scr: string }
 const CHANGES = changesJson as Record<string, Change>
 const POOLS = ['Starter', 'Logic', 'Lower grade', 'Upper grade', 'Grade task'] as const
-function Bank() {
-  const [f, setF] = useState({ lv: '', pool: '', d: '', t: '', q: '', ch: '' })
-  const [sel, setSel] = useState<Question>(BANK[0])
+function Bank({ pick }: { pick?: string }) {
+  // /content/bank/<id> opens that question (links from Question health).
+  const picked = BANK.find(q => q.id === pick)
+  const [f, setF] = useState({ lv: '', pool: '', d: '', t: '', q: picked?.id || '', ch: '' })
+  const [sel, setSel] = useState<Question>(picked || BANK[0])
   const list = BANK.filter(q => (!f.lv || q.lv === +f.lv) && (!f.pool || q.pool === f.pool) && (!f.d || q.d === f.d) && (!f.t || q.t === f.t) && (!f.ch || !!CHANGES[q.id])
     && (!f.q || `${q.id} ${q.old} ${q.q} ${q.qa} ${q.strand}`.toLowerCase().includes(f.q.toLowerCase())))
   const types = [...new Set(BANK.map(q => q.t))]

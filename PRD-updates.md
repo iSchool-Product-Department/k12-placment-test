@@ -6,6 +6,8 @@ Newest decisions go at the bottom of each section.
 Everything up to 19 November 2026 is in the PRD.
 
 ## 11 Technical notes
+- Content > Question health (/content/health): for each question, how many answered, % right and average time, from finished real tests (simulated ones only while there are none). Flags after 5 answers: Too hard (under 25% right), Harder than its label (Starter or Easy under 50%), Too easy (95% or more, not Starter), Easier than its label (Hard over 85%), Slow (twice the level's median time). Clicking a question opens it in the bank.
+- Questions.csv is the only question file. The sheet's Questions tab is imported from it; the app builds from it with npm run bank.
 - Addresses: the student test is the home page (/), the admin is /admin (one test: /admin/<id>), content is /content/<tab>. Students see no tabs. For the demo, admin and content are open with no password; add one before real students take the test.
 - Storage: Supabase, one table `tests` (id, data as JSON, status, updated_at). Schema in `supabase/schema.sql`. Without the two env values the app stays a local demo with fake students.
 - Students save through one function, `save_test`, and cannot read anything. A finished test can never be overwritten. A save that fails (offline) is kept in the browser and sent again later.
@@ -30,6 +32,7 @@ Everything up to 19 November 2026 is in the PRD.
 - Game screens no longer show small icon chips in the corner as parts are added.
 - Screen readers: drawn stages and scenes are read from the sheet's picture note (On screen column), when it describes a picture.
 - Ages 6 to 9: card icons are drawn as filled shapes on a soft blue tile, to match the stage drawings. Older students keep line icons.
+- Arabic pass on the rewritten questions: status names in Arabic (جاهزة، جديدة، مُرسلة) instead of English, clearer wording on 17 rows, and L3-LG-09 says "after 12" instead of "right side", which reads the other way in RTL.
 - Pictures for young ages stay drawings of things in the question (a cat, a coin, a robot), not a character with a name or personality, so the no-mascot rule holds.
 
 ## 5 Placement steps

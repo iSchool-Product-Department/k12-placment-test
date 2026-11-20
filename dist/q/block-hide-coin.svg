@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240" font-family="Nunito Sans, Arial, sans-serif" font-weight="800">
-<rect x="2" y="2" width="356" height="236" rx="18" fill="#fff" stroke="#DCEAF3" stroke-width="3"/>
-<path d="M34 72h26l10 10h24l10-10h218a8 8 0 0 1 8 8v80a8 8 0 0 1-8 8H104l-10 10H70l-10-10H34a8 8 0 0 1-8-8V80a8 8 0 0 1 8-8z" fill="#8A5CF5" stroke="#0E2A4D" stroke-opacity=".25" stroke-width="2"/>
-<text x="48" y="136" font-size="44" fill="#fff">hide</text>
-<rect x="216" y="88" width="104" height="64" rx="32" fill="#fff"/><circle cx="268" cy="120" r="24" fill="#FFD700" stroke="#C9A100" stroke-width="4"/><text x="268" y="132" text-anchor="middle" font-size="30" fill="#8A6A00">$</text>
-</svg>
