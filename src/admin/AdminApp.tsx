@@ -7,7 +7,7 @@ import { groupName } from '../engine/engine'
 import { GRADES, GradeIcon } from '../grades'
 import { BY_ID } from '../data/ladder'
 import { store, useTests } from '../store'
-import { cloudOn, savedPassword, studentOnly } from '../cloud'
+import { cloudOn } from '../cloud'
 import { QuestionView, KeyLine, answerText } from '../question/QuestionView'
 import { Journey } from './Journey'
 import { FLAG, REASON, STEP_LABEL, TIER_STYLE, mins, when, TIER_NO } from './labels'
@@ -18,30 +18,11 @@ const levelLabel = (lv: number) => `Grade ${2 * lv - 1} - ${2 * lv}`
 const took = (t: TestRecord) => (t.finishedAt ? `${mins(t.finishedAt - t.createdAt)} min` : '')
 
 export default function AdminApp(props: { route: string[]; go: (h: string) => void }) {
-  const [state, setState] = useState(!cloudOn ? 'ready' : studentOnly && !savedPassword() ? 'password' : 'loading')
-  useEffect(() => { if (state === 'loading') store.loadRemote().then(() => setState('ready'), (e: Error) => setState(e.message === 'password' ? 'password' : e.message)) }, [state])
-  if (state === 'password') return <Password done={() => setState('ready')} />
+  const [state, setState] = useState(cloudOn ? 'loading' : 'ready')
+  useEffect(() => { if (state === 'loading') store.loadRemote().then(() => setState('ready'), (e: Error) => setState(e.message)) }, [state])
   if (state === 'loading') return <p className="py-16 text-center font-bold text-soft">Loading tests...</p>
   if (state !== 'ready') return <p className="mx-auto max-w-md py-16 text-center font-bold text-bad">{state}</p>
   return <Admin {...props} />
-}
-
-function Password({ done }: { done: () => void }) {
-  const [pw, setPw] = useState('')
-  const [err, setErr] = useState('')
-  const [busy, setBusy] = useState(false)
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault(); setBusy(true); setErr('')
-    store.loadRemote(pw).then(done, (x: Error) => { setErr(x.message === 'password' ? 'Wrong password.' : x.message); setBusy(false) })
-  }
-  return (
-    <form onSubmit={submit} className="mx-auto mt-16 flex max-w-sm flex-col gap-3 rounded-3xl border border-line bg-white p-6 shadow-[var(--shadow-card)]">
-      <div><p className="m-0 text-sm font-extrabold text-orange-deep">Admin</p><h1 className="m-0 text-2xl text-deep">Team password</h1></div>
-      <input type="password" autoComplete="current-password" aria-label="Team password" required autoFocus value={pw} onChange={e => setPw(e.target.value)} className="w-full rounded-xl border-2 border-line bg-white px-3 py-2.5 font-semibold text-deep outline-none focus:border-blue" />
-      {err && <p role="alert" className="m-0 text-sm font-bold text-bad">{err}</p>}
-      <button disabled={busy} className="rounded-full bg-blue px-4 py-2.5 font-extrabold text-white disabled:opacity-60">{busy ? 'Opening...' : 'Open admin'}</button>
-    </form>
-  )
 }
 
 function Admin({ route, go }: { route: string[]; go: (h: string) => void }) {

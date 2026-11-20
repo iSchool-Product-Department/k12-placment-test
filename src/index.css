@@ -33,8 +33,4 @@ code, pre, .mono { font-family: var(--font-mono); direction: ltr; unicode-bidi: 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 @keyframes floaty { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
 .floaty { animation: floaty 5s ease-in-out infinite; }
-@keyframes shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-5px) } 75% { transform: translateX(5px) } }
-.shake { animation: shake .35s 2; }
-@keyframes pop { 0% { transform: scale(1) } 50% { transform: scale(1.35) } 100% { transform: scale(1.15) } }
-.won { animation: pop .6s forwards; transform-box: fill-box; transform-origin: center; }
-@media (prefers-reduced-motion: reduce) { .floaty, .shake, .won { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .floaty { animation: none !important; } }

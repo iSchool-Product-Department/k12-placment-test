@@ -6,7 +6,7 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 
 ## Storage
 - Everything goes through `src/store.ts`. With `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set (`.env.local`), tests save to Supabase (`src/cloud.ts`, plain fetch, schema in `supabase/schema.sql`) and the admin needs a team sign-in. Without them it is a local demo with fake students seeded in `store.ts`.
-- Students can only call `save_test`; they can never read results. Keep it that way.
+- Students can only call `save_test` directly. Demo exception (Nov 2026): `/api/tests` and `/admin` are open with no password, so anyone with the link can read results. Put a password back before real students take it.
 
 ## Rules that must match the PRD
 - Placement logic is PRD section 5. `src/engine/engine.ts` implements it, and every row of the "Every possible score" table (5.3) has a test in `src/engine/engine.test.ts`. Change the PRD, the engine and the test together, then run `npm test`.
@@ -22,7 +22,7 @@ Every decision made while building goes into `PRD-updates.md` (by PRD section) u
 - Say Lower grade and Upper grade, and real grade numbers (Grade 1 to 12). Never "Grade A" or "Grade B".
 
 ## Views
-- Student `#/student`, Admin `#/admin` and `#/admin/<id>`, Content `#/content/<tab>`. Hash routing in `App.tsx` so any static host works.
+- Student `/`, Admin `/admin` and `/admin/<id>`, Content `/content/<tab>`. Real paths in `App.tsx`; `vercel.json` sends every non-API path to index.html. Old `#/` links redirect.
 - Admin is for the team that talks to parents. It lists finished tests only.
 
 ## Brand and copy
