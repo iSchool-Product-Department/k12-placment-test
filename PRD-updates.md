@@ -24,6 +24,7 @@ Everything up to 19 November 2026 is in the PRD.
 
 - Second audit (iSchool_Placement_All_600_Difficulty_Audit.csv): 54 drafted replacements written in full (options, Arabic, why), mostly plainer Lower-grade and warm-up questions for levels 5 and 6. Difficulty changes: L5-LG-10, L5-G10-17 and L6-LG-16 Hard to Medium, L1-G2-28 Medium to Easy. Each row's decision is in the audit file.
 - Game screens for ages 6 to 9 (GameScene.tsx): game-making questions show a small game picture (the cat mid-jump, a coin to collect, a wall). After Next it acts out the student's answer. An Order rebuilds the game in their order, and "Test" only works if what it needs came first; a wrong order just does not work, with no right or wrong shown. Used on L1-G1-22, 24, 29, 30, 31, L1-T-07, L2-G3-11, 14, 16, 29. Still pictures on L1-G1-07 and L2-LG-05; robot stage with a gate on L1-G2-18.
+- L1-G2-12 now has a goal: "Repeat 4 times: move forward. Where does the robot stop?" A row with a battery 1 step away, a star 4 away and a flower 5 away. After Next the robot moves to the picked spot. The wrong answers are still the same mistakes (counting the block once, or one step too many).
 - Pictures for young ages stay drawings of things in the question (a cat, a coin, a robot), not a character with a name or personality, so the no-mascot rule holds.
 
 ## 5 Placement steps
