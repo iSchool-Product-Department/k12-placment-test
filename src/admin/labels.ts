@@ -1,18 +1,18 @@
 import type { FlagKey, OutcomeKey, StepName, Tier } from '../engine/types'
 
 export const STEP_LABEL: Record<StepName, string> = {
-  warmup: 'Warm-up', warmupDown: 'Warm-up one level lower', know: 'Skill check', knowUp: 'Skill check one level higher', grade: 'Final check',
+  warmup: 'Warm-up', warmupDown: 'Warm-up one level lower', know: 'Grade check', knowUp: 'Grade check one level higher', grade: 'Final check',
 }
 export const OUTCOME: Record<OutcomeKey, string> = {
-  warmPass: 'Passed the warm-up, so a skill check at this level.',
+  warmPass: 'Passed the warm-up, so a grade check at this level.',
   warmFailDown: 'Did not pass the warm-up, so a warm-up one level lower.',
   warmFailL1: 'Did not pass the warm-up at Level 1, so Grade 1.',
   downPass: 'Passed the lower warm-up, so a final check at that level.',
   downFail: 'Did not pass either warm-up, so the lower grade of this level.',
-  knowLow: 'Low skill check, so the lower grade of this level.',
-  knowMid: 'Middle skill check, so a final check at this level.',
-  knowUp: 'High skill check, so a skill check one level higher.',
-  knowTop: 'High skill check at the top level, so a final check.',
+  knowLow: 'Low score on the grade check, so the lower grade of this level.',
+  knowMid: 'Middle score on the grade check, so a final check at this level.',
+  knowUp: 'High score on the grade check, so a grade check one level higher.',
+  knowTop: 'High score on the grade check at the top level, so a final check.',
   upLow: 'Low score one level higher, so the upper grade of the age level.',
   upMid: 'Middle score one level higher, so the lower grade of that level.',
   upHigh: 'High score one level higher, so a final check at that level.',

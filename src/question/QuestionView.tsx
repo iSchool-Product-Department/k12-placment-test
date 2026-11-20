@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
-import { Check, Volume2, X } from 'lucide-react'
+import { Check, Pause, Play, RotateCcw, Volume2, X } from 'lucide-react'
 import clsx from 'clsx'
 import type { AnswerValue, Question } from '../engine/types'
 import { check, correctAnswer, keysOf, matchPairs, seeded, sortBoxes, splitPair } from '../engine/engine'
@@ -42,7 +43,8 @@ function OptLabel({ text, pic, icon, big, tile }: { text: string; pic?: string; 
   return <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 [overflow-wrap:anywhere]"><Art pic={pic} icon={icon} size={pic ? 88 : big ? 52 : 40} />{label}</span>
 }
 
-export function speak(q: Question, lang: Lang) {
+/** Reads the question and its answers out loud. Returns the utterance, or null when the device has no speech. */
+export function speak(q: Question, lang: Lang, onEnd?: () => void) {
   try {
     const s = window.speechSynthesis; s.cancel()
     const parts = [qText(q, lang)]
@@ -50,8 +52,36 @@ export function speak(q: Question, lang: Lang) {
     else keysOf(q).forEach(i => parts.push(optText(q, i, lang)))
     const u = new SpeechSynthesisUtterance(parts.join('. '))
     u.lang = lang === 'ar' ? 'ar-EG' : 'en-US'; u.rate = 0.92
+    u.onend = u.onerror = () => onEnd?.()
     s.speak(u)
-  } catch { /* no speech on this device */ }
+    return u
+  } catch { return null /* no speech on this device */ }
+}
+
+/** Listen only plays when tapped (PRD). While it reads: Pause and Start again. While paused: Resume and Start again. */
+function Listen({ q, lang, hot }: { q: Question; lang: Lang; hot?: boolean }) {
+  const t = T[lang]
+  const [st, setSt] = useState<'idle' | 'on' | 'paused'>('idle')
+  const cur = useRef<SpeechSynthesisUtterance | null>(null)
+  useEffect(() => () => { cur.current = null; try { speechSynthesis.cancel() } catch { /* no speech */ } }, [q.id])
+  const start = () => { const u = speak(q, lang, () => { if (cur.current === u) setSt('idle') }); cur.current = u; setSt(u ? 'on' : 'idle') }
+  const pause = () => { try { speechSynthesis.pause(); setSt('paused') } catch { /* no speech */ } }
+  const resume = () => { try { speechSynthesis.resume(); setSt('on') } catch { /* no speech */ } }
+  const btn = 'flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-sm font-extrabold'
+  const soft = clsx(btn, 'border-line bg-white text-deep hover:border-blue')
+  if (st === 'idle') return (
+    <button onClick={start} aria-label={t.listen} className={clsx(btn, hot ? 'border-orange bg-orange text-white' : 'border-line bg-white text-deep hover:border-blue')}>
+      <Volume2 size={18} /> <span className={hot ? '' : 'hidden sm:inline'}>{t.listen}</span>
+    </button>
+  )
+  return (
+    <div className="flex shrink-0 gap-1.5">
+      {st === 'on'
+        ? <button onClick={pause} aria-label={t.pause} className={clsx(btn, 'border-blue bg-sky text-deep')}><Pause size={18} /> <span className="hidden sm:inline">{t.pause}</span></button>
+        : <button onClick={resume} aria-label={t.listenOn} className={clsx(btn, 'border-blue bg-sky text-deep')}><Play size={18} /> <span className="hidden sm:inline">{t.listenOn}</span></button>}
+      <button onClick={start} aria-label={t.again} className={soft}><RotateCcw size={18} /> <span className="hidden sm:inline">{t.again}</span></button>
+    </div>
+  )
 }
 
 export function answerText(q: Question, v: AnswerValue | null | undefined, lang: Lang = 'en'): string {
@@ -101,12 +131,7 @@ export function QuestionView({ q, lang, band = 'teen', value, onChange, salt = '
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <h2 className={clsx('m-0 max-w-3xl flex-1 text-ink', band === 'kids' ? 'text-[26px] font-bold' : band === 'teen' ? 'text-2xl font-bold' : 'text-[22px] font-semibold')}>{qText(q, lang)}</h2>
-        {showListen && (
-          <button onClick={() => speak(q, lang)} aria-label={t.listen}
-            className={clsx('flex shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1.5 text-sm font-extrabold', listenHot ? 'border-orange bg-orange text-white' : 'border-line bg-white text-deep hover:border-blue')}>
-            <Volume2 size={18} /> <span className={listenHot ? '' : 'hidden sm:inline'}>{t.listen}</span>
-          </button>
-        )}
+        {showListen && <Listen key={q.id + lang} q={q} lang={lang} hot={listenHot} />}
       </div>
       <div className={clsx('flex flex-col gap-3', side && 'md:grid md:items-center md:gap-5', side && (wide ? 'md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]' : 'md:grid-cols-2'))}>
       {q.img && !hasSim(q)

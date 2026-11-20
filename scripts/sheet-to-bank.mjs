@@ -87,7 +87,7 @@ const THING = {
   dark: 'moon', hungry: 'food', raining: 'rain', cold: 'snow', clap: 'clap', jump: 'jump', step: 'steps',
   button: 'button', label: 'label', title: 'title', sprite: 'sprite', character: 'sprite', drawing: 'palette', password: 'lock',
   idea: 'lamp', story: 'book', model: 'brain', classifier: 'brain', prompt: 'talk', reply: 'talk', home: 'house',
-  school: 'school', space: 'keyboard', reset: 'reset', list: 'list', shark: 'fish', flower: 'flower', robot: 'robot',
+  school: 'school', blue: 'palette', happy: 'sprite', space: 'keyboard', reset: 'reset', list: 'list', shark: 'fish', flower: 'flower', robot: 'robot',
 }
 const ACTION = {
   save: 'save', delete: 'trash', mute: 'mute', click: 'click', tap: 'hand', touch: 'hand', start: 'play', play: 'play', stop: 'stop',
