@@ -15,3 +15,4 @@ yarn-error.log*
 dist/*.tsbuildinfo
 _K12*.pptx
 .env.local
+dist/
