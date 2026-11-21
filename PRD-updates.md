@@ -33,6 +33,8 @@ Everything up to 19 November 2026 is in the PRD.
 - Screen readers: drawn stages and scenes are read from the sheet's picture note (On screen column), when it describes a picture.
 - Ages 6 to 9: card icons are drawn as filled shapes on a soft blue tile, to match the stage drawings. Older students keep line icons.
 - Arabic pass on the rewritten questions: status names in Arabic (جاهزة، جديدة، مُرسلة) instead of English, clearer wording on 17 rows, and L3-LG-09 says "after 12" instead of "right side", which reads the other way in RTL.
+- Question stems are full questions: no fragment endings like "Score?", "Which block?" or "Best fix?". 27 stems rewritten in English and Arabic (for example "Which block makes the coin vanish when it is touched?"), all within the age word limits.
+- No method names in question text. "Which is the best How Might We question?" became "Which question should the team start with?" (L4-G7-05, L4-G7-07, L4-G7-13, and the first step of L4-T-01).
 - Pictures for young ages stay drawings of things in the question (a cat, a coin, a robot), not a character with a name or personality, so the no-mascot rule holds.
 
 ## 5 Placement steps
